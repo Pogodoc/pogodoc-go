@@ -5,14 +5,14 @@ package client
 import (
 	http "net/http"
 	core "sdk/core"
-	render "sdk/render"
+	documents "sdk/documents"
 	templates "sdk/templates"
 	tokens "sdk/tokens"
 )
 
 type Client interface {
 	Templates() templates.Client
-	Render() render.Client
+	Documents() documents.Client
 	Tokens() tokens.Client
 }
 
@@ -26,7 +26,7 @@ func NewClient(opts ...core.ClientOption) Client {
 		httpClient:      options.HTTPClient,
 		header:          options.ToHeader(),
 		templatesClient: templates.NewClient(opts...),
-		renderClient:    render.NewClient(opts...),
+		documentsClient: documents.NewClient(opts...),
 		tokensClient:    tokens.NewClient(opts...),
 	}
 }
@@ -36,7 +36,7 @@ type client struct {
 	httpClient      core.HTTPClient
 	header          http.Header
 	templatesClient templates.Client
-	renderClient    render.Client
+	documentsClient documents.Client
 	tokensClient    tokens.Client
 }
 
@@ -44,8 +44,8 @@ func (c *client) Templates() templates.Client {
 	return c.templatesClient
 }
 
-func (c *client) Render() render.Client {
-	return c.renderClient
+func (c *client) Documents() documents.Client {
+	return c.documentsClient
 }
 
 func (c *client) Tokens() tokens.Client {
