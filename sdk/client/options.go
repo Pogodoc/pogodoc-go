@@ -3,8 +3,8 @@
 package client
 
 import (
-	core "github.com/pogodoc/sdk-go/core"
 	http "net/http"
+	core "pogodoc/go/sdk/core"
 )
 
 // ClientWithBaseURL sets the client's base URL, overriding the

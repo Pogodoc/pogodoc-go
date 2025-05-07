@@ -3,11 +3,11 @@
 package client
 
 import (
-	core "github.com/pogodoc/sdk-go/core"
-	documents "github.com/pogodoc/sdk-go/documents"
-	templates "github.com/pogodoc/sdk-go/templates"
-	tokens "github.com/pogodoc/sdk-go/tokens"
 	http "net/http"
+	core "pogodoc/go/sdk/core"
+	documents "pogodoc/go/sdk/documents"
+	templates "pogodoc/go/sdk/templates"
+	tokens "pogodoc/go/sdk/tokens"
 )
 
 type Client interface {

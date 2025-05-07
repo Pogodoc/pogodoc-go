@@ -5,8 +5,8 @@ package tokens
 import (
 	context "context"
 	fmt "fmt"
-	core "github.com/pogodoc/sdk-go/core"
 	http "net/http"
+	core "pogodoc/go/sdk/core"
 )
 
 type Client interface {
