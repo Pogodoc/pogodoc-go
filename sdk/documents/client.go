@@ -5,18 +5,18 @@ package documents
 import (
 	context "context"
 	fmt "fmt"
+	sdkgo "github.com/pogodoc/sdk-go"
+	core "github.com/pogodoc/sdk-go/core"
 	http "net/http"
 	url "net/url"
-	sdk "sdk"
-	core "sdk/core"
 )
 
 type Client interface {
-	InitializeRenderJob(ctx context.Context, request *sdk.InitializeRenderJobRequest) (*sdk.InitializeRenderJobResponse, error)
-	StartRenderJob(ctx context.Context, jobId string, request *sdk.StartRenderJobRequest) (*sdk.StartRenderJobResponse, error)
-	GenerateDocumentPreview(ctx context.Context, request *sdk.GenerateDocumentPreviewRequest) (*sdk.GenerateDocumentPreviewResponse, error)
-	StartImmediateRender(ctx context.Context, request *sdk.StartImmediateRenderRequest) (*sdk.StartImmediateRenderResponse, error)
-	GetJobStatus(ctx context.Context, jobId string) (*sdk.GetJobStatusResponse, error)
+	InitializeRenderJob(ctx context.Context, request *sdkgo.InitializeRenderJobRequest) (*sdkgo.InitializeRenderJobResponse, error)
+	StartRenderJob(ctx context.Context, jobId string, request *sdkgo.StartRenderJobRequest) (*sdkgo.StartRenderJobResponse, error)
+	GenerateDocumentPreview(ctx context.Context, request *sdkgo.GenerateDocumentPreviewRequest) (*sdkgo.GenerateDocumentPreviewResponse, error)
+	StartImmediateRender(ctx context.Context, request *sdkgo.StartImmediateRenderRequest) (*sdkgo.StartImmediateRenderResponse, error)
+	GetJobStatus(ctx context.Context, jobId string) (*sdkgo.GetJobStatusResponse, error)
 }
 
 func NewClient(opts ...core.ClientOption) Client {
@@ -38,14 +38,14 @@ type client struct {
 }
 
 // Creates a new render job with a unique ID, sets up S3 storage for template and data files, and generates presigned upload URLs if needed. Requires subscription check.
-func (c *client) InitializeRenderJob(ctx context.Context, request *sdk.InitializeRenderJobRequest) (*sdk.InitializeRenderJobResponse, error) {
+func (c *client) InitializeRenderJob(ctx context.Context, request *sdkgo.InitializeRenderJobRequest) (*sdkgo.InitializeRenderJobResponse, error) {
 	baseURL := "https://api.pogodoc.com"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
 	endpointURL := baseURL + "/" + "documents/init"
 
-	var response *sdk.InitializeRenderJobResponse
+	var response *sdkgo.InitializeRenderJobResponse
 	if err := core.DoRequest(
 		ctx,
 		c.httpClient,
@@ -63,14 +63,14 @@ func (c *client) InitializeRenderJob(ctx context.Context, request *sdk.Initializ
 }
 
 // Takes a previously initialized job, updates its status to in-progress, and triggers the rendering process using Puppeteer. Can optionally wait for render completion.
-func (c *client) StartRenderJob(ctx context.Context, jobId string, request *sdk.StartRenderJobRequest) (*sdk.StartRenderJobResponse, error) {
+func (c *client) StartRenderJob(ctx context.Context, jobId string, request *sdkgo.StartRenderJobRequest) (*sdkgo.StartRenderJobResponse, error) {
 	baseURL := "https://api.pogodoc.com"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
 	endpointURL := fmt.Sprintf(baseURL+"/"+"documents/%v/render", jobId)
 
-	var response *sdk.StartRenderJobResponse
+	var response *sdkgo.StartRenderJobResponse
 	if err := core.DoRequest(
 		ctx,
 		c.httpClient,
@@ -88,7 +88,7 @@ func (c *client) StartRenderJob(ctx context.Context, jobId string, request *sdk.
 }
 
 // Generates a preview by creating a single-page render job, processing it immediately, and returning the output URL. Used for template visualization.
-func (c *client) GenerateDocumentPreview(ctx context.Context, request *sdk.GenerateDocumentPreviewRequest) (*sdk.GenerateDocumentPreviewResponse, error) {
+func (c *client) GenerateDocumentPreview(ctx context.Context, request *sdkgo.GenerateDocumentPreviewRequest) (*sdkgo.GenerateDocumentPreviewResponse, error) {
 	baseURL := "https://api.pogodoc.com"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -101,7 +101,7 @@ func (c *client) GenerateDocumentPreview(ctx context.Context, request *sdk.Gener
 		endpointURL += "?" + queryParams.Encode()
 	}
 
-	var response *sdk.GenerateDocumentPreviewResponse
+	var response *sdkgo.GenerateDocumentPreviewResponse
 	if err := core.DoRequest(
 		ctx,
 		c.httpClient,
@@ -119,14 +119,14 @@ func (c *client) GenerateDocumentPreview(ctx context.Context, request *sdk.Gener
 }
 
 // Combines initialization and rendering in one step. Creates a job, uploads template/data directly, starts rendering, and adds the document to Strapi. Requires subscription check.
-func (c *client) StartImmediateRender(ctx context.Context, request *sdk.StartImmediateRenderRequest) (*sdk.StartImmediateRenderResponse, error) {
+func (c *client) StartImmediateRender(ctx context.Context, request *sdkgo.StartImmediateRenderRequest) (*sdkgo.StartImmediateRenderResponse, error) {
 	baseURL := "https://api.pogodoc.com"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
 	endpointURL := baseURL + "/" + "documents/immediate-render"
 
-	var response *sdk.StartImmediateRenderResponse
+	var response *sdkgo.StartImmediateRenderResponse
 	if err := core.DoRequest(
 		ctx,
 		c.httpClient,
@@ -144,14 +144,14 @@ func (c *client) StartImmediateRender(ctx context.Context, request *sdk.StartImm
 }
 
 // Fetches detailed job information from S3 storage including job status, template ID, target format, and output details if available.
-func (c *client) GetJobStatus(ctx context.Context, jobId string) (*sdk.GetJobStatusResponse, error) {
+func (c *client) GetJobStatus(ctx context.Context, jobId string) (*sdkgo.GetJobStatusResponse, error) {
 	baseURL := "https://api.pogodoc.com"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
 	endpointURL := fmt.Sprintf(baseURL+"/"+"jobs/%v", jobId)
 
-	var response *sdk.GetJobStatusResponse
+	var response *sdkgo.GetJobStatusResponse
 	if err := core.DoRequest(
 		ctx,
 		c.httpClient,

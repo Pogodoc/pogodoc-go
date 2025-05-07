@@ -5,12 +5,12 @@ package tokens
 import (
 	context "context"
 	fmt "fmt"
+	core "github.com/pogodoc/sdk-go/core"
 	http "net/http"
-	core "sdk/core"
 )
 
 type Client interface {
-	DeleteApiToken(ctx context.Context, tokenId string) (any, error)
+	DeleteApiToken(ctx context.Context, tokenId string) error
 }
 
 func NewClient(opts ...core.ClientOption) Client {
@@ -32,26 +32,25 @@ type client struct {
 }
 
 // Invalidates an API token by storing it in the deleted tokens S3 bucket, preventing future use of the token for authentication.
-func (c *client) DeleteApiToken(ctx context.Context, tokenId string) (any, error) {
+func (c *client) DeleteApiToken(ctx context.Context, tokenId string) error {
 	baseURL := "https://api.pogodoc.com"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
 	}
 	endpointURL := fmt.Sprintf(baseURL+"/"+"api-tokens/%v", tokenId)
 
-	var response any
 	if err := core.DoRequest(
 		ctx,
 		c.httpClient,
 		endpointURL,
 		http.MethodDelete,
 		nil,
-		&response,
+		nil,
 		false,
 		c.header,
 		nil,
 	); err != nil {
-		return response, err
+		return err
 	}
-	return response, nil
+	return nil
 }

@@ -1,4 +1,4 @@
-module sdk
+module github.com/pogodoc/sdk-go
 
 go 1.19
 
