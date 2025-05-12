@@ -307,5 +307,6 @@ func main() {
 		return
 	}
 	fmt.Println("Document generated successfully:", render)
+	fmt.Println("Document URL:", render.Output.Data.Url)
 
 }
