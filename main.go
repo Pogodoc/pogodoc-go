@@ -2,14 +2,9 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"log"
-	"os"
 	api "pogodoc/go/sdk"
 	"pogodoc/go/sdk/client"
-
-	"github.com/joho/godotenv"
 )
 
 type PogodocEnv struct {
@@ -17,14 +12,16 @@ type PogodocEnv struct {
 	token   string `env:"POGODOC_TOKEN"`
 }
 
-func PogodocClientInit(baseURL string, tokenString string) PogodocClient {
-
+func PogodocClientInit(baseURL string, tokenString string) (*PogodocClient, error) {
+	if tokenString == "" || baseURL == "" {
+		return nil, fmt.Errorf("PogodocClientInit: token or baseURL is empty")
+	}
 	c := client.NewClient(
 		client.ClientWithBaseURL(baseURL),
 		client.ClientWithAuthToken(tokenString),
 	)
 
-	return PogodocClient{c}
+	return &PogodocClient{c}, nil
 }
 
 func (c *PogodocClient) SaveTemplate(filePath string, metadata api.SaveCreatedTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
@@ -233,80 +230,5 @@ func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx cont
 	}
 
 	return result, nil
-
-}
-
-func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	pogodocEnv := PogodocEnv{
-		baseURL: os.Getenv("POGODOC_BASE_URL"),
-		token:   os.Getenv("POGODOC_TOKEN"),
-	}
-	ctx := context.Background()
-	c := PogodocClientInit(pogodocEnv.baseURL, pogodocEnv.token)
-
-	response, err := c.Templates().InitializeTemplateCreation(ctx)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(response.JobId)
-	sampledata, _ := ReadFile("../../data/json_data/react.json")
-
-	var sampleDataMap map[string]interface{}
-	err = json.Unmarshal([]byte(sampledata), &sampleDataMap)
-	if err != nil {
-		fmt.Println("Error unmarshaling sample data:", err)
-		return
-	}
-
-	templateId, err := c.SaveTemplate("../../data/templates/React-Demo-App.zip", api.SaveCreatedTemplateRequestTemplateInfo{
-		Title:       "Naslov",
-		Description: "Deksripshn",
-		Type:        api.SaveCreatedTemplateRequestTemplateInfoTypeReact,
-		SampleData:  sampleDataMap,
-		Categories:  []api.SaveCreatedTemplateRequestTemplateInfoCategoriesItem{1, 2},
-	}, ctx)
-	if err != nil {
-		fmt.Println("Error saving template:", err)
-		return
-	}
-	sourcecode := "SORSKODE"
-
-	_, err = c.UpdateTemplate(templateId, "../../data/templates/React-Demo-App.zip", api.UpdateTemplateRequestTemplateInfo{
-		Title:       "Naslov SMENET",
-		Description: "ANDREJ UPDATE TEMPLATE",
-		Type:        api.UpdateTemplateRequestTemplateInfoTypeReact,
-		SampleData:  sampleDataMap,
-		SourceCode:  &sourcecode,
-		Categories:  []api.UpdateTemplateRequestTemplateInfoCategoriesItem{1, 2},
-	}, ctx)
-	if err != nil {
-		fmt.Println("Error saving template:", err)
-		return
-	}
-
-	fmt.Println(templateId)
-
-	render, err := c.GenerateDocument(GenerateDocumentProps{
-		InitializeRenderJobRequest: api.InitializeRenderJobRequest{
-			TemplateId: &templateId,
-			Type:       api.InitializeRenderJobRequestTypeReact,
-			Target:     api.InitializeRenderJobRequestTargetPdf,
-			Data:       sampleDataMap,
-		},
-		StartRenderJobRequest: api.StartRenderJobRequest{
-			ShouldWaitForRenderCompletion: Pointer(true),
-		}}, ctx)
-
-	if err != nil {
-		fmt.Println("Error generating document:", err)
-		return
-	}
-	fmt.Println("Document generated successfully:", render)
-	fmt.Println("Document URL:", render.Output.Data.Url)
 
 }
