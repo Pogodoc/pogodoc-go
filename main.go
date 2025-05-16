@@ -7,11 +7,6 @@ import (
 	"pogodoc/go/sdk/client"
 )
 
-type PogodocEnv struct {
-	baseURL string `env:"POGODOC_BASE_URL"`
-	token   string `env:"POGODOC_TOKEN"`
-}
-
 func PogodocClientInit(baseURL string, tokenString string) (*PogodocClient, error) {
 	if tokenString == "" || baseURL == "" {
 		return nil, fmt.Errorf("PogodocClientInit: token or baseURL is empty")
@@ -58,8 +53,7 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 		return "", err
 	}
 
-	req := map[string]any{}
-	err = c.Templates().ExtractTemplateFiles(ctx, templateId, req)
+	err = c.Templates().ExtractTemplateFiles(ctx, templateId, nil)
 	if err != nil {
 		fmt.Println("Error extracting template files:", err)
 		return "", err
@@ -133,8 +127,7 @@ func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps 
 		return "", err
 	}
 
-	req := map[string]any{}
-	err = c.Templates().ExtractTemplateFiles(ctx, contentId, req)
+	err = c.Templates().ExtractTemplateFiles(ctx, contentId, nil)
 	if err != nil {
 		fmt.Println("Error extracting template files:", err)
 		return "", err

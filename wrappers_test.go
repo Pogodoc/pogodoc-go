@@ -4,12 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
 	api "pogodoc/go/sdk"
 	"testing"
+
+	"github.com/joho/godotenv"
 )
+
+type PogodocEnv struct {
+	baseURL string `env:"POGODOC_BASE_URL"`
+	token   string `env:"POGODOC_TOKEN"`
+}
 
 type TestData struct {
 	PogodocEnv    PogodocEnv
@@ -137,7 +143,8 @@ func TestGenerateDocument(t *testing.T) {
 			ShouldWaitForRenderCompletion: Pointer(true),
 		}}
 
-	_, err = data.client.GenerateDocument(documentProps, data.ctx)
+	doc, err := data.client.GenerateDocument(documentProps, data.ctx)
+	fmt.Println(doc.Output.Data.Url)
 	if err != nil {
 		t.Errorf("GenerateDocument failed: %v", err)
 

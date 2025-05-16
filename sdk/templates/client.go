@@ -15,7 +15,7 @@ type Client interface {
 	SaveCreatedTemplate(ctx context.Context, templateId string, request *sdk.SaveCreatedTemplateRequest) error
 	UpdateTemplate(ctx context.Context, templateId string, request *sdk.UpdateTemplateRequest) (*sdk.UpdateTemplateResponse, error)
 	DeleteTemplate(ctx context.Context, templateId string) error
-	ExtractTemplateFiles(ctx context.Context, templateId string, request map[string]any) error
+	ExtractTemplateFiles(ctx context.Context, templateId string, request *sdk.ExtractTemplateFilesRequest) error
 	GenerateTemplatePreviews(ctx context.Context, templateId string, request *sdk.GenerateTemplatePreviewsRequest) (*sdk.GenerateTemplatePreviewsResponse, error)
 	GeneratePresignedGetUrl(ctx context.Context, templateId string) (*sdk.GeneratePresignedGetUrlResponse, error)
 	GetTemplateIndexHtml(ctx context.Context, templateId string) (*sdk.GetTemplateIndexHtmlResponse, error)
@@ -140,7 +140,7 @@ func (c *client) DeleteTemplate(ctx context.Context, templateId string) error {
 }
 
 // Extracts contents from an uploaded template ZIP file and stores individual files in the appropriate S3 storage structure.
-func (c *client) ExtractTemplateFiles(ctx context.Context, templateId string, request map[string]any) error {
+func (c *client) ExtractTemplateFiles(ctx context.Context, templateId string, request *sdk.ExtractTemplateFilesRequest) error {
 	baseURL := "https://api.pogodoc.com"
 	if c.baseURL != "" {
 		baseURL = c.baseURL
@@ -151,7 +151,7 @@ func (c *client) ExtractTemplateFiles(ctx context.Context, templateId string, re
 		ctx,
 		c.httpClient,
 		endpointURL,
-		http.MethodPost,
+		http.MethodPatch,
 		request,
 		nil,
 		false,

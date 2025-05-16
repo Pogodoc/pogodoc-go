@@ -23,6 +23,9 @@ type CloneTemplateResponse struct {
 	NewTemplateId string `json:"newTemplateId"`
 }
 
+type ExtractTemplateFilesRequest struct {
+}
+
 type GeneratePresignedGetUrlResponse struct {
 	PresignedUrl string `json:"presignedUrl"`
 }
