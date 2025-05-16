@@ -4,166 +4,236 @@ package documents
 
 import (
 	context "context"
-	fmt "fmt"
 	http "net/http"
-	url "net/url"
 	sdk "pogodoc/go/sdk"
 	core "pogodoc/go/sdk/core"
+	internal "pogodoc/go/sdk/internal"
+	option "pogodoc/go/sdk/option"
 )
 
-type Client interface {
-	InitializeRenderJob(ctx context.Context, request *sdk.InitializeRenderJobRequest) (*sdk.InitializeRenderJobResponse, error)
-	StartRenderJob(ctx context.Context, jobId string, request *sdk.StartRenderJobRequest) (*sdk.StartRenderJobResponse, error)
-	GenerateDocumentPreview(ctx context.Context, request *sdk.GenerateDocumentPreviewRequest) (*sdk.GenerateDocumentPreviewResponse, error)
-	StartImmediateRender(ctx context.Context, request *sdk.StartImmediateRenderRequest) (*sdk.StartImmediateRenderResponse, error)
-	GetJobStatus(ctx context.Context, jobId string) (*sdk.GetJobStatusResponse, error)
+type Client struct {
+	baseURL string
+	caller  *internal.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
-	options := core.NewClientOptions()
-	for _, opt := range opts {
-		opt(options)
+func NewClient(opts ...option.RequestOption) *Client {
+	options := core.NewRequestOptions(opts...)
+	return &Client{
+		baseURL: options.BaseURL,
+		caller: internal.NewCaller(
+			&internal.CallerParams{
+				Client:      options.HTTPClient,
+				MaxAttempts: options.MaxAttempts,
+			},
+		),
+		header: options.ToHeader(),
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
-	}
-}
-
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
 }
 
 // Creates a new render job with a unique ID, sets up S3 storage for template and data files, and generates presigned upload URLs if needed. Requires subscription check.
-func (c *client) InitializeRenderJob(ctx context.Context, request *sdk.InitializeRenderJobRequest) (*sdk.InitializeRenderJobResponse, error) {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := baseURL + "/" + "documents/init"
+func (c *Client) InitializeRenderJob(
+	ctx context.Context,
+	request *sdk.InitializeRenderJobRequest,
+	opts ...option.RequestOption,
+) (*sdk.InitializeRenderJobResponse, error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := baseURL + "/documents/init"
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
+	headers.Set("Content-Type", "application/json")
 
 	var response *sdk.InitializeRenderJobResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodPost,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Request:         request,
+			Response:        &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Takes a previously initialized job, updates its status to in-progress, and triggers the rendering process using Puppeteer. Can optionally wait for render completion.
-func (c *client) StartRenderJob(ctx context.Context, jobId string, request *sdk.StartRenderJobRequest) (*sdk.StartRenderJobResponse, error) {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"documents/%v/render", jobId)
+func (c *Client) StartRenderJob(
+	ctx context.Context,
+	jobId string,
+	request *sdk.StartRenderJobRequest,
+	opts ...option.RequestOption,
+) (*sdk.StartRenderJobResponse, error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := internal.EncodeURL(
+		baseURL+"/documents/%v/render",
+		jobId,
+	)
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
+	headers.Set("Content-Type", "application/json")
 
 	var response *sdk.StartRenderJobResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodPost,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Request:         request,
+			Response:        &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Generates a preview by creating a single-page render job, processing it immediately, and returning the output URL. Used for template visualization.
-func (c *client) GenerateDocumentPreview(ctx context.Context, request *sdk.GenerateDocumentPreviewRequest) (*sdk.GenerateDocumentPreviewResponse, error) {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
+func (c *Client) GenerateDocumentPreview(
+	ctx context.Context,
+	request *sdk.GenerateDocumentPreviewRequest,
+	opts ...option.RequestOption,
+) (*sdk.GenerateDocumentPreviewResponse, error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := baseURL + "/documents/render-preview"
+	queryParams, err := internal.QueryValues(request)
+	if err != nil {
+		return nil, err
 	}
-	endpointURL := baseURL + "/" + "documents/render-preview"
-
-	queryParams := make(url.Values)
-	queryParams.Add("templateId", fmt.Sprintf("%v", request.TemplateId))
 	if len(queryParams) > 0 {
 		endpointURL += "?" + queryParams.Encode()
 	}
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
+	headers.Set("Content-Type", "application/json")
 
 	var response *sdk.GenerateDocumentPreviewResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodPost,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Request:         request,
+			Response:        &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Combines initialization and rendering in one step. Creates a job, uploads template/data directly, starts rendering, and adds the document to Strapi. Requires subscription check.
-func (c *client) StartImmediateRender(ctx context.Context, request *sdk.StartImmediateRenderRequest) (*sdk.StartImmediateRenderResponse, error) {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := baseURL + "/" + "documents/immediate-render"
+func (c *Client) StartImmediateRender(
+	ctx context.Context,
+	request *sdk.StartImmediateRenderRequest,
+	opts ...option.RequestOption,
+) (*sdk.StartImmediateRenderResponse, error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := baseURL + "/documents/immediate-render"
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
+	headers.Set("Content-Type", "application/json")
 
 	var response *sdk.StartImmediateRenderResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodPost,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Request:         request,
+			Response:        &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Fetches detailed job information from S3 storage including job status, template ID, target format, and output details if available.
-func (c *client) GetJobStatus(ctx context.Context, jobId string) (*sdk.GetJobStatusResponse, error) {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"jobs/%v", jobId)
+func (c *Client) GetJobStatus(
+	ctx context.Context,
+	jobId string,
+	opts ...option.RequestOption,
+) (*sdk.GetJobStatusResponse, error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := internal.EncodeURL(
+		baseURL+"/jobs/%v",
+		jobId,
+	)
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
 
 	var response *sdk.GetJobStatusResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodGet,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Response:        &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

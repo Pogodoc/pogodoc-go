@@ -5,917 +5,1135 @@ package api
 import (
 	json "encoding/json"
 	fmt "fmt"
-	strconv "strconv"
+	internal "pogodoc/go/sdk/internal"
 )
 
 type GenerateDocumentPreviewRequest struct {
-	TemplateId string                                    `json:"-"`
-	Type       GenerateDocumentPreviewRequestType        `json:"type,omitempty"`
-	Data       map[string]any                            `json:"data,omitempty"`
-	FormatOpts *GenerateDocumentPreviewRequestFormatOpts `json:"formatOpts,omitempty"`
+	TemplateId string                                    `json:"-" url:"templateId"`
+	Type       GenerateDocumentPreviewRequestType        `json:"type" url:"-"`
+	Data       map[string]interface{}                    `json:"data,omitempty" url:"-"`
+	FormatOpts *GenerateDocumentPreviewRequestFormatOpts `json:"formatOpts,omitempty" url:"-"`
 }
 
 type InitializeRenderJobRequest struct {
-	Data       map[string]any                        `json:"data,omitempty"`
-	Type       InitializeRenderJobRequestType        `json:"type,omitempty"`
-	Target     InitializeRenderJobRequestTarget      `json:"target,omitempty"`
-	TemplateId *string                               `json:"templateId,omitempty"`
-	FormatOpts *InitializeRenderJobRequestFormatOpts `json:"formatOpts,omitempty"`
+	Data       map[string]interface{}                `json:"data,omitempty" url:"-"`
+	Type       InitializeRenderJobRequestType        `json:"type" url:"-"`
+	Target     InitializeRenderJobRequestTarget      `json:"target" url:"-"`
+	TemplateId *string                               `json:"templateId,omitempty" url:"-"`
+	FormatOpts *InitializeRenderJobRequestFormatOpts `json:"formatOpts,omitempty" url:"-"`
 }
 
 type StartImmediateRenderRequest struct {
-	StartImmediateRenderRequestData map[string]any                         `json:"data,omitempty"`
-	Type                            StartImmediateRenderRequestType        `json:"type,omitempty"`
-	Target                          StartImmediateRenderRequestTarget      `json:"target,omitempty"`
-	TemplateId                      *string                                `json:"templateId,omitempty"`
-	FormatOpts                      *StartImmediateRenderRequestFormatOpts `json:"formatOpts,omitempty"`
-	Template                        *string                                `json:"template,omitempty"`
+	StartImmediateRenderRequestData map[string]interface{}                 `json:"data,omitempty" url:"-"`
+	Type                            StartImmediateRenderRequestType        `json:"type" url:"-"`
+	Target                          StartImmediateRenderRequestTarget      `json:"target" url:"-"`
+	TemplateId                      *string                                `json:"templateId,omitempty" url:"-"`
+	FormatOpts                      *StartImmediateRenderRequestFormatOpts `json:"formatOpts,omitempty" url:"-"`
+	Template                        *string                                `json:"template,omitempty" url:"-"`
 }
 
 type StartRenderJobRequest struct {
-	ShouldWaitForRenderCompletion *bool   `json:"shouldWaitForRenderCompletion,omitempty"`
-	UploadPresignedS3Url          *string `json:"uploadPresignedS3Url,omitempty"`
+	ShouldWaitForRenderCompletion *bool   `json:"shouldWaitForRenderCompletion,omitempty" url:"-"`
+	UploadPresignedS3Url          *string `json:"uploadPresignedS3Url,omitempty" url:"-"`
 }
 
 type GenerateDocumentPreviewRequestFormatOpts struct {
-	FromPage        *float64                                        `json:"fromPage,omitempty"`
-	ToPage          *float64                                        `json:"toPage,omitempty"`
-	Format          *GenerateDocumentPreviewRequestFormatOptsFormat `json:"format,omitempty"`
-	WaitForSelector *string                                         `json:"waitForSelector,omitempty"`
+	FromPage        *float64                                        `json:"fromPage,omitempty" url:"fromPage,omitempty"`
+	ToPage          *float64                                        `json:"toPage,omitempty" url:"toPage,omitempty"`
+	Format          *GenerateDocumentPreviewRequestFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
+	WaitForSelector *string                                         `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
 }
 
-type GenerateDocumentPreviewRequestFormatOptsFormat uint
-
-const (
-	GenerateDocumentPreviewRequestFormatOptsFormatLetter GenerateDocumentPreviewRequestFormatOptsFormat = iota + 1
-	GenerateDocumentPreviewRequestFormatOptsFormatLegal
-	GenerateDocumentPreviewRequestFormatOptsFormatTabloid
-	GenerateDocumentPreviewRequestFormatOptsFormatLedger
-	GenerateDocumentPreviewRequestFormatOptsFormatA0
-	GenerateDocumentPreviewRequestFormatOptsFormatA1
-	GenerateDocumentPreviewRequestFormatOptsFormatA2
-	GenerateDocumentPreviewRequestFormatOptsFormatA3
-	GenerateDocumentPreviewRequestFormatOptsFormatA4
-	GenerateDocumentPreviewRequestFormatOptsFormatA5
-	GenerateDocumentPreviewRequestFormatOptsFormatA6
-)
-
-func (g GenerateDocumentPreviewRequestFormatOptsFormat) String() string {
-	switch g {
-	default:
-		return strconv.Itoa(int(g))
-	case GenerateDocumentPreviewRequestFormatOptsFormatLetter:
-		return "letter"
-	case GenerateDocumentPreviewRequestFormatOptsFormatLegal:
-		return "legal"
-	case GenerateDocumentPreviewRequestFormatOptsFormatTabloid:
-		return "tabloid"
-	case GenerateDocumentPreviewRequestFormatOptsFormatLedger:
-		return "ledger"
-	case GenerateDocumentPreviewRequestFormatOptsFormatA0:
-		return "a0"
-	case GenerateDocumentPreviewRequestFormatOptsFormatA1:
-		return "a1"
-	case GenerateDocumentPreviewRequestFormatOptsFormatA2:
-		return "a2"
-	case GenerateDocumentPreviewRequestFormatOptsFormatA3:
-		return "a3"
-	case GenerateDocumentPreviewRequestFormatOptsFormatA4:
-		return "a4"
-	case GenerateDocumentPreviewRequestFormatOptsFormatA5:
-		return "a5"
-	case GenerateDocumentPreviewRequestFormatOptsFormatA6:
-		return "a6"
+func (g *GenerateDocumentPreviewRequestFormatOpts) GetFromPage() *float64 {
+	if g == nil {
+		return nil
 	}
+	return g.FromPage
 }
 
-func (g GenerateDocumentPreviewRequestFormatOptsFormat) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", g.String())), nil
+func (g *GenerateDocumentPreviewRequestFormatOpts) GetToPage() *float64 {
+	if g == nil {
+		return nil
+	}
+	return g.ToPage
 }
 
-func (g *GenerateDocumentPreviewRequestFormatOptsFormat) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (g *GenerateDocumentPreviewRequestFormatOpts) GetFormat() *GenerateDocumentPreviewRequestFormatOptsFormat {
+	if g == nil {
+		return nil
+	}
+	return g.Format
+}
+
+func (g *GenerateDocumentPreviewRequestFormatOpts) GetWaitForSelector() *string {
+	if g == nil {
+		return nil
+	}
+	return g.WaitForSelector
+}
+
+func (g *GenerateDocumentPreviewRequestFormatOpts) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GenerateDocumentPreviewRequestFormatOpts) UnmarshalJSON(data []byte) error {
+	type unmarshaler GenerateDocumentPreviewRequestFormatOpts
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*g = GenerateDocumentPreviewRequestFormatOpts(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GenerateDocumentPreviewRequestFormatOpts) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
+}
+
+type GenerateDocumentPreviewRequestFormatOptsFormat string
+
+const (
+	GenerateDocumentPreviewRequestFormatOptsFormatLetter  GenerateDocumentPreviewRequestFormatOptsFormat = "letter"
+	GenerateDocumentPreviewRequestFormatOptsFormatLegal   GenerateDocumentPreviewRequestFormatOptsFormat = "legal"
+	GenerateDocumentPreviewRequestFormatOptsFormatTabloid GenerateDocumentPreviewRequestFormatOptsFormat = "tabloid"
+	GenerateDocumentPreviewRequestFormatOptsFormatLedger  GenerateDocumentPreviewRequestFormatOptsFormat = "ledger"
+	GenerateDocumentPreviewRequestFormatOptsFormatA0      GenerateDocumentPreviewRequestFormatOptsFormat = "a0"
+	GenerateDocumentPreviewRequestFormatOptsFormatA1      GenerateDocumentPreviewRequestFormatOptsFormat = "a1"
+	GenerateDocumentPreviewRequestFormatOptsFormatA2      GenerateDocumentPreviewRequestFormatOptsFormat = "a2"
+	GenerateDocumentPreviewRequestFormatOptsFormatA3      GenerateDocumentPreviewRequestFormatOptsFormat = "a3"
+	GenerateDocumentPreviewRequestFormatOptsFormatA4      GenerateDocumentPreviewRequestFormatOptsFormat = "a4"
+	GenerateDocumentPreviewRequestFormatOptsFormatA5      GenerateDocumentPreviewRequestFormatOptsFormat = "a5"
+	GenerateDocumentPreviewRequestFormatOptsFormatA6      GenerateDocumentPreviewRequestFormatOptsFormat = "a6"
+)
+
+func NewGenerateDocumentPreviewRequestFormatOptsFormatFromString(s string) (GenerateDocumentPreviewRequestFormatOptsFormat, error) {
+	switch s {
 	case "letter":
-		value := GenerateDocumentPreviewRequestFormatOptsFormatLetter
-		*g = value
+		return GenerateDocumentPreviewRequestFormatOptsFormatLetter, nil
 	case "legal":
-		value := GenerateDocumentPreviewRequestFormatOptsFormatLegal
-		*g = value
+		return GenerateDocumentPreviewRequestFormatOptsFormatLegal, nil
 	case "tabloid":
-		value := GenerateDocumentPreviewRequestFormatOptsFormatTabloid
-		*g = value
+		return GenerateDocumentPreviewRequestFormatOptsFormatTabloid, nil
 	case "ledger":
-		value := GenerateDocumentPreviewRequestFormatOptsFormatLedger
-		*g = value
+		return GenerateDocumentPreviewRequestFormatOptsFormatLedger, nil
 	case "a0":
-		value := GenerateDocumentPreviewRequestFormatOptsFormatA0
-		*g = value
+		return GenerateDocumentPreviewRequestFormatOptsFormatA0, nil
 	case "a1":
-		value := GenerateDocumentPreviewRequestFormatOptsFormatA1
-		*g = value
+		return GenerateDocumentPreviewRequestFormatOptsFormatA1, nil
 	case "a2":
-		value := GenerateDocumentPreviewRequestFormatOptsFormatA2
-		*g = value
+		return GenerateDocumentPreviewRequestFormatOptsFormatA2, nil
 	case "a3":
-		value := GenerateDocumentPreviewRequestFormatOptsFormatA3
-		*g = value
+		return GenerateDocumentPreviewRequestFormatOptsFormatA3, nil
 	case "a4":
-		value := GenerateDocumentPreviewRequestFormatOptsFormatA4
-		*g = value
+		return GenerateDocumentPreviewRequestFormatOptsFormatA4, nil
 	case "a5":
-		value := GenerateDocumentPreviewRequestFormatOptsFormatA5
-		*g = value
+		return GenerateDocumentPreviewRequestFormatOptsFormatA5, nil
 	case "a6":
-		value := GenerateDocumentPreviewRequestFormatOptsFormatA6
-		*g = value
+		return GenerateDocumentPreviewRequestFormatOptsFormatA6, nil
 	}
-	return nil
+	var t GenerateDocumentPreviewRequestFormatOptsFormat
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type GenerateDocumentPreviewRequestType uint
+func (g GenerateDocumentPreviewRequestFormatOptsFormat) Ptr() *GenerateDocumentPreviewRequestFormatOptsFormat {
+	return &g
+}
+
+type GenerateDocumentPreviewRequestType string
 
 const (
-	GenerateDocumentPreviewRequestTypeDocx GenerateDocumentPreviewRequestType = iota + 1
-	GenerateDocumentPreviewRequestTypeXlsx
-	GenerateDocumentPreviewRequestTypePptx
-	GenerateDocumentPreviewRequestTypeEjs
-	GenerateDocumentPreviewRequestTypeHtml
-	GenerateDocumentPreviewRequestTypeLatex
-	GenerateDocumentPreviewRequestTypeReact
+	GenerateDocumentPreviewRequestTypeDocx  GenerateDocumentPreviewRequestType = "docx"
+	GenerateDocumentPreviewRequestTypeXlsx  GenerateDocumentPreviewRequestType = "xlsx"
+	GenerateDocumentPreviewRequestTypePptx  GenerateDocumentPreviewRequestType = "pptx"
+	GenerateDocumentPreviewRequestTypeEjs   GenerateDocumentPreviewRequestType = "ejs"
+	GenerateDocumentPreviewRequestTypeHtml  GenerateDocumentPreviewRequestType = "html"
+	GenerateDocumentPreviewRequestTypeLatex GenerateDocumentPreviewRequestType = "latex"
+	GenerateDocumentPreviewRequestTypeReact GenerateDocumentPreviewRequestType = "react"
 )
 
-func (g GenerateDocumentPreviewRequestType) String() string {
-	switch g {
-	default:
-		return strconv.Itoa(int(g))
-	case GenerateDocumentPreviewRequestTypeDocx:
-		return "docx"
-	case GenerateDocumentPreviewRequestTypeXlsx:
-		return "xlsx"
-	case GenerateDocumentPreviewRequestTypePptx:
-		return "pptx"
-	case GenerateDocumentPreviewRequestTypeEjs:
-		return "ejs"
-	case GenerateDocumentPreviewRequestTypeHtml:
-		return "html"
-	case GenerateDocumentPreviewRequestTypeLatex:
-		return "latex"
-	case GenerateDocumentPreviewRequestTypeReact:
-		return "react"
-	}
-}
-
-func (g GenerateDocumentPreviewRequestType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", g.String())), nil
-}
-
-func (g *GenerateDocumentPreviewRequestType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewGenerateDocumentPreviewRequestTypeFromString(s string) (GenerateDocumentPreviewRequestType, error) {
+	switch s {
 	case "docx":
-		value := GenerateDocumentPreviewRequestTypeDocx
-		*g = value
+		return GenerateDocumentPreviewRequestTypeDocx, nil
 	case "xlsx":
-		value := GenerateDocumentPreviewRequestTypeXlsx
-		*g = value
+		return GenerateDocumentPreviewRequestTypeXlsx, nil
 	case "pptx":
-		value := GenerateDocumentPreviewRequestTypePptx
-		*g = value
+		return GenerateDocumentPreviewRequestTypePptx, nil
 	case "ejs":
-		value := GenerateDocumentPreviewRequestTypeEjs
-		*g = value
+		return GenerateDocumentPreviewRequestTypeEjs, nil
 	case "html":
-		value := GenerateDocumentPreviewRequestTypeHtml
-		*g = value
+		return GenerateDocumentPreviewRequestTypeHtml, nil
 	case "latex":
-		value := GenerateDocumentPreviewRequestTypeLatex
-		*g = value
+		return GenerateDocumentPreviewRequestTypeLatex, nil
 	case "react":
-		value := GenerateDocumentPreviewRequestTypeReact
-		*g = value
+		return GenerateDocumentPreviewRequestTypeReact, nil
 	}
-	return nil
+	var t GenerateDocumentPreviewRequestType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (g GenerateDocumentPreviewRequestType) Ptr() *GenerateDocumentPreviewRequestType {
+	return &g
 }
 
 type GenerateDocumentPreviewResponse struct {
-	Url   *string `json:"url,omitempty"`
-	JobId string  `json:"jobId"`
+	Url   *string `json:"url,omitempty" url:"url,omitempty"`
+	JobId string  `json:"jobId" url:"jobId"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (g *GenerateDocumentPreviewResponse) GetUrl() *string {
+	if g == nil {
+		return nil
+	}
+	return g.Url
+}
+
+func (g *GenerateDocumentPreviewResponse) GetJobId() string {
+	if g == nil {
+		return ""
+	}
+	return g.JobId
+}
+
+func (g *GenerateDocumentPreviewResponse) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GenerateDocumentPreviewResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler GenerateDocumentPreviewResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GenerateDocumentPreviewResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GenerateDocumentPreviewResponse) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
 }
 
 type GetJobStatusResponse struct {
-	Type    GetJobStatusResponseType    `json:"type,omitempty"`
-	JobId   string                      `json:"jobId"`
-	Target  GetJobStatusResponseTarget  `json:"target,omitempty"`
-	Output  *GetJobStatusResponseOutput `json:"output,omitempty"`
-	Success *bool                       `json:"success,omitempty"`
-	Status  *string                     `json:"status,omitempty"`
+	Type    GetJobStatusResponseType    `json:"type" url:"type"`
+	JobId   string                      `json:"jobId" url:"jobId"`
+	Target  GetJobStatusResponseTarget  `json:"target" url:"target"`
+	Output  *GetJobStatusResponseOutput `json:"output,omitempty" url:"output,omitempty"`
+	Success *bool                       `json:"success,omitempty" url:"success,omitempty"`
+	Status  *string                     `json:"status,omitempty" url:"status,omitempty"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (g *GetJobStatusResponse) GetType() GetJobStatusResponseType {
+	if g == nil {
+		return ""
+	}
+	return g.Type
+}
+
+func (g *GetJobStatusResponse) GetJobId() string {
+	if g == nil {
+		return ""
+	}
+	return g.JobId
+}
+
+func (g *GetJobStatusResponse) GetTarget() GetJobStatusResponseTarget {
+	if g == nil {
+		return ""
+	}
+	return g.Target
+}
+
+func (g *GetJobStatusResponse) GetOutput() *GetJobStatusResponseOutput {
+	if g == nil {
+		return nil
+	}
+	return g.Output
+}
+
+func (g *GetJobStatusResponse) GetSuccess() *bool {
+	if g == nil {
+		return nil
+	}
+	return g.Success
+}
+
+func (g *GetJobStatusResponse) GetStatus() *string {
+	if g == nil {
+		return nil
+	}
+	return g.Status
+}
+
+func (g *GetJobStatusResponse) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GetJobStatusResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler GetJobStatusResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GetJobStatusResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GetJobStatusResponse) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
 }
 
 type GetJobStatusResponseOutput struct {
-	Data     *GetJobStatusResponseOutputData     `json:"data,omitempty"`
-	Metadata *GetJobStatusResponseOutputMetadata `json:"metadata,omitempty"`
+	Data     *GetJobStatusResponseOutputData     `json:"data,omitempty" url:"data,omitempty"`
+	Metadata *GetJobStatusResponseOutputMetadata `json:"metadata,omitempty" url:"metadata,omitempty"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (g *GetJobStatusResponseOutput) GetData() *GetJobStatusResponseOutputData {
+	if g == nil {
+		return nil
+	}
+	return g.Data
+}
+
+func (g *GetJobStatusResponseOutput) GetMetadata() *GetJobStatusResponseOutputMetadata {
+	if g == nil {
+		return nil
+	}
+	return g.Metadata
+}
+
+func (g *GetJobStatusResponseOutput) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GetJobStatusResponseOutput) UnmarshalJSON(data []byte) error {
+	type unmarshaler GetJobStatusResponseOutput
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GetJobStatusResponseOutput(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GetJobStatusResponseOutput) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
 }
 
 type GetJobStatusResponseOutputData struct {
-	Url string `json:"url"`
+	Url string `json:"url" url:"url"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (g *GetJobStatusResponseOutputData) GetUrl() string {
+	if g == nil {
+		return ""
+	}
+	return g.Url
+}
+
+func (g *GetJobStatusResponseOutputData) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GetJobStatusResponseOutputData) UnmarshalJSON(data []byte) error {
+	type unmarshaler GetJobStatusResponseOutputData
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GetJobStatusResponseOutputData(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GetJobStatusResponseOutputData) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
 }
 
 type GetJobStatusResponseOutputMetadata struct {
-	RenderTime float64 `json:"renderTime"`
+	RenderTime float64 `json:"renderTime" url:"renderTime"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
 }
 
-type GetJobStatusResponseTarget uint
-
-const (
-	GetJobStatusResponseTargetPdf GetJobStatusResponseTarget = iota + 1
-	GetJobStatusResponseTargetHtml
-	GetJobStatusResponseTargetDocx
-	GetJobStatusResponseTargetXlsx
-	GetJobStatusResponseTargetPptx
-	GetJobStatusResponseTargetPng
-	GetJobStatusResponseTargetJpg
-)
-
-func (g GetJobStatusResponseTarget) String() string {
-	switch g {
-	default:
-		return strconv.Itoa(int(g))
-	case GetJobStatusResponseTargetPdf:
-		return "pdf"
-	case GetJobStatusResponseTargetHtml:
-		return "html"
-	case GetJobStatusResponseTargetDocx:
-		return "docx"
-	case GetJobStatusResponseTargetXlsx:
-		return "xlsx"
-	case GetJobStatusResponseTargetPptx:
-		return "pptx"
-	case GetJobStatusResponseTargetPng:
-		return "png"
-	case GetJobStatusResponseTargetJpg:
-		return "jpg"
+func (g *GetJobStatusResponseOutputMetadata) GetRenderTime() float64 {
+	if g == nil {
+		return 0
 	}
+	return g.RenderTime
 }
 
-func (g GetJobStatusResponseTarget) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", g.String())), nil
+func (g *GetJobStatusResponseOutputMetadata) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
 }
 
-func (g *GetJobStatusResponseTarget) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (g *GetJobStatusResponseOutputMetadata) UnmarshalJSON(data []byte) error {
+	type unmarshaler GetJobStatusResponseOutputMetadata
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*g = GetJobStatusResponseOutputMetadata(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GetJobStatusResponseOutputMetadata) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
+}
+
+type GetJobStatusResponseTarget string
+
+const (
+	GetJobStatusResponseTargetPdf  GetJobStatusResponseTarget = "pdf"
+	GetJobStatusResponseTargetHtml GetJobStatusResponseTarget = "html"
+	GetJobStatusResponseTargetDocx GetJobStatusResponseTarget = "docx"
+	GetJobStatusResponseTargetXlsx GetJobStatusResponseTarget = "xlsx"
+	GetJobStatusResponseTargetPptx GetJobStatusResponseTarget = "pptx"
+	GetJobStatusResponseTargetPng  GetJobStatusResponseTarget = "png"
+	GetJobStatusResponseTargetJpg  GetJobStatusResponseTarget = "jpg"
+)
+
+func NewGetJobStatusResponseTargetFromString(s string) (GetJobStatusResponseTarget, error) {
+	switch s {
 	case "pdf":
-		value := GetJobStatusResponseTargetPdf
-		*g = value
+		return GetJobStatusResponseTargetPdf, nil
 	case "html":
-		value := GetJobStatusResponseTargetHtml
-		*g = value
+		return GetJobStatusResponseTargetHtml, nil
 	case "docx":
-		value := GetJobStatusResponseTargetDocx
-		*g = value
+		return GetJobStatusResponseTargetDocx, nil
 	case "xlsx":
-		value := GetJobStatusResponseTargetXlsx
-		*g = value
+		return GetJobStatusResponseTargetXlsx, nil
 	case "pptx":
-		value := GetJobStatusResponseTargetPptx
-		*g = value
+		return GetJobStatusResponseTargetPptx, nil
 	case "png":
-		value := GetJobStatusResponseTargetPng
-		*g = value
+		return GetJobStatusResponseTargetPng, nil
 	case "jpg":
-		value := GetJobStatusResponseTargetJpg
-		*g = value
+		return GetJobStatusResponseTargetJpg, nil
 	}
-	return nil
+	var t GetJobStatusResponseTarget
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type GetJobStatusResponseType uint
+func (g GetJobStatusResponseTarget) Ptr() *GetJobStatusResponseTarget {
+	return &g
+}
+
+type GetJobStatusResponseType string
 
 const (
-	GetJobStatusResponseTypeDocx GetJobStatusResponseType = iota + 1
-	GetJobStatusResponseTypeXlsx
-	GetJobStatusResponseTypePptx
-	GetJobStatusResponseTypeEjs
-	GetJobStatusResponseTypeHtml
-	GetJobStatusResponseTypeLatex
-	GetJobStatusResponseTypeReact
+	GetJobStatusResponseTypeDocx  GetJobStatusResponseType = "docx"
+	GetJobStatusResponseTypeXlsx  GetJobStatusResponseType = "xlsx"
+	GetJobStatusResponseTypePptx  GetJobStatusResponseType = "pptx"
+	GetJobStatusResponseTypeEjs   GetJobStatusResponseType = "ejs"
+	GetJobStatusResponseTypeHtml  GetJobStatusResponseType = "html"
+	GetJobStatusResponseTypeLatex GetJobStatusResponseType = "latex"
+	GetJobStatusResponseTypeReact GetJobStatusResponseType = "react"
 )
 
-func (g GetJobStatusResponseType) String() string {
-	switch g {
-	default:
-		return strconv.Itoa(int(g))
-	case GetJobStatusResponseTypeDocx:
-		return "docx"
-	case GetJobStatusResponseTypeXlsx:
-		return "xlsx"
-	case GetJobStatusResponseTypePptx:
-		return "pptx"
-	case GetJobStatusResponseTypeEjs:
-		return "ejs"
-	case GetJobStatusResponseTypeHtml:
-		return "html"
-	case GetJobStatusResponseTypeLatex:
-		return "latex"
-	case GetJobStatusResponseTypeReact:
-		return "react"
-	}
-}
-
-func (g GetJobStatusResponseType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", g.String())), nil
-}
-
-func (g *GetJobStatusResponseType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewGetJobStatusResponseTypeFromString(s string) (GetJobStatusResponseType, error) {
+	switch s {
 	case "docx":
-		value := GetJobStatusResponseTypeDocx
-		*g = value
+		return GetJobStatusResponseTypeDocx, nil
 	case "xlsx":
-		value := GetJobStatusResponseTypeXlsx
-		*g = value
+		return GetJobStatusResponseTypeXlsx, nil
 	case "pptx":
-		value := GetJobStatusResponseTypePptx
-		*g = value
+		return GetJobStatusResponseTypePptx, nil
 	case "ejs":
-		value := GetJobStatusResponseTypeEjs
-		*g = value
+		return GetJobStatusResponseTypeEjs, nil
 	case "html":
-		value := GetJobStatusResponseTypeHtml
-		*g = value
+		return GetJobStatusResponseTypeHtml, nil
 	case "latex":
-		value := GetJobStatusResponseTypeLatex
-		*g = value
+		return GetJobStatusResponseTypeLatex, nil
 	case "react":
-		value := GetJobStatusResponseTypeReact
-		*g = value
+		return GetJobStatusResponseTypeReact, nil
 	}
-	return nil
+	var t GetJobStatusResponseType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (g GetJobStatusResponseType) Ptr() *GetJobStatusResponseType {
+	return &g
 }
 
 type InitializeRenderJobRequestFormatOpts struct {
-	FromPage        *float64                                    `json:"fromPage,omitempty"`
-	ToPage          *float64                                    `json:"toPage,omitempty"`
-	Format          *InitializeRenderJobRequestFormatOptsFormat `json:"format,omitempty"`
-	WaitForSelector *string                                     `json:"waitForSelector,omitempty"`
+	FromPage        *float64                                    `json:"fromPage,omitempty" url:"fromPage,omitempty"`
+	ToPage          *float64                                    `json:"toPage,omitempty" url:"toPage,omitempty"`
+	Format          *InitializeRenderJobRequestFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
+	WaitForSelector *string                                     `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
 }
 
-type InitializeRenderJobRequestFormatOptsFormat uint
-
-const (
-	InitializeRenderJobRequestFormatOptsFormatLetter InitializeRenderJobRequestFormatOptsFormat = iota + 1
-	InitializeRenderJobRequestFormatOptsFormatLegal
-	InitializeRenderJobRequestFormatOptsFormatTabloid
-	InitializeRenderJobRequestFormatOptsFormatLedger
-	InitializeRenderJobRequestFormatOptsFormatA0
-	InitializeRenderJobRequestFormatOptsFormatA1
-	InitializeRenderJobRequestFormatOptsFormatA2
-	InitializeRenderJobRequestFormatOptsFormatA3
-	InitializeRenderJobRequestFormatOptsFormatA4
-	InitializeRenderJobRequestFormatOptsFormatA5
-	InitializeRenderJobRequestFormatOptsFormatA6
-)
-
-func (i InitializeRenderJobRequestFormatOptsFormat) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case InitializeRenderJobRequestFormatOptsFormatLetter:
-		return "letter"
-	case InitializeRenderJobRequestFormatOptsFormatLegal:
-		return "legal"
-	case InitializeRenderJobRequestFormatOptsFormatTabloid:
-		return "tabloid"
-	case InitializeRenderJobRequestFormatOptsFormatLedger:
-		return "ledger"
-	case InitializeRenderJobRequestFormatOptsFormatA0:
-		return "a0"
-	case InitializeRenderJobRequestFormatOptsFormatA1:
-		return "a1"
-	case InitializeRenderJobRequestFormatOptsFormatA2:
-		return "a2"
-	case InitializeRenderJobRequestFormatOptsFormatA3:
-		return "a3"
-	case InitializeRenderJobRequestFormatOptsFormatA4:
-		return "a4"
-	case InitializeRenderJobRequestFormatOptsFormatA5:
-		return "a5"
-	case InitializeRenderJobRequestFormatOptsFormatA6:
-		return "a6"
+func (i *InitializeRenderJobRequestFormatOpts) GetFromPage() *float64 {
+	if i == nil {
+		return nil
 	}
+	return i.FromPage
 }
 
-func (i InitializeRenderJobRequestFormatOptsFormat) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
+func (i *InitializeRenderJobRequestFormatOpts) GetToPage() *float64 {
+	if i == nil {
+		return nil
+	}
+	return i.ToPage
 }
 
-func (i *InitializeRenderJobRequestFormatOptsFormat) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (i *InitializeRenderJobRequestFormatOpts) GetFormat() *InitializeRenderJobRequestFormatOptsFormat {
+	if i == nil {
+		return nil
+	}
+	return i.Format
+}
+
+func (i *InitializeRenderJobRequestFormatOpts) GetWaitForSelector() *string {
+	if i == nil {
+		return nil
+	}
+	return i.WaitForSelector
+}
+
+func (i *InitializeRenderJobRequestFormatOpts) GetExtraProperties() map[string]interface{} {
+	return i.extraProperties
+}
+
+func (i *InitializeRenderJobRequestFormatOpts) UnmarshalJSON(data []byte) error {
+	type unmarshaler InitializeRenderJobRequestFormatOpts
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*i = InitializeRenderJobRequestFormatOpts(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *i)
+	if err != nil {
+		return err
+	}
+	i.extraProperties = extraProperties
+	i.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (i *InitializeRenderJobRequestFormatOpts) String() string {
+	if len(i.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(i.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
+}
+
+type InitializeRenderJobRequestFormatOptsFormat string
+
+const (
+	InitializeRenderJobRequestFormatOptsFormatLetter  InitializeRenderJobRequestFormatOptsFormat = "letter"
+	InitializeRenderJobRequestFormatOptsFormatLegal   InitializeRenderJobRequestFormatOptsFormat = "legal"
+	InitializeRenderJobRequestFormatOptsFormatTabloid InitializeRenderJobRequestFormatOptsFormat = "tabloid"
+	InitializeRenderJobRequestFormatOptsFormatLedger  InitializeRenderJobRequestFormatOptsFormat = "ledger"
+	InitializeRenderJobRequestFormatOptsFormatA0      InitializeRenderJobRequestFormatOptsFormat = "a0"
+	InitializeRenderJobRequestFormatOptsFormatA1      InitializeRenderJobRequestFormatOptsFormat = "a1"
+	InitializeRenderJobRequestFormatOptsFormatA2      InitializeRenderJobRequestFormatOptsFormat = "a2"
+	InitializeRenderJobRequestFormatOptsFormatA3      InitializeRenderJobRequestFormatOptsFormat = "a3"
+	InitializeRenderJobRequestFormatOptsFormatA4      InitializeRenderJobRequestFormatOptsFormat = "a4"
+	InitializeRenderJobRequestFormatOptsFormatA5      InitializeRenderJobRequestFormatOptsFormat = "a5"
+	InitializeRenderJobRequestFormatOptsFormatA6      InitializeRenderJobRequestFormatOptsFormat = "a6"
+)
+
+func NewInitializeRenderJobRequestFormatOptsFormatFromString(s string) (InitializeRenderJobRequestFormatOptsFormat, error) {
+	switch s {
 	case "letter":
-		value := InitializeRenderJobRequestFormatOptsFormatLetter
-		*i = value
+		return InitializeRenderJobRequestFormatOptsFormatLetter, nil
 	case "legal":
-		value := InitializeRenderJobRequestFormatOptsFormatLegal
-		*i = value
+		return InitializeRenderJobRequestFormatOptsFormatLegal, nil
 	case "tabloid":
-		value := InitializeRenderJobRequestFormatOptsFormatTabloid
-		*i = value
+		return InitializeRenderJobRequestFormatOptsFormatTabloid, nil
 	case "ledger":
-		value := InitializeRenderJobRequestFormatOptsFormatLedger
-		*i = value
+		return InitializeRenderJobRequestFormatOptsFormatLedger, nil
 	case "a0":
-		value := InitializeRenderJobRequestFormatOptsFormatA0
-		*i = value
+		return InitializeRenderJobRequestFormatOptsFormatA0, nil
 	case "a1":
-		value := InitializeRenderJobRequestFormatOptsFormatA1
-		*i = value
+		return InitializeRenderJobRequestFormatOptsFormatA1, nil
 	case "a2":
-		value := InitializeRenderJobRequestFormatOptsFormatA2
-		*i = value
+		return InitializeRenderJobRequestFormatOptsFormatA2, nil
 	case "a3":
-		value := InitializeRenderJobRequestFormatOptsFormatA3
-		*i = value
+		return InitializeRenderJobRequestFormatOptsFormatA3, nil
 	case "a4":
-		value := InitializeRenderJobRequestFormatOptsFormatA4
-		*i = value
+		return InitializeRenderJobRequestFormatOptsFormatA4, nil
 	case "a5":
-		value := InitializeRenderJobRequestFormatOptsFormatA5
-		*i = value
+		return InitializeRenderJobRequestFormatOptsFormatA5, nil
 	case "a6":
-		value := InitializeRenderJobRequestFormatOptsFormatA6
-		*i = value
+		return InitializeRenderJobRequestFormatOptsFormatA6, nil
 	}
-	return nil
+	var t InitializeRenderJobRequestFormatOptsFormat
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type InitializeRenderJobRequestTarget uint
+func (i InitializeRenderJobRequestFormatOptsFormat) Ptr() *InitializeRenderJobRequestFormatOptsFormat {
+	return &i
+}
+
+type InitializeRenderJobRequestTarget string
 
 const (
-	InitializeRenderJobRequestTargetPdf InitializeRenderJobRequestTarget = iota + 1
-	InitializeRenderJobRequestTargetHtml
-	InitializeRenderJobRequestTargetDocx
-	InitializeRenderJobRequestTargetXlsx
-	InitializeRenderJobRequestTargetPptx
-	InitializeRenderJobRequestTargetPng
-	InitializeRenderJobRequestTargetJpg
+	InitializeRenderJobRequestTargetPdf  InitializeRenderJobRequestTarget = "pdf"
+	InitializeRenderJobRequestTargetHtml InitializeRenderJobRequestTarget = "html"
+	InitializeRenderJobRequestTargetDocx InitializeRenderJobRequestTarget = "docx"
+	InitializeRenderJobRequestTargetXlsx InitializeRenderJobRequestTarget = "xlsx"
+	InitializeRenderJobRequestTargetPptx InitializeRenderJobRequestTarget = "pptx"
+	InitializeRenderJobRequestTargetPng  InitializeRenderJobRequestTarget = "png"
+	InitializeRenderJobRequestTargetJpg  InitializeRenderJobRequestTarget = "jpg"
 )
 
-func (i InitializeRenderJobRequestTarget) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case InitializeRenderJobRequestTargetPdf:
-		return "pdf"
-	case InitializeRenderJobRequestTargetHtml:
-		return "html"
-	case InitializeRenderJobRequestTargetDocx:
-		return "docx"
-	case InitializeRenderJobRequestTargetXlsx:
-		return "xlsx"
-	case InitializeRenderJobRequestTargetPptx:
-		return "pptx"
-	case InitializeRenderJobRequestTargetPng:
-		return "png"
-	case InitializeRenderJobRequestTargetJpg:
-		return "jpg"
-	}
-}
-
-func (i InitializeRenderJobRequestTarget) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *InitializeRenderJobRequestTarget) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewInitializeRenderJobRequestTargetFromString(s string) (InitializeRenderJobRequestTarget, error) {
+	switch s {
 	case "pdf":
-		value := InitializeRenderJobRequestTargetPdf
-		*i = value
+		return InitializeRenderJobRequestTargetPdf, nil
 	case "html":
-		value := InitializeRenderJobRequestTargetHtml
-		*i = value
+		return InitializeRenderJobRequestTargetHtml, nil
 	case "docx":
-		value := InitializeRenderJobRequestTargetDocx
-		*i = value
+		return InitializeRenderJobRequestTargetDocx, nil
 	case "xlsx":
-		value := InitializeRenderJobRequestTargetXlsx
-		*i = value
+		return InitializeRenderJobRequestTargetXlsx, nil
 	case "pptx":
-		value := InitializeRenderJobRequestTargetPptx
-		*i = value
+		return InitializeRenderJobRequestTargetPptx, nil
 	case "png":
-		value := InitializeRenderJobRequestTargetPng
-		*i = value
+		return InitializeRenderJobRequestTargetPng, nil
 	case "jpg":
-		value := InitializeRenderJobRequestTargetJpg
-		*i = value
+		return InitializeRenderJobRequestTargetJpg, nil
 	}
-	return nil
+	var t InitializeRenderJobRequestTarget
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type InitializeRenderJobRequestType uint
+func (i InitializeRenderJobRequestTarget) Ptr() *InitializeRenderJobRequestTarget {
+	return &i
+}
+
+type InitializeRenderJobRequestType string
 
 const (
-	InitializeRenderJobRequestTypeDocx InitializeRenderJobRequestType = iota + 1
-	InitializeRenderJobRequestTypeXlsx
-	InitializeRenderJobRequestTypePptx
-	InitializeRenderJobRequestTypeEjs
-	InitializeRenderJobRequestTypeHtml
-	InitializeRenderJobRequestTypeLatex
-	InitializeRenderJobRequestTypeReact
+	InitializeRenderJobRequestTypeDocx  InitializeRenderJobRequestType = "docx"
+	InitializeRenderJobRequestTypeXlsx  InitializeRenderJobRequestType = "xlsx"
+	InitializeRenderJobRequestTypePptx  InitializeRenderJobRequestType = "pptx"
+	InitializeRenderJobRequestTypeEjs   InitializeRenderJobRequestType = "ejs"
+	InitializeRenderJobRequestTypeHtml  InitializeRenderJobRequestType = "html"
+	InitializeRenderJobRequestTypeLatex InitializeRenderJobRequestType = "latex"
+	InitializeRenderJobRequestTypeReact InitializeRenderJobRequestType = "react"
 )
 
-func (i InitializeRenderJobRequestType) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case InitializeRenderJobRequestTypeDocx:
-		return "docx"
-	case InitializeRenderJobRequestTypeXlsx:
-		return "xlsx"
-	case InitializeRenderJobRequestTypePptx:
-		return "pptx"
-	case InitializeRenderJobRequestTypeEjs:
-		return "ejs"
-	case InitializeRenderJobRequestTypeHtml:
-		return "html"
-	case InitializeRenderJobRequestTypeLatex:
-		return "latex"
-	case InitializeRenderJobRequestTypeReact:
-		return "react"
-	}
-}
-
-func (i InitializeRenderJobRequestType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
-}
-
-func (i *InitializeRenderJobRequestType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewInitializeRenderJobRequestTypeFromString(s string) (InitializeRenderJobRequestType, error) {
+	switch s {
 	case "docx":
-		value := InitializeRenderJobRequestTypeDocx
-		*i = value
+		return InitializeRenderJobRequestTypeDocx, nil
 	case "xlsx":
-		value := InitializeRenderJobRequestTypeXlsx
-		*i = value
+		return InitializeRenderJobRequestTypeXlsx, nil
 	case "pptx":
-		value := InitializeRenderJobRequestTypePptx
-		*i = value
+		return InitializeRenderJobRequestTypePptx, nil
 	case "ejs":
-		value := InitializeRenderJobRequestTypeEjs
-		*i = value
+		return InitializeRenderJobRequestTypeEjs, nil
 	case "html":
-		value := InitializeRenderJobRequestTypeHtml
-		*i = value
+		return InitializeRenderJobRequestTypeHtml, nil
 	case "latex":
-		value := InitializeRenderJobRequestTypeLatex
-		*i = value
+		return InitializeRenderJobRequestTypeLatex, nil
 	case "react":
-		value := InitializeRenderJobRequestTypeReact
-		*i = value
+		return InitializeRenderJobRequestTypeReact, nil
 	}
-	return nil
+	var t InitializeRenderJobRequestType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i InitializeRenderJobRequestType) Ptr() *InitializeRenderJobRequestType {
+	return &i
 }
 
 type InitializeRenderJobResponse struct {
-	JobId                      string                            `json:"jobId"`
-	Target                     InitializeRenderJobResponseTarget `json:"target,omitempty"`
-	PresignedDataUploadUrl     *string                           `json:"presignedDataUploadUrl,omitempty"`
-	PresignedTemplateUploadUrl *string                           `json:"presignedTemplateUploadUrl,omitempty"`
+	JobId                      string                            `json:"jobId" url:"jobId"`
+	Target                     InitializeRenderJobResponseTarget `json:"target" url:"target"`
+	PresignedDataUploadUrl     *string                           `json:"presignedDataUploadUrl,omitempty" url:"presignedDataUploadUrl,omitempty"`
+	PresignedTemplateUploadUrl *string                           `json:"presignedTemplateUploadUrl,omitempty" url:"presignedTemplateUploadUrl,omitempty"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
 }
 
-type InitializeRenderJobResponseTarget uint
-
-const (
-	InitializeRenderJobResponseTargetPdf InitializeRenderJobResponseTarget = iota + 1
-	InitializeRenderJobResponseTargetHtml
-	InitializeRenderJobResponseTargetDocx
-	InitializeRenderJobResponseTargetXlsx
-	InitializeRenderJobResponseTargetPptx
-	InitializeRenderJobResponseTargetPng
-	InitializeRenderJobResponseTargetJpg
-)
-
-func (i InitializeRenderJobResponseTarget) String() string {
-	switch i {
-	default:
-		return strconv.Itoa(int(i))
-	case InitializeRenderJobResponseTargetPdf:
-		return "pdf"
-	case InitializeRenderJobResponseTargetHtml:
-		return "html"
-	case InitializeRenderJobResponseTargetDocx:
-		return "docx"
-	case InitializeRenderJobResponseTargetXlsx:
-		return "xlsx"
-	case InitializeRenderJobResponseTargetPptx:
-		return "pptx"
-	case InitializeRenderJobResponseTargetPng:
-		return "png"
-	case InitializeRenderJobResponseTargetJpg:
-		return "jpg"
+func (i *InitializeRenderJobResponse) GetJobId() string {
+	if i == nil {
+		return ""
 	}
+	return i.JobId
 }
 
-func (i InitializeRenderJobResponseTarget) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", i.String())), nil
+func (i *InitializeRenderJobResponse) GetTarget() InitializeRenderJobResponseTarget {
+	if i == nil {
+		return ""
+	}
+	return i.Target
 }
 
-func (i *InitializeRenderJobResponseTarget) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (i *InitializeRenderJobResponse) GetPresignedDataUploadUrl() *string {
+	if i == nil {
+		return nil
+	}
+	return i.PresignedDataUploadUrl
+}
+
+func (i *InitializeRenderJobResponse) GetPresignedTemplateUploadUrl() *string {
+	if i == nil {
+		return nil
+	}
+	return i.PresignedTemplateUploadUrl
+}
+
+func (i *InitializeRenderJobResponse) GetExtraProperties() map[string]interface{} {
+	return i.extraProperties
+}
+
+func (i *InitializeRenderJobResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler InitializeRenderJobResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
-	case "pdf":
-		value := InitializeRenderJobResponseTargetPdf
-		*i = value
-	case "html":
-		value := InitializeRenderJobResponseTargetHtml
-		*i = value
-	case "docx":
-		value := InitializeRenderJobResponseTargetDocx
-		*i = value
-	case "xlsx":
-		value := InitializeRenderJobResponseTargetXlsx
-		*i = value
-	case "pptx":
-		value := InitializeRenderJobResponseTargetPptx
-		*i = value
-	case "png":
-		value := InitializeRenderJobResponseTargetPng
-		*i = value
-	case "jpg":
-		value := InitializeRenderJobResponseTargetJpg
-		*i = value
+	*i = InitializeRenderJobResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *i)
+	if err != nil {
+		return err
 	}
+	i.extraProperties = extraProperties
+	i.rawJSON = json.RawMessage(data)
 	return nil
+}
+
+func (i *InitializeRenderJobResponse) String() string {
+	if len(i.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(i.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
+}
+
+type InitializeRenderJobResponseTarget string
+
+const (
+	InitializeRenderJobResponseTargetPdf  InitializeRenderJobResponseTarget = "pdf"
+	InitializeRenderJobResponseTargetHtml InitializeRenderJobResponseTarget = "html"
+	InitializeRenderJobResponseTargetDocx InitializeRenderJobResponseTarget = "docx"
+	InitializeRenderJobResponseTargetXlsx InitializeRenderJobResponseTarget = "xlsx"
+	InitializeRenderJobResponseTargetPptx InitializeRenderJobResponseTarget = "pptx"
+	InitializeRenderJobResponseTargetPng  InitializeRenderJobResponseTarget = "png"
+	InitializeRenderJobResponseTargetJpg  InitializeRenderJobResponseTarget = "jpg"
+)
+
+func NewInitializeRenderJobResponseTargetFromString(s string) (InitializeRenderJobResponseTarget, error) {
+	switch s {
+	case "pdf":
+		return InitializeRenderJobResponseTargetPdf, nil
+	case "html":
+		return InitializeRenderJobResponseTargetHtml, nil
+	case "docx":
+		return InitializeRenderJobResponseTargetDocx, nil
+	case "xlsx":
+		return InitializeRenderJobResponseTargetXlsx, nil
+	case "pptx":
+		return InitializeRenderJobResponseTargetPptx, nil
+	case "png":
+		return InitializeRenderJobResponseTargetPng, nil
+	case "jpg":
+		return InitializeRenderJobResponseTargetJpg, nil
+	}
+	var t InitializeRenderJobResponseTarget
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i InitializeRenderJobResponseTarget) Ptr() *InitializeRenderJobResponseTarget {
+	return &i
 }
 
 type StartImmediateRenderRequestFormatOpts struct {
-	FromPage        *float64                                     `json:"fromPage,omitempty"`
-	ToPage          *float64                                     `json:"toPage,omitempty"`
-	Format          *StartImmediateRenderRequestFormatOptsFormat `json:"format,omitempty"`
-	WaitForSelector *string                                      `json:"waitForSelector,omitempty"`
+	FromPage        *float64                                     `json:"fromPage,omitempty" url:"fromPage,omitempty"`
+	ToPage          *float64                                     `json:"toPage,omitempty" url:"toPage,omitempty"`
+	Format          *StartImmediateRenderRequestFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
+	WaitForSelector *string                                      `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
 }
 
-type StartImmediateRenderRequestFormatOptsFormat uint
-
-const (
-	StartImmediateRenderRequestFormatOptsFormatLetter StartImmediateRenderRequestFormatOptsFormat = iota + 1
-	StartImmediateRenderRequestFormatOptsFormatLegal
-	StartImmediateRenderRequestFormatOptsFormatTabloid
-	StartImmediateRenderRequestFormatOptsFormatLedger
-	StartImmediateRenderRequestFormatOptsFormatA0
-	StartImmediateRenderRequestFormatOptsFormatA1
-	StartImmediateRenderRequestFormatOptsFormatA2
-	StartImmediateRenderRequestFormatOptsFormatA3
-	StartImmediateRenderRequestFormatOptsFormatA4
-	StartImmediateRenderRequestFormatOptsFormatA5
-	StartImmediateRenderRequestFormatOptsFormatA6
-)
-
-func (s StartImmediateRenderRequestFormatOptsFormat) String() string {
-	switch s {
-	default:
-		return strconv.Itoa(int(s))
-	case StartImmediateRenderRequestFormatOptsFormatLetter:
-		return "letter"
-	case StartImmediateRenderRequestFormatOptsFormatLegal:
-		return "legal"
-	case StartImmediateRenderRequestFormatOptsFormatTabloid:
-		return "tabloid"
-	case StartImmediateRenderRequestFormatOptsFormatLedger:
-		return "ledger"
-	case StartImmediateRenderRequestFormatOptsFormatA0:
-		return "a0"
-	case StartImmediateRenderRequestFormatOptsFormatA1:
-		return "a1"
-	case StartImmediateRenderRequestFormatOptsFormatA2:
-		return "a2"
-	case StartImmediateRenderRequestFormatOptsFormatA3:
-		return "a3"
-	case StartImmediateRenderRequestFormatOptsFormatA4:
-		return "a4"
-	case StartImmediateRenderRequestFormatOptsFormatA5:
-		return "a5"
-	case StartImmediateRenderRequestFormatOptsFormatA6:
-		return "a6"
+func (s *StartImmediateRenderRequestFormatOpts) GetFromPage() *float64 {
+	if s == nil {
+		return nil
 	}
+	return s.FromPage
 }
 
-func (s StartImmediateRenderRequestFormatOptsFormat) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", s.String())), nil
+func (s *StartImmediateRenderRequestFormatOpts) GetToPage() *float64 {
+	if s == nil {
+		return nil
+	}
+	return s.ToPage
 }
 
-func (s *StartImmediateRenderRequestFormatOptsFormat) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (s *StartImmediateRenderRequestFormatOpts) GetFormat() *StartImmediateRenderRequestFormatOptsFormat {
+	if s == nil {
+		return nil
+	}
+	return s.Format
+}
+
+func (s *StartImmediateRenderRequestFormatOpts) GetWaitForSelector() *string {
+	if s == nil {
+		return nil
+	}
+	return s.WaitForSelector
+}
+
+func (s *StartImmediateRenderRequestFormatOpts) GetExtraProperties() map[string]interface{} {
+	return s.extraProperties
+}
+
+func (s *StartImmediateRenderRequestFormatOpts) UnmarshalJSON(data []byte) error {
+	type unmarshaler StartImmediateRenderRequestFormatOpts
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*s = StartImmediateRenderRequestFormatOpts(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *s)
+	if err != nil {
+		return err
+	}
+	s.extraProperties = extraProperties
+	s.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (s *StartImmediateRenderRequestFormatOpts) String() string {
+	if len(s.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
+}
+
+type StartImmediateRenderRequestFormatOptsFormat string
+
+const (
+	StartImmediateRenderRequestFormatOptsFormatLetter  StartImmediateRenderRequestFormatOptsFormat = "letter"
+	StartImmediateRenderRequestFormatOptsFormatLegal   StartImmediateRenderRequestFormatOptsFormat = "legal"
+	StartImmediateRenderRequestFormatOptsFormatTabloid StartImmediateRenderRequestFormatOptsFormat = "tabloid"
+	StartImmediateRenderRequestFormatOptsFormatLedger  StartImmediateRenderRequestFormatOptsFormat = "ledger"
+	StartImmediateRenderRequestFormatOptsFormatA0      StartImmediateRenderRequestFormatOptsFormat = "a0"
+	StartImmediateRenderRequestFormatOptsFormatA1      StartImmediateRenderRequestFormatOptsFormat = "a1"
+	StartImmediateRenderRequestFormatOptsFormatA2      StartImmediateRenderRequestFormatOptsFormat = "a2"
+	StartImmediateRenderRequestFormatOptsFormatA3      StartImmediateRenderRequestFormatOptsFormat = "a3"
+	StartImmediateRenderRequestFormatOptsFormatA4      StartImmediateRenderRequestFormatOptsFormat = "a4"
+	StartImmediateRenderRequestFormatOptsFormatA5      StartImmediateRenderRequestFormatOptsFormat = "a5"
+	StartImmediateRenderRequestFormatOptsFormatA6      StartImmediateRenderRequestFormatOptsFormat = "a6"
+)
+
+func NewStartImmediateRenderRequestFormatOptsFormatFromString(s string) (StartImmediateRenderRequestFormatOptsFormat, error) {
+	switch s {
 	case "letter":
-		value := StartImmediateRenderRequestFormatOptsFormatLetter
-		*s = value
+		return StartImmediateRenderRequestFormatOptsFormatLetter, nil
 	case "legal":
-		value := StartImmediateRenderRequestFormatOptsFormatLegal
-		*s = value
+		return StartImmediateRenderRequestFormatOptsFormatLegal, nil
 	case "tabloid":
-		value := StartImmediateRenderRequestFormatOptsFormatTabloid
-		*s = value
+		return StartImmediateRenderRequestFormatOptsFormatTabloid, nil
 	case "ledger":
-		value := StartImmediateRenderRequestFormatOptsFormatLedger
-		*s = value
+		return StartImmediateRenderRequestFormatOptsFormatLedger, nil
 	case "a0":
-		value := StartImmediateRenderRequestFormatOptsFormatA0
-		*s = value
+		return StartImmediateRenderRequestFormatOptsFormatA0, nil
 	case "a1":
-		value := StartImmediateRenderRequestFormatOptsFormatA1
-		*s = value
+		return StartImmediateRenderRequestFormatOptsFormatA1, nil
 	case "a2":
-		value := StartImmediateRenderRequestFormatOptsFormatA2
-		*s = value
+		return StartImmediateRenderRequestFormatOptsFormatA2, nil
 	case "a3":
-		value := StartImmediateRenderRequestFormatOptsFormatA3
-		*s = value
+		return StartImmediateRenderRequestFormatOptsFormatA3, nil
 	case "a4":
-		value := StartImmediateRenderRequestFormatOptsFormatA4
-		*s = value
+		return StartImmediateRenderRequestFormatOptsFormatA4, nil
 	case "a5":
-		value := StartImmediateRenderRequestFormatOptsFormatA5
-		*s = value
+		return StartImmediateRenderRequestFormatOptsFormatA5, nil
 	case "a6":
-		value := StartImmediateRenderRequestFormatOptsFormatA6
-		*s = value
+		return StartImmediateRenderRequestFormatOptsFormatA6, nil
 	}
-	return nil
+	var t StartImmediateRenderRequestFormatOptsFormat
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type StartImmediateRenderRequestTarget uint
+func (s StartImmediateRenderRequestFormatOptsFormat) Ptr() *StartImmediateRenderRequestFormatOptsFormat {
+	return &s
+}
+
+type StartImmediateRenderRequestTarget string
 
 const (
-	StartImmediateRenderRequestTargetPdf StartImmediateRenderRequestTarget = iota + 1
-	StartImmediateRenderRequestTargetHtml
-	StartImmediateRenderRequestTargetDocx
-	StartImmediateRenderRequestTargetXlsx
-	StartImmediateRenderRequestTargetPptx
-	StartImmediateRenderRequestTargetPng
-	StartImmediateRenderRequestTargetJpg
+	StartImmediateRenderRequestTargetPdf  StartImmediateRenderRequestTarget = "pdf"
+	StartImmediateRenderRequestTargetHtml StartImmediateRenderRequestTarget = "html"
+	StartImmediateRenderRequestTargetDocx StartImmediateRenderRequestTarget = "docx"
+	StartImmediateRenderRequestTargetXlsx StartImmediateRenderRequestTarget = "xlsx"
+	StartImmediateRenderRequestTargetPptx StartImmediateRenderRequestTarget = "pptx"
+	StartImmediateRenderRequestTargetPng  StartImmediateRenderRequestTarget = "png"
+	StartImmediateRenderRequestTargetJpg  StartImmediateRenderRequestTarget = "jpg"
 )
 
-func (s StartImmediateRenderRequestTarget) String() string {
+func NewStartImmediateRenderRequestTargetFromString(s string) (StartImmediateRenderRequestTarget, error) {
 	switch s {
-	default:
-		return strconv.Itoa(int(s))
-	case StartImmediateRenderRequestTargetPdf:
-		return "pdf"
-	case StartImmediateRenderRequestTargetHtml:
-		return "html"
-	case StartImmediateRenderRequestTargetDocx:
-		return "docx"
-	case StartImmediateRenderRequestTargetXlsx:
-		return "xlsx"
-	case StartImmediateRenderRequestTargetPptx:
-		return "pptx"
-	case StartImmediateRenderRequestTargetPng:
-		return "png"
-	case StartImmediateRenderRequestTargetJpg:
-		return "jpg"
-	}
-}
-
-func (s StartImmediateRenderRequestTarget) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", s.String())), nil
-}
-
-func (s *StartImmediateRenderRequestTarget) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
 	case "pdf":
-		value := StartImmediateRenderRequestTargetPdf
-		*s = value
+		return StartImmediateRenderRequestTargetPdf, nil
 	case "html":
-		value := StartImmediateRenderRequestTargetHtml
-		*s = value
+		return StartImmediateRenderRequestTargetHtml, nil
 	case "docx":
-		value := StartImmediateRenderRequestTargetDocx
-		*s = value
+		return StartImmediateRenderRequestTargetDocx, nil
 	case "xlsx":
-		value := StartImmediateRenderRequestTargetXlsx
-		*s = value
+		return StartImmediateRenderRequestTargetXlsx, nil
 	case "pptx":
-		value := StartImmediateRenderRequestTargetPptx
-		*s = value
+		return StartImmediateRenderRequestTargetPptx, nil
 	case "png":
-		value := StartImmediateRenderRequestTargetPng
-		*s = value
+		return StartImmediateRenderRequestTargetPng, nil
 	case "jpg":
-		value := StartImmediateRenderRequestTargetJpg
-		*s = value
+		return StartImmediateRenderRequestTargetJpg, nil
 	}
-	return nil
+	var t StartImmediateRenderRequestTarget
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type StartImmediateRenderRequestType uint
+func (s StartImmediateRenderRequestTarget) Ptr() *StartImmediateRenderRequestTarget {
+	return &s
+}
+
+type StartImmediateRenderRequestType string
 
 const (
-	StartImmediateRenderRequestTypeDocx StartImmediateRenderRequestType = iota + 1
-	StartImmediateRenderRequestTypeXlsx
-	StartImmediateRenderRequestTypePptx
-	StartImmediateRenderRequestTypeEjs
-	StartImmediateRenderRequestTypeHtml
-	StartImmediateRenderRequestTypeLatex
-	StartImmediateRenderRequestTypeReact
+	StartImmediateRenderRequestTypeDocx  StartImmediateRenderRequestType = "docx"
+	StartImmediateRenderRequestTypeXlsx  StartImmediateRenderRequestType = "xlsx"
+	StartImmediateRenderRequestTypePptx  StartImmediateRenderRequestType = "pptx"
+	StartImmediateRenderRequestTypeEjs   StartImmediateRenderRequestType = "ejs"
+	StartImmediateRenderRequestTypeHtml  StartImmediateRenderRequestType = "html"
+	StartImmediateRenderRequestTypeLatex StartImmediateRenderRequestType = "latex"
+	StartImmediateRenderRequestTypeReact StartImmediateRenderRequestType = "react"
 )
 
-func (s StartImmediateRenderRequestType) String() string {
+func NewStartImmediateRenderRequestTypeFromString(s string) (StartImmediateRenderRequestType, error) {
 	switch s {
-	default:
-		return strconv.Itoa(int(s))
-	case StartImmediateRenderRequestTypeDocx:
-		return "docx"
-	case StartImmediateRenderRequestTypeXlsx:
-		return "xlsx"
-	case StartImmediateRenderRequestTypePptx:
-		return "pptx"
-	case StartImmediateRenderRequestTypeEjs:
-		return "ejs"
-	case StartImmediateRenderRequestTypeHtml:
-		return "html"
-	case StartImmediateRenderRequestTypeLatex:
-		return "latex"
-	case StartImmediateRenderRequestTypeReact:
-		return "react"
-	}
-}
-
-func (s StartImmediateRenderRequestType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", s.String())), nil
-}
-
-func (s *StartImmediateRenderRequestType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
 	case "docx":
-		value := StartImmediateRenderRequestTypeDocx
-		*s = value
+		return StartImmediateRenderRequestTypeDocx, nil
 	case "xlsx":
-		value := StartImmediateRenderRequestTypeXlsx
-		*s = value
+		return StartImmediateRenderRequestTypeXlsx, nil
 	case "pptx":
-		value := StartImmediateRenderRequestTypePptx
-		*s = value
+		return StartImmediateRenderRequestTypePptx, nil
 	case "ejs":
-		value := StartImmediateRenderRequestTypeEjs
-		*s = value
+		return StartImmediateRenderRequestTypeEjs, nil
 	case "html":
-		value := StartImmediateRenderRequestTypeHtml
-		*s = value
+		return StartImmediateRenderRequestTypeHtml, nil
 	case "latex":
-		value := StartImmediateRenderRequestTypeLatex
-		*s = value
+		return StartImmediateRenderRequestTypeLatex, nil
 	case "react":
-		value := StartImmediateRenderRequestTypeReact
-		*s = value
+		return StartImmediateRenderRequestTypeReact, nil
 	}
-	return nil
+	var t StartImmediateRenderRequestType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s StartImmediateRenderRequestType) Ptr() *StartImmediateRenderRequestType {
+	return &s
 }
 
 type StartImmediateRenderResponse struct {
-	Url string `json:"url"`
+	Url string `json:"url" url:"url"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (s *StartImmediateRenderResponse) GetUrl() string {
+	if s == nil {
+		return ""
+	}
+	return s.Url
+}
+
+func (s *StartImmediateRenderResponse) GetExtraProperties() map[string]interface{} {
+	return s.extraProperties
+}
+
+func (s *StartImmediateRenderResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler StartImmediateRenderResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*s = StartImmediateRenderResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *s)
+	if err != nil {
+		return err
+	}
+	s.extraProperties = extraProperties
+	s.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (s *StartImmediateRenderResponse) String() string {
+	if len(s.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
 }
 
 type StartRenderJobResponse struct {
-	JobId string `json:"jobId"`
+	JobId string `json:"jobId" url:"jobId"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (s *StartRenderJobResponse) GetJobId() string {
+	if s == nil {
+		return ""
+	}
+	return s.JobId
+}
+
+func (s *StartRenderJobResponse) GetExtraProperties() map[string]interface{} {
+	return s.extraProperties
+}
+
+func (s *StartRenderJobResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler StartRenderJobResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*s = StartRenderJobResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *s)
+	if err != nil {
+		return err
+	}
+	s.extraProperties = extraProperties
+	s.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (s *StartRenderJobResponse) String() string {
+	if len(s.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
 }

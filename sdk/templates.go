@@ -5,508 +5,998 @@ package api
 import (
 	json "encoding/json"
 	fmt "fmt"
-	strconv "strconv"
+	internal "pogodoc/go/sdk/internal"
 )
 
 type GenerateTemplatePreviewsRequest struct {
-	Type       GenerateTemplatePreviewsRequestType        `json:"type,omitempty"`
-	Data       map[string]any                             `json:"data,omitempty"`
-	FormatOpts *GenerateTemplatePreviewsRequestFormatOpts `json:"formatOpts,omitempty"`
+	Type       GenerateTemplatePreviewsRequestType        `json:"type" url:"-"`
+	Data       map[string]interface{}                     `json:"data,omitempty" url:"-"`
+	FormatOpts *GenerateTemplatePreviewsRequestFormatOpts `json:"formatOpts,omitempty" url:"-"`
 }
 
 type SaveCreatedTemplateRequest struct {
-	TemplateInfo *SaveCreatedTemplateRequestTemplateInfo `json:"templateInfo,omitempty"`
-	PreviewIds   *SaveCreatedTemplateRequestPreviewIds   `json:"previewIds,omitempty"`
+	TemplateInfo *SaveCreatedTemplateRequestTemplateInfo `json:"templateInfo,omitempty" url:"-"`
+	PreviewIds   *SaveCreatedTemplateRequestPreviewIds   `json:"previewIds,omitempty" url:"-"`
 }
 
 type CloneTemplateResponse struct {
-	NewTemplateId string `json:"newTemplateId"`
+	NewTemplateId string `json:"newTemplateId" url:"newTemplateId"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
 }
 
-type ExtractTemplateFilesRequest struct {
+func (c *CloneTemplateResponse) GetNewTemplateId() string {
+	if c == nil {
+		return ""
+	}
+	return c.NewTemplateId
+}
+
+func (c *CloneTemplateResponse) GetExtraProperties() map[string]interface{} {
+	return c.extraProperties
+}
+
+func (c *CloneTemplateResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler CloneTemplateResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*c = CloneTemplateResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *c)
+	if err != nil {
+		return err
+	}
+	c.extraProperties = extraProperties
+	c.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CloneTemplateResponse) String() string {
+	if len(c.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(c.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
 }
 
 type GeneratePresignedGetUrlResponse struct {
-	PresignedUrl string `json:"presignedUrl"`
+	PresignedUrl string `json:"presignedUrl" url:"presignedUrl"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (g *GeneratePresignedGetUrlResponse) GetPresignedUrl() string {
+	if g == nil {
+		return ""
+	}
+	return g.PresignedUrl
+}
+
+func (g *GeneratePresignedGetUrlResponse) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GeneratePresignedGetUrlResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler GeneratePresignedGetUrlResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GeneratePresignedGetUrlResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GeneratePresignedGetUrlResponse) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
 }
 
 type GenerateTemplatePreviewsRequestFormatOpts struct {
-	FromPage        *float64                                         `json:"fromPage,omitempty"`
-	ToPage          *float64                                         `json:"toPage,omitempty"`
-	Format          *GenerateTemplatePreviewsRequestFormatOptsFormat `json:"format,omitempty"`
-	WaitForSelector *string                                          `json:"waitForSelector,omitempty"`
+	FromPage        *float64                                         `json:"fromPage,omitempty" url:"fromPage,omitempty"`
+	ToPage          *float64                                         `json:"toPage,omitempty" url:"toPage,omitempty"`
+	Format          *GenerateTemplatePreviewsRequestFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
+	WaitForSelector *string                                          `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
 }
 
-type GenerateTemplatePreviewsRequestFormatOptsFormat uint
-
-const (
-	GenerateTemplatePreviewsRequestFormatOptsFormatLetter GenerateTemplatePreviewsRequestFormatOptsFormat = iota + 1
-	GenerateTemplatePreviewsRequestFormatOptsFormatLegal
-	GenerateTemplatePreviewsRequestFormatOptsFormatTabloid
-	GenerateTemplatePreviewsRequestFormatOptsFormatLedger
-	GenerateTemplatePreviewsRequestFormatOptsFormatA0
-	GenerateTemplatePreviewsRequestFormatOptsFormatA1
-	GenerateTemplatePreviewsRequestFormatOptsFormatA2
-	GenerateTemplatePreviewsRequestFormatOptsFormatA3
-	GenerateTemplatePreviewsRequestFormatOptsFormatA4
-	GenerateTemplatePreviewsRequestFormatOptsFormatA5
-	GenerateTemplatePreviewsRequestFormatOptsFormatA6
-)
-
-func (g GenerateTemplatePreviewsRequestFormatOptsFormat) String() string {
-	switch g {
-	default:
-		return strconv.Itoa(int(g))
-	case GenerateTemplatePreviewsRequestFormatOptsFormatLetter:
-		return "letter"
-	case GenerateTemplatePreviewsRequestFormatOptsFormatLegal:
-		return "legal"
-	case GenerateTemplatePreviewsRequestFormatOptsFormatTabloid:
-		return "tabloid"
-	case GenerateTemplatePreviewsRequestFormatOptsFormatLedger:
-		return "ledger"
-	case GenerateTemplatePreviewsRequestFormatOptsFormatA0:
-		return "a0"
-	case GenerateTemplatePreviewsRequestFormatOptsFormatA1:
-		return "a1"
-	case GenerateTemplatePreviewsRequestFormatOptsFormatA2:
-		return "a2"
-	case GenerateTemplatePreviewsRequestFormatOptsFormatA3:
-		return "a3"
-	case GenerateTemplatePreviewsRequestFormatOptsFormatA4:
-		return "a4"
-	case GenerateTemplatePreviewsRequestFormatOptsFormatA5:
-		return "a5"
-	case GenerateTemplatePreviewsRequestFormatOptsFormatA6:
-		return "a6"
+func (g *GenerateTemplatePreviewsRequestFormatOpts) GetFromPage() *float64 {
+	if g == nil {
+		return nil
 	}
+	return g.FromPage
 }
 
-func (g GenerateTemplatePreviewsRequestFormatOptsFormat) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", g.String())), nil
+func (g *GenerateTemplatePreviewsRequestFormatOpts) GetToPage() *float64 {
+	if g == nil {
+		return nil
+	}
+	return g.ToPage
 }
 
-func (g *GenerateTemplatePreviewsRequestFormatOptsFormat) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (g *GenerateTemplatePreviewsRequestFormatOpts) GetFormat() *GenerateTemplatePreviewsRequestFormatOptsFormat {
+	if g == nil {
+		return nil
+	}
+	return g.Format
+}
+
+func (g *GenerateTemplatePreviewsRequestFormatOpts) GetWaitForSelector() *string {
+	if g == nil {
+		return nil
+	}
+	return g.WaitForSelector
+}
+
+func (g *GenerateTemplatePreviewsRequestFormatOpts) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GenerateTemplatePreviewsRequestFormatOpts) UnmarshalJSON(data []byte) error {
+	type unmarshaler GenerateTemplatePreviewsRequestFormatOpts
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*g = GenerateTemplatePreviewsRequestFormatOpts(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GenerateTemplatePreviewsRequestFormatOpts) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
+}
+
+type GenerateTemplatePreviewsRequestFormatOptsFormat string
+
+const (
+	GenerateTemplatePreviewsRequestFormatOptsFormatLetter  GenerateTemplatePreviewsRequestFormatOptsFormat = "letter"
+	GenerateTemplatePreviewsRequestFormatOptsFormatLegal   GenerateTemplatePreviewsRequestFormatOptsFormat = "legal"
+	GenerateTemplatePreviewsRequestFormatOptsFormatTabloid GenerateTemplatePreviewsRequestFormatOptsFormat = "tabloid"
+	GenerateTemplatePreviewsRequestFormatOptsFormatLedger  GenerateTemplatePreviewsRequestFormatOptsFormat = "ledger"
+	GenerateTemplatePreviewsRequestFormatOptsFormatA0      GenerateTemplatePreviewsRequestFormatOptsFormat = "a0"
+	GenerateTemplatePreviewsRequestFormatOptsFormatA1      GenerateTemplatePreviewsRequestFormatOptsFormat = "a1"
+	GenerateTemplatePreviewsRequestFormatOptsFormatA2      GenerateTemplatePreviewsRequestFormatOptsFormat = "a2"
+	GenerateTemplatePreviewsRequestFormatOptsFormatA3      GenerateTemplatePreviewsRequestFormatOptsFormat = "a3"
+	GenerateTemplatePreviewsRequestFormatOptsFormatA4      GenerateTemplatePreviewsRequestFormatOptsFormat = "a4"
+	GenerateTemplatePreviewsRequestFormatOptsFormatA5      GenerateTemplatePreviewsRequestFormatOptsFormat = "a5"
+	GenerateTemplatePreviewsRequestFormatOptsFormatA6      GenerateTemplatePreviewsRequestFormatOptsFormat = "a6"
+)
+
+func NewGenerateTemplatePreviewsRequestFormatOptsFormatFromString(s string) (GenerateTemplatePreviewsRequestFormatOptsFormat, error) {
+	switch s {
 	case "letter":
-		value := GenerateTemplatePreviewsRequestFormatOptsFormatLetter
-		*g = value
+		return GenerateTemplatePreviewsRequestFormatOptsFormatLetter, nil
 	case "legal":
-		value := GenerateTemplatePreviewsRequestFormatOptsFormatLegal
-		*g = value
+		return GenerateTemplatePreviewsRequestFormatOptsFormatLegal, nil
 	case "tabloid":
-		value := GenerateTemplatePreviewsRequestFormatOptsFormatTabloid
-		*g = value
+		return GenerateTemplatePreviewsRequestFormatOptsFormatTabloid, nil
 	case "ledger":
-		value := GenerateTemplatePreviewsRequestFormatOptsFormatLedger
-		*g = value
+		return GenerateTemplatePreviewsRequestFormatOptsFormatLedger, nil
 	case "a0":
-		value := GenerateTemplatePreviewsRequestFormatOptsFormatA0
-		*g = value
+		return GenerateTemplatePreviewsRequestFormatOptsFormatA0, nil
 	case "a1":
-		value := GenerateTemplatePreviewsRequestFormatOptsFormatA1
-		*g = value
+		return GenerateTemplatePreviewsRequestFormatOptsFormatA1, nil
 	case "a2":
-		value := GenerateTemplatePreviewsRequestFormatOptsFormatA2
-		*g = value
+		return GenerateTemplatePreviewsRequestFormatOptsFormatA2, nil
 	case "a3":
-		value := GenerateTemplatePreviewsRequestFormatOptsFormatA3
-		*g = value
+		return GenerateTemplatePreviewsRequestFormatOptsFormatA3, nil
 	case "a4":
-		value := GenerateTemplatePreviewsRequestFormatOptsFormatA4
-		*g = value
+		return GenerateTemplatePreviewsRequestFormatOptsFormatA4, nil
 	case "a5":
-		value := GenerateTemplatePreviewsRequestFormatOptsFormatA5
-		*g = value
+		return GenerateTemplatePreviewsRequestFormatOptsFormatA5, nil
 	case "a6":
-		value := GenerateTemplatePreviewsRequestFormatOptsFormatA6
-		*g = value
+		return GenerateTemplatePreviewsRequestFormatOptsFormatA6, nil
 	}
-	return nil
+	var t GenerateTemplatePreviewsRequestFormatOptsFormat
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type GenerateTemplatePreviewsRequestType uint
+func (g GenerateTemplatePreviewsRequestFormatOptsFormat) Ptr() *GenerateTemplatePreviewsRequestFormatOptsFormat {
+	return &g
+}
+
+type GenerateTemplatePreviewsRequestType string
 
 const (
-	GenerateTemplatePreviewsRequestTypeDocx GenerateTemplatePreviewsRequestType = iota + 1
-	GenerateTemplatePreviewsRequestTypeXlsx
-	GenerateTemplatePreviewsRequestTypePptx
-	GenerateTemplatePreviewsRequestTypeEjs
-	GenerateTemplatePreviewsRequestTypeHtml
-	GenerateTemplatePreviewsRequestTypeLatex
-	GenerateTemplatePreviewsRequestTypeReact
+	GenerateTemplatePreviewsRequestTypeDocx  GenerateTemplatePreviewsRequestType = "docx"
+	GenerateTemplatePreviewsRequestTypeXlsx  GenerateTemplatePreviewsRequestType = "xlsx"
+	GenerateTemplatePreviewsRequestTypePptx  GenerateTemplatePreviewsRequestType = "pptx"
+	GenerateTemplatePreviewsRequestTypeEjs   GenerateTemplatePreviewsRequestType = "ejs"
+	GenerateTemplatePreviewsRequestTypeHtml  GenerateTemplatePreviewsRequestType = "html"
+	GenerateTemplatePreviewsRequestTypeLatex GenerateTemplatePreviewsRequestType = "latex"
+	GenerateTemplatePreviewsRequestTypeReact GenerateTemplatePreviewsRequestType = "react"
 )
 
-func (g GenerateTemplatePreviewsRequestType) String() string {
-	switch g {
-	default:
-		return strconv.Itoa(int(g))
-	case GenerateTemplatePreviewsRequestTypeDocx:
-		return "docx"
-	case GenerateTemplatePreviewsRequestTypeXlsx:
-		return "xlsx"
-	case GenerateTemplatePreviewsRequestTypePptx:
-		return "pptx"
-	case GenerateTemplatePreviewsRequestTypeEjs:
-		return "ejs"
-	case GenerateTemplatePreviewsRequestTypeHtml:
-		return "html"
-	case GenerateTemplatePreviewsRequestTypeLatex:
-		return "latex"
-	case GenerateTemplatePreviewsRequestTypeReact:
-		return "react"
-	}
-}
-
-func (g GenerateTemplatePreviewsRequestType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", g.String())), nil
-}
-
-func (g *GenerateTemplatePreviewsRequestType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewGenerateTemplatePreviewsRequestTypeFromString(s string) (GenerateTemplatePreviewsRequestType, error) {
+	switch s {
 	case "docx":
-		value := GenerateTemplatePreviewsRequestTypeDocx
-		*g = value
+		return GenerateTemplatePreviewsRequestTypeDocx, nil
 	case "xlsx":
-		value := GenerateTemplatePreviewsRequestTypeXlsx
-		*g = value
+		return GenerateTemplatePreviewsRequestTypeXlsx, nil
 	case "pptx":
-		value := GenerateTemplatePreviewsRequestTypePptx
-		*g = value
+		return GenerateTemplatePreviewsRequestTypePptx, nil
 	case "ejs":
-		value := GenerateTemplatePreviewsRequestTypeEjs
-		*g = value
+		return GenerateTemplatePreviewsRequestTypeEjs, nil
 	case "html":
-		value := GenerateTemplatePreviewsRequestTypeHtml
-		*g = value
+		return GenerateTemplatePreviewsRequestTypeHtml, nil
 	case "latex":
-		value := GenerateTemplatePreviewsRequestTypeLatex
-		*g = value
+		return GenerateTemplatePreviewsRequestTypeLatex, nil
 	case "react":
-		value := GenerateTemplatePreviewsRequestTypeReact
-		*g = value
+		return GenerateTemplatePreviewsRequestTypeReact, nil
 	}
-	return nil
+	var t GenerateTemplatePreviewsRequestType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (g GenerateTemplatePreviewsRequestType) Ptr() *GenerateTemplatePreviewsRequestType {
+	return &g
 }
 
 type GenerateTemplatePreviewsResponse struct {
-	PngPreview *GenerateTemplatePreviewsResponsePngPreview `json:"pngPreview,omitempty"`
-	PdfPreview *GenerateTemplatePreviewsResponsePdfPreview `json:"pdfPreview,omitempty"`
+	PngPreview *GenerateTemplatePreviewsResponsePngPreview `json:"pngPreview,omitempty" url:"pngPreview,omitempty"`
+	PdfPreview *GenerateTemplatePreviewsResponsePdfPreview `json:"pdfPreview,omitempty" url:"pdfPreview,omitempty"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (g *GenerateTemplatePreviewsResponse) GetPngPreview() *GenerateTemplatePreviewsResponsePngPreview {
+	if g == nil {
+		return nil
+	}
+	return g.PngPreview
+}
+
+func (g *GenerateTemplatePreviewsResponse) GetPdfPreview() *GenerateTemplatePreviewsResponsePdfPreview {
+	if g == nil {
+		return nil
+	}
+	return g.PdfPreview
+}
+
+func (g *GenerateTemplatePreviewsResponse) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GenerateTemplatePreviewsResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler GenerateTemplatePreviewsResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GenerateTemplatePreviewsResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GenerateTemplatePreviewsResponse) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
 }
 
 type GenerateTemplatePreviewsResponsePdfPreview struct {
-	Url   *string `json:"url,omitempty"`
-	JobId string  `json:"jobId"`
+	Url   *string `json:"url,omitempty" url:"url,omitempty"`
+	JobId string  `json:"jobId" url:"jobId"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (g *GenerateTemplatePreviewsResponsePdfPreview) GetUrl() *string {
+	if g == nil {
+		return nil
+	}
+	return g.Url
+}
+
+func (g *GenerateTemplatePreviewsResponsePdfPreview) GetJobId() string {
+	if g == nil {
+		return ""
+	}
+	return g.JobId
+}
+
+func (g *GenerateTemplatePreviewsResponsePdfPreview) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GenerateTemplatePreviewsResponsePdfPreview) UnmarshalJSON(data []byte) error {
+	type unmarshaler GenerateTemplatePreviewsResponsePdfPreview
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GenerateTemplatePreviewsResponsePdfPreview(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GenerateTemplatePreviewsResponsePdfPreview) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
 }
 
 type GenerateTemplatePreviewsResponsePngPreview struct {
-	Url   *string `json:"url,omitempty"`
-	JobId string  `json:"jobId"`
+	Url   *string `json:"url,omitempty" url:"url,omitempty"`
+	JobId string  `json:"jobId" url:"jobId"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (g *GenerateTemplatePreviewsResponsePngPreview) GetUrl() *string {
+	if g == nil {
+		return nil
+	}
+	return g.Url
+}
+
+func (g *GenerateTemplatePreviewsResponsePngPreview) GetJobId() string {
+	if g == nil {
+		return ""
+	}
+	return g.JobId
+}
+
+func (g *GenerateTemplatePreviewsResponsePngPreview) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GenerateTemplatePreviewsResponsePngPreview) UnmarshalJSON(data []byte) error {
+	type unmarshaler GenerateTemplatePreviewsResponsePngPreview
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GenerateTemplatePreviewsResponsePngPreview(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GenerateTemplatePreviewsResponsePngPreview) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
 }
 
 type GetTemplateIndexHtmlResponse struct {
-	TemplateIndex string `json:"templateIndex"`
+	TemplateIndex string `json:"templateIndex" url:"templateIndex"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (g *GetTemplateIndexHtmlResponse) GetTemplateIndex() string {
+	if g == nil {
+		return ""
+	}
+	return g.TemplateIndex
+}
+
+func (g *GetTemplateIndexHtmlResponse) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GetTemplateIndexHtmlResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler GetTemplateIndexHtmlResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GetTemplateIndexHtmlResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GetTemplateIndexHtmlResponse) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
 }
 
 type InitializeTemplateCreationResponse struct {
-	JobId                      string `json:"jobId"`
-	PresignedTemplateUploadUrl string `json:"presignedTemplateUploadUrl"`
+	JobId                      string `json:"jobId" url:"jobId"`
+	PresignedTemplateUploadUrl string `json:"presignedTemplateUploadUrl" url:"presignedTemplateUploadUrl"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (i *InitializeTemplateCreationResponse) GetJobId() string {
+	if i == nil {
+		return ""
+	}
+	return i.JobId
+}
+
+func (i *InitializeTemplateCreationResponse) GetPresignedTemplateUploadUrl() string {
+	if i == nil {
+		return ""
+	}
+	return i.PresignedTemplateUploadUrl
+}
+
+func (i *InitializeTemplateCreationResponse) GetExtraProperties() map[string]interface{} {
+	return i.extraProperties
+}
+
+func (i *InitializeTemplateCreationResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler InitializeTemplateCreationResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*i = InitializeTemplateCreationResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *i)
+	if err != nil {
+		return err
+	}
+	i.extraProperties = extraProperties
+	i.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (i *InitializeTemplateCreationResponse) String() string {
+	if len(i.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(i.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
 }
 
 type SaveCreatedTemplateRequestPreviewIds struct {
-	PngJobId string `json:"pngJobId"`
-	PdfJobId string `json:"pdfJobId"`
+	PngJobId string `json:"pngJobId" url:"pngJobId"`
+	PdfJobId string `json:"pdfJobId" url:"pdfJobId"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (s *SaveCreatedTemplateRequestPreviewIds) GetPngJobId() string {
+	if s == nil {
+		return ""
+	}
+	return s.PngJobId
+}
+
+func (s *SaveCreatedTemplateRequestPreviewIds) GetPdfJobId() string {
+	if s == nil {
+		return ""
+	}
+	return s.PdfJobId
+}
+
+func (s *SaveCreatedTemplateRequestPreviewIds) GetExtraProperties() map[string]interface{} {
+	return s.extraProperties
+}
+
+func (s *SaveCreatedTemplateRequestPreviewIds) UnmarshalJSON(data []byte) error {
+	type unmarshaler SaveCreatedTemplateRequestPreviewIds
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*s = SaveCreatedTemplateRequestPreviewIds(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *s)
+	if err != nil {
+		return err
+	}
+	s.extraProperties = extraProperties
+	s.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (s *SaveCreatedTemplateRequestPreviewIds) String() string {
+	if len(s.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
 }
 
 type SaveCreatedTemplateRequestTemplateInfo struct {
-	Title       string                                                 `json:"title"`
-	Description string                                                 `json:"description"`
-	Type        SaveCreatedTemplateRequestTemplateInfoType             `json:"type,omitempty"`
-	SampleData  map[string]any                                         `json:"sampleData,omitempty"`
-	SourceCode  *string                                                `json:"sourceCode,omitempty"`
-	Categories  []SaveCreatedTemplateRequestTemplateInfoCategoriesItem `json:"categories,omitempty"`
+	Title       string                                                 `json:"title" url:"title"`
+	Description string                                                 `json:"description" url:"description"`
+	Type        SaveCreatedTemplateRequestTemplateInfoType             `json:"type" url:"type"`
+	SampleData  map[string]interface{}                                 `json:"sampleData,omitempty" url:"sampleData,omitempty"`
+	SourceCode  *string                                                `json:"sourceCode,omitempty" url:"sourceCode,omitempty"`
+	Categories  []SaveCreatedTemplateRequestTemplateInfoCategoriesItem `json:"categories,omitempty" url:"categories,omitempty"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
 }
 
-type SaveCreatedTemplateRequestTemplateInfoCategoriesItem uint
-
-const (
-	SaveCreatedTemplateRequestTemplateInfoCategoriesItemInvoice SaveCreatedTemplateRequestTemplateInfoCategoriesItem = iota + 1
-	SaveCreatedTemplateRequestTemplateInfoCategoriesItemMail
-	SaveCreatedTemplateRequestTemplateInfoCategoriesItemReport
-	SaveCreatedTemplateRequestTemplateInfoCategoriesItemCv
-	SaveCreatedTemplateRequestTemplateInfoCategoriesItemOther
-)
-
-func (s SaveCreatedTemplateRequestTemplateInfoCategoriesItem) String() string {
-	switch s {
-	default:
-		return strconv.Itoa(int(s))
-	case SaveCreatedTemplateRequestTemplateInfoCategoriesItemInvoice:
-		return "invoice"
-	case SaveCreatedTemplateRequestTemplateInfoCategoriesItemMail:
-		return "mail"
-	case SaveCreatedTemplateRequestTemplateInfoCategoriesItemReport:
-		return "report"
-	case SaveCreatedTemplateRequestTemplateInfoCategoriesItemCv:
-		return "cv"
-	case SaveCreatedTemplateRequestTemplateInfoCategoriesItemOther:
-		return "other"
+func (s *SaveCreatedTemplateRequestTemplateInfo) GetTitle() string {
+	if s == nil {
+		return ""
 	}
+	return s.Title
 }
 
-func (s SaveCreatedTemplateRequestTemplateInfoCategoriesItem) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", s.String())), nil
+func (s *SaveCreatedTemplateRequestTemplateInfo) GetDescription() string {
+	if s == nil {
+		return ""
+	}
+	return s.Description
 }
 
-func (s *SaveCreatedTemplateRequestTemplateInfoCategoriesItem) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (s *SaveCreatedTemplateRequestTemplateInfo) GetType() SaveCreatedTemplateRequestTemplateInfoType {
+	if s == nil {
+		return ""
+	}
+	return s.Type
+}
+
+func (s *SaveCreatedTemplateRequestTemplateInfo) GetSampleData() map[string]interface{} {
+	if s == nil {
+		return nil
+	}
+	return s.SampleData
+}
+
+func (s *SaveCreatedTemplateRequestTemplateInfo) GetSourceCode() *string {
+	if s == nil {
+		return nil
+	}
+	return s.SourceCode
+}
+
+func (s *SaveCreatedTemplateRequestTemplateInfo) GetCategories() []SaveCreatedTemplateRequestTemplateInfoCategoriesItem {
+	if s == nil {
+		return nil
+	}
+	return s.Categories
+}
+
+func (s *SaveCreatedTemplateRequestTemplateInfo) GetExtraProperties() map[string]interface{} {
+	return s.extraProperties
+}
+
+func (s *SaveCreatedTemplateRequestTemplateInfo) UnmarshalJSON(data []byte) error {
+	type unmarshaler SaveCreatedTemplateRequestTemplateInfo
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*s = SaveCreatedTemplateRequestTemplateInfo(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *s)
+	if err != nil {
+		return err
+	}
+	s.extraProperties = extraProperties
+	s.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (s *SaveCreatedTemplateRequestTemplateInfo) String() string {
+	if len(s.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
+}
+
+type SaveCreatedTemplateRequestTemplateInfoCategoriesItem string
+
+const (
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemInvoice SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "invoice"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemMail    SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "mail"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemReport  SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "report"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemCv      SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "cv"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemOther   SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "other"
+)
+
+func NewSaveCreatedTemplateRequestTemplateInfoCategoriesItemFromString(s string) (SaveCreatedTemplateRequestTemplateInfoCategoriesItem, error) {
+	switch s {
 	case "invoice":
-		value := SaveCreatedTemplateRequestTemplateInfoCategoriesItemInvoice
-		*s = value
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemInvoice, nil
 	case "mail":
-		value := SaveCreatedTemplateRequestTemplateInfoCategoriesItemMail
-		*s = value
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemMail, nil
 	case "report":
-		value := SaveCreatedTemplateRequestTemplateInfoCategoriesItemReport
-		*s = value
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemReport, nil
 	case "cv":
-		value := SaveCreatedTemplateRequestTemplateInfoCategoriesItemCv
-		*s = value
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemCv, nil
 	case "other":
-		value := SaveCreatedTemplateRequestTemplateInfoCategoriesItemOther
-		*s = value
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemOther, nil
 	}
-	return nil
+	var t SaveCreatedTemplateRequestTemplateInfoCategoriesItem
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type SaveCreatedTemplateRequestTemplateInfoType uint
+func (s SaveCreatedTemplateRequestTemplateInfoCategoriesItem) Ptr() *SaveCreatedTemplateRequestTemplateInfoCategoriesItem {
+	return &s
+}
+
+type SaveCreatedTemplateRequestTemplateInfoType string
 
 const (
-	SaveCreatedTemplateRequestTemplateInfoTypeDocx SaveCreatedTemplateRequestTemplateInfoType = iota + 1
-	SaveCreatedTemplateRequestTemplateInfoTypeXlsx
-	SaveCreatedTemplateRequestTemplateInfoTypePptx
-	SaveCreatedTemplateRequestTemplateInfoTypeEjs
-	SaveCreatedTemplateRequestTemplateInfoTypeHtml
-	SaveCreatedTemplateRequestTemplateInfoTypeLatex
-	SaveCreatedTemplateRequestTemplateInfoTypeReact
+	SaveCreatedTemplateRequestTemplateInfoTypeDocx  SaveCreatedTemplateRequestTemplateInfoType = "docx"
+	SaveCreatedTemplateRequestTemplateInfoTypeXlsx  SaveCreatedTemplateRequestTemplateInfoType = "xlsx"
+	SaveCreatedTemplateRequestTemplateInfoTypePptx  SaveCreatedTemplateRequestTemplateInfoType = "pptx"
+	SaveCreatedTemplateRequestTemplateInfoTypeEjs   SaveCreatedTemplateRequestTemplateInfoType = "ejs"
+	SaveCreatedTemplateRequestTemplateInfoTypeHtml  SaveCreatedTemplateRequestTemplateInfoType = "html"
+	SaveCreatedTemplateRequestTemplateInfoTypeLatex SaveCreatedTemplateRequestTemplateInfoType = "latex"
+	SaveCreatedTemplateRequestTemplateInfoTypeReact SaveCreatedTemplateRequestTemplateInfoType = "react"
 )
 
-func (s SaveCreatedTemplateRequestTemplateInfoType) String() string {
+func NewSaveCreatedTemplateRequestTemplateInfoTypeFromString(s string) (SaveCreatedTemplateRequestTemplateInfoType, error) {
 	switch s {
-	default:
-		return strconv.Itoa(int(s))
-	case SaveCreatedTemplateRequestTemplateInfoTypeDocx:
-		return "docx"
-	case SaveCreatedTemplateRequestTemplateInfoTypeXlsx:
-		return "xlsx"
-	case SaveCreatedTemplateRequestTemplateInfoTypePptx:
-		return "pptx"
-	case SaveCreatedTemplateRequestTemplateInfoTypeEjs:
-		return "ejs"
-	case SaveCreatedTemplateRequestTemplateInfoTypeHtml:
-		return "html"
-	case SaveCreatedTemplateRequestTemplateInfoTypeLatex:
-		return "latex"
-	case SaveCreatedTemplateRequestTemplateInfoTypeReact:
-		return "react"
-	}
-}
-
-func (s SaveCreatedTemplateRequestTemplateInfoType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", s.String())), nil
-}
-
-func (s *SaveCreatedTemplateRequestTemplateInfoType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
 	case "docx":
-		value := SaveCreatedTemplateRequestTemplateInfoTypeDocx
-		*s = value
+		return SaveCreatedTemplateRequestTemplateInfoTypeDocx, nil
 	case "xlsx":
-		value := SaveCreatedTemplateRequestTemplateInfoTypeXlsx
-		*s = value
+		return SaveCreatedTemplateRequestTemplateInfoTypeXlsx, nil
 	case "pptx":
-		value := SaveCreatedTemplateRequestTemplateInfoTypePptx
-		*s = value
+		return SaveCreatedTemplateRequestTemplateInfoTypePptx, nil
 	case "ejs":
-		value := SaveCreatedTemplateRequestTemplateInfoTypeEjs
-		*s = value
+		return SaveCreatedTemplateRequestTemplateInfoTypeEjs, nil
 	case "html":
-		value := SaveCreatedTemplateRequestTemplateInfoTypeHtml
-		*s = value
+		return SaveCreatedTemplateRequestTemplateInfoTypeHtml, nil
 	case "latex":
-		value := SaveCreatedTemplateRequestTemplateInfoTypeLatex
-		*s = value
+		return SaveCreatedTemplateRequestTemplateInfoTypeLatex, nil
 	case "react":
-		value := SaveCreatedTemplateRequestTemplateInfoTypeReact
-		*s = value
+		return SaveCreatedTemplateRequestTemplateInfoTypeReact, nil
 	}
-	return nil
+	var t SaveCreatedTemplateRequestTemplateInfoType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s SaveCreatedTemplateRequestTemplateInfoType) Ptr() *SaveCreatedTemplateRequestTemplateInfoType {
+	return &s
 }
 
 type UpdateTemplateRequestPreviewIds struct {
-	PngJobId string `json:"pngJobId"`
-	PdfJobId string `json:"pdfJobId"`
+	PngJobId string `json:"pngJobId" url:"pngJobId"`
+	PdfJobId string `json:"pdfJobId" url:"pdfJobId"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (u *UpdateTemplateRequestPreviewIds) GetPngJobId() string {
+	if u == nil {
+		return ""
+	}
+	return u.PngJobId
+}
+
+func (u *UpdateTemplateRequestPreviewIds) GetPdfJobId() string {
+	if u == nil {
+		return ""
+	}
+	return u.PdfJobId
+}
+
+func (u *UpdateTemplateRequestPreviewIds) GetExtraProperties() map[string]interface{} {
+	return u.extraProperties
+}
+
+func (u *UpdateTemplateRequestPreviewIds) UnmarshalJSON(data []byte) error {
+	type unmarshaler UpdateTemplateRequestPreviewIds
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*u = UpdateTemplateRequestPreviewIds(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *u)
+	if err != nil {
+		return err
+	}
+	u.extraProperties = extraProperties
+	u.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (u *UpdateTemplateRequestPreviewIds) String() string {
+	if len(u.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(u.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(u); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", u)
 }
 
 type UpdateTemplateRequestTemplateInfo struct {
-	Title       string                                            `json:"title"`
-	Description string                                            `json:"description"`
-	Type        UpdateTemplateRequestTemplateInfoType             `json:"type,omitempty"`
-	SampleData  map[string]any                                    `json:"sampleData,omitempty"`
-	SourceCode  *string                                           `json:"sourceCode,omitempty"`
-	Categories  []UpdateTemplateRequestTemplateInfoCategoriesItem `json:"categories,omitempty"`
+	Title       string                                            `json:"title" url:"title"`
+	Description string                                            `json:"description" url:"description"`
+	Type        UpdateTemplateRequestTemplateInfoType             `json:"type" url:"type"`
+	SampleData  map[string]interface{}                            `json:"sampleData,omitempty" url:"sampleData,omitempty"`
+	SourceCode  *string                                           `json:"sourceCode,omitempty" url:"sourceCode,omitempty"`
+	Categories  []UpdateTemplateRequestTemplateInfoCategoriesItem `json:"categories,omitempty" url:"categories,omitempty"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
 }
 
-type UpdateTemplateRequestTemplateInfoCategoriesItem uint
-
-const (
-	UpdateTemplateRequestTemplateInfoCategoriesItemInvoice UpdateTemplateRequestTemplateInfoCategoriesItem = iota + 1
-	UpdateTemplateRequestTemplateInfoCategoriesItemMail
-	UpdateTemplateRequestTemplateInfoCategoriesItemReport
-	UpdateTemplateRequestTemplateInfoCategoriesItemCv
-	UpdateTemplateRequestTemplateInfoCategoriesItemOther
-)
-
-func (u UpdateTemplateRequestTemplateInfoCategoriesItem) String() string {
-	switch u {
-	default:
-		return strconv.Itoa(int(u))
-	case UpdateTemplateRequestTemplateInfoCategoriesItemInvoice:
-		return "invoice"
-	case UpdateTemplateRequestTemplateInfoCategoriesItemMail:
-		return "mail"
-	case UpdateTemplateRequestTemplateInfoCategoriesItemReport:
-		return "report"
-	case UpdateTemplateRequestTemplateInfoCategoriesItemCv:
-		return "cv"
-	case UpdateTemplateRequestTemplateInfoCategoriesItemOther:
-		return "other"
+func (u *UpdateTemplateRequestTemplateInfo) GetTitle() string {
+	if u == nil {
+		return ""
 	}
+	return u.Title
 }
 
-func (u UpdateTemplateRequestTemplateInfoCategoriesItem) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", u.String())), nil
+func (u *UpdateTemplateRequestTemplateInfo) GetDescription() string {
+	if u == nil {
+		return ""
+	}
+	return u.Description
 }
 
-func (u *UpdateTemplateRequestTemplateInfoCategoriesItem) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
+func (u *UpdateTemplateRequestTemplateInfo) GetType() UpdateTemplateRequestTemplateInfoType {
+	if u == nil {
+		return ""
+	}
+	return u.Type
+}
+
+func (u *UpdateTemplateRequestTemplateInfo) GetSampleData() map[string]interface{} {
+	if u == nil {
+		return nil
+	}
+	return u.SampleData
+}
+
+func (u *UpdateTemplateRequestTemplateInfo) GetSourceCode() *string {
+	if u == nil {
+		return nil
+	}
+	return u.SourceCode
+}
+
+func (u *UpdateTemplateRequestTemplateInfo) GetCategories() []UpdateTemplateRequestTemplateInfoCategoriesItem {
+	if u == nil {
+		return nil
+	}
+	return u.Categories
+}
+
+func (u *UpdateTemplateRequestTemplateInfo) GetExtraProperties() map[string]interface{} {
+	return u.extraProperties
+}
+
+func (u *UpdateTemplateRequestTemplateInfo) UnmarshalJSON(data []byte) error {
+	type unmarshaler UpdateTemplateRequestTemplateInfo
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	switch raw {
+	*u = UpdateTemplateRequestTemplateInfo(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *u)
+	if err != nil {
+		return err
+	}
+	u.extraProperties = extraProperties
+	u.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (u *UpdateTemplateRequestTemplateInfo) String() string {
+	if len(u.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(u.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(u); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", u)
+}
+
+type UpdateTemplateRequestTemplateInfoCategoriesItem string
+
+const (
+	UpdateTemplateRequestTemplateInfoCategoriesItemInvoice UpdateTemplateRequestTemplateInfoCategoriesItem = "invoice"
+	UpdateTemplateRequestTemplateInfoCategoriesItemMail    UpdateTemplateRequestTemplateInfoCategoriesItem = "mail"
+	UpdateTemplateRequestTemplateInfoCategoriesItemReport  UpdateTemplateRequestTemplateInfoCategoriesItem = "report"
+	UpdateTemplateRequestTemplateInfoCategoriesItemCv      UpdateTemplateRequestTemplateInfoCategoriesItem = "cv"
+	UpdateTemplateRequestTemplateInfoCategoriesItemOther   UpdateTemplateRequestTemplateInfoCategoriesItem = "other"
+)
+
+func NewUpdateTemplateRequestTemplateInfoCategoriesItemFromString(s string) (UpdateTemplateRequestTemplateInfoCategoriesItem, error) {
+	switch s {
 	case "invoice":
-		value := UpdateTemplateRequestTemplateInfoCategoriesItemInvoice
-		*u = value
+		return UpdateTemplateRequestTemplateInfoCategoriesItemInvoice, nil
 	case "mail":
-		value := UpdateTemplateRequestTemplateInfoCategoriesItemMail
-		*u = value
+		return UpdateTemplateRequestTemplateInfoCategoriesItemMail, nil
 	case "report":
-		value := UpdateTemplateRequestTemplateInfoCategoriesItemReport
-		*u = value
+		return UpdateTemplateRequestTemplateInfoCategoriesItemReport, nil
 	case "cv":
-		value := UpdateTemplateRequestTemplateInfoCategoriesItemCv
-		*u = value
+		return UpdateTemplateRequestTemplateInfoCategoriesItemCv, nil
 	case "other":
-		value := UpdateTemplateRequestTemplateInfoCategoriesItemOther
-		*u = value
+		return UpdateTemplateRequestTemplateInfoCategoriesItemOther, nil
 	}
-	return nil
+	var t UpdateTemplateRequestTemplateInfoCategoriesItem
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-type UpdateTemplateRequestTemplateInfoType uint
+func (u UpdateTemplateRequestTemplateInfoCategoriesItem) Ptr() *UpdateTemplateRequestTemplateInfoCategoriesItem {
+	return &u
+}
+
+type UpdateTemplateRequestTemplateInfoType string
 
 const (
-	UpdateTemplateRequestTemplateInfoTypeDocx UpdateTemplateRequestTemplateInfoType = iota + 1
-	UpdateTemplateRequestTemplateInfoTypeXlsx
-	UpdateTemplateRequestTemplateInfoTypePptx
-	UpdateTemplateRequestTemplateInfoTypeEjs
-	UpdateTemplateRequestTemplateInfoTypeHtml
-	UpdateTemplateRequestTemplateInfoTypeLatex
-	UpdateTemplateRequestTemplateInfoTypeReact
+	UpdateTemplateRequestTemplateInfoTypeDocx  UpdateTemplateRequestTemplateInfoType = "docx"
+	UpdateTemplateRequestTemplateInfoTypeXlsx  UpdateTemplateRequestTemplateInfoType = "xlsx"
+	UpdateTemplateRequestTemplateInfoTypePptx  UpdateTemplateRequestTemplateInfoType = "pptx"
+	UpdateTemplateRequestTemplateInfoTypeEjs   UpdateTemplateRequestTemplateInfoType = "ejs"
+	UpdateTemplateRequestTemplateInfoTypeHtml  UpdateTemplateRequestTemplateInfoType = "html"
+	UpdateTemplateRequestTemplateInfoTypeLatex UpdateTemplateRequestTemplateInfoType = "latex"
+	UpdateTemplateRequestTemplateInfoTypeReact UpdateTemplateRequestTemplateInfoType = "react"
 )
 
-func (u UpdateTemplateRequestTemplateInfoType) String() string {
-	switch u {
-	default:
-		return strconv.Itoa(int(u))
-	case UpdateTemplateRequestTemplateInfoTypeDocx:
-		return "docx"
-	case UpdateTemplateRequestTemplateInfoTypeXlsx:
-		return "xlsx"
-	case UpdateTemplateRequestTemplateInfoTypePptx:
-		return "pptx"
-	case UpdateTemplateRequestTemplateInfoTypeEjs:
-		return "ejs"
-	case UpdateTemplateRequestTemplateInfoTypeHtml:
-		return "html"
-	case UpdateTemplateRequestTemplateInfoTypeLatex:
-		return "latex"
-	case UpdateTemplateRequestTemplateInfoTypeReact:
-		return "react"
-	}
-}
-
-func (u UpdateTemplateRequestTemplateInfoType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", u.String())), nil
-}
-
-func (u *UpdateTemplateRequestTemplateInfoType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
+func NewUpdateTemplateRequestTemplateInfoTypeFromString(s string) (UpdateTemplateRequestTemplateInfoType, error) {
+	switch s {
 	case "docx":
-		value := UpdateTemplateRequestTemplateInfoTypeDocx
-		*u = value
+		return UpdateTemplateRequestTemplateInfoTypeDocx, nil
 	case "xlsx":
-		value := UpdateTemplateRequestTemplateInfoTypeXlsx
-		*u = value
+		return UpdateTemplateRequestTemplateInfoTypeXlsx, nil
 	case "pptx":
-		value := UpdateTemplateRequestTemplateInfoTypePptx
-		*u = value
+		return UpdateTemplateRequestTemplateInfoTypePptx, nil
 	case "ejs":
-		value := UpdateTemplateRequestTemplateInfoTypeEjs
-		*u = value
+		return UpdateTemplateRequestTemplateInfoTypeEjs, nil
 	case "html":
-		value := UpdateTemplateRequestTemplateInfoTypeHtml
-		*u = value
+		return UpdateTemplateRequestTemplateInfoTypeHtml, nil
 	case "latex":
-		value := UpdateTemplateRequestTemplateInfoTypeLatex
-		*u = value
+		return UpdateTemplateRequestTemplateInfoTypeLatex, nil
 	case "react":
-		value := UpdateTemplateRequestTemplateInfoTypeReact
-		*u = value
+		return UpdateTemplateRequestTemplateInfoTypeReact, nil
 	}
-	return nil
+	var t UpdateTemplateRequestTemplateInfoType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (u UpdateTemplateRequestTemplateInfoType) Ptr() *UpdateTemplateRequestTemplateInfoType {
+	return &u
 }
 
 type UpdateTemplateResponse struct {
-	NewContentId string `json:"newContentId"`
+	NewContentId string `json:"newContentId" url:"newContentId"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (u *UpdateTemplateResponse) GetNewContentId() string {
+	if u == nil {
+		return ""
+	}
+	return u.NewContentId
+}
+
+func (u *UpdateTemplateResponse) GetExtraProperties() map[string]interface{} {
+	return u.extraProperties
+}
+
+func (u *UpdateTemplateResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler UpdateTemplateResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*u = UpdateTemplateResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *u)
+	if err != nil {
+		return err
+	}
+	u.extraProperties = extraProperties
+	u.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (u *UpdateTemplateResponse) String() string {
+	if len(u.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(u.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(u); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", u)
 }
 
 type UpdateTemplateRequest struct {
-	TemplateInfo *UpdateTemplateRequestTemplateInfo `json:"templateInfo,omitempty"`
-	PreviewIds   *UpdateTemplateRequestPreviewIds   `json:"previewIds,omitempty"`
-	ContentId    string                             `json:"contentId"`
+	TemplateInfo *UpdateTemplateRequestTemplateInfo `json:"templateInfo,omitempty" url:"-"`
+	PreviewIds   *UpdateTemplateRequestPreviewIds   `json:"previewIds,omitempty" url:"-"`
+	ContentId    string                             `json:"contentId" url:"-"`
 }
 
 type UploadTemplateIndexHtmlRequest struct {
-	TemplateIndex string `json:"templateIndex"`
+	TemplateIndex string `json:"templateIndex" url:"-"`
 }
