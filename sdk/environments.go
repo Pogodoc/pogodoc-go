@@ -3,8 +3,8 @@
 package api
 
 // Environments defines all of the API environments.
-// These values can be used with the ClientWithBaseURL
-// ClientOption to override the client's default environment,
+// These values can be used with the WithBaseURL
+// RequestOption to override the client's default environment,
 // if any.
 var Environments = struct {
 	Default string

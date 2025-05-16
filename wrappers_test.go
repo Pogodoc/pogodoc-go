@@ -35,9 +35,11 @@ func PrepareData() TestData {
 		token:   os.Getenv("POGODOC_TOKEN"),
 	}
 	c, err := PogodocClientInit(pogodocEnv.baseURL, pogodocEnv.token)
-
+	if err != nil {
+		fmt.Errorf("Error initializing PogodocClient")
+	}
 	ctx := context.Background()
-	response, err := c.Templates().InitializeTemplateCreation(ctx)
+	response, err := c.Templates.InitializeTemplateCreation(ctx)
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -66,16 +68,18 @@ func TestPogodocClient(t *testing.T) {
 
 func TestSaveTemplate(t *testing.T) {
 	data := PrepareData()
+
 	_, err := data.client.SaveTemplate("../../data/templates/React-Demo-App.zip", api.SaveCreatedTemplateRequestTemplateInfo{
 		Title:       "Naslov",
 		Description: "Deksripshn",
 		Type:        api.SaveCreatedTemplateRequestTemplateInfoTypeReact,
 		SampleData:  data.sampleDataMap,
-		Categories:  []api.SaveCreatedTemplateRequestTemplateInfoCategoriesItem{1, 2},
+		Categories:  []api.SaveCreatedTemplateRequestTemplateInfoCategoriesItem{"invoice", "report"},
 	}, data.ctx)
 	if err != nil {
 		t.Errorf("SaveTemplate failed: %v", err)
 	}
+
 }
 
 func TestUpdateTemplate(t *testing.T) {
@@ -87,7 +91,7 @@ func TestUpdateTemplate(t *testing.T) {
 			Description: "Deksripshn",
 			Type:        api.SaveCreatedTemplateRequestTemplateInfoTypeReact,
 			SampleData:  data.sampleDataMap,
-			Categories:  []api.SaveCreatedTemplateRequestTemplateInfoCategoriesItem{1, 2},
+			Categories:  []api.SaveCreatedTemplateRequestTemplateInfoCategoriesItem{"invoice", "report"},
 		},
 		data.ctx,
 	)
@@ -105,7 +109,7 @@ func TestUpdateTemplate(t *testing.T) {
 			Type:        api.UpdateTemplateRequestTemplateInfoTypeReact,
 			SampleData:  data.sampleDataMap,
 			SourceCode:  &src,
-			Categories:  []api.UpdateTemplateRequestTemplateInfoCategoriesItem{1, 2},
+			Categories:  []api.UpdateTemplateRequestTemplateInfoCategoriesItem{"invoice", "report"},
 		},
 		data.ctx,
 	)
@@ -124,10 +128,11 @@ func TestGenerateDocument(t *testing.T) {
 			Description: "Deksripshn",
 			Type:        api.SaveCreatedTemplateRequestTemplateInfoTypeReact,
 			SampleData:  data.sampleDataMap,
-			Categories:  []api.SaveCreatedTemplateRequestTemplateInfoCategoriesItem{1, 2},
+			Categories:  []api.SaveCreatedTemplateRequestTemplateInfoCategoriesItem{"invoice", "report"},
 		},
 		data.ctx,
 	)
+	fmt.Println(templateId)
 	if err != nil {
 		t.Fatalf("SaveTemplate failed: %v", err)
 	}

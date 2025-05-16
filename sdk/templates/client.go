@@ -4,86 +4,104 @@ package templates
 
 import (
 	context "context"
-	fmt "fmt"
 	http "net/http"
 	sdk "pogodoc/go/sdk"
 	core "pogodoc/go/sdk/core"
+	internal "pogodoc/go/sdk/internal"
+	option "pogodoc/go/sdk/option"
 )
 
-type Client interface {
-	InitializeTemplateCreation(ctx context.Context) (*sdk.InitializeTemplateCreationResponse, error)
-	SaveCreatedTemplate(ctx context.Context, templateId string, request *sdk.SaveCreatedTemplateRequest) error
-	UpdateTemplate(ctx context.Context, templateId string, request *sdk.UpdateTemplateRequest) (*sdk.UpdateTemplateResponse, error)
-	DeleteTemplate(ctx context.Context, templateId string) error
-	ExtractTemplateFiles(ctx context.Context, templateId string, request *sdk.ExtractTemplateFilesRequest) error
-	GenerateTemplatePreviews(ctx context.Context, templateId string, request *sdk.GenerateTemplatePreviewsRequest) (*sdk.GenerateTemplatePreviewsResponse, error)
-	GeneratePresignedGetUrl(ctx context.Context, templateId string) (*sdk.GeneratePresignedGetUrlResponse, error)
-	GetTemplateIndexHtml(ctx context.Context, templateId string) (*sdk.GetTemplateIndexHtmlResponse, error)
-	UploadTemplateIndexHtml(ctx context.Context, templateId string, request *sdk.UploadTemplateIndexHtmlRequest) error
-	CloneTemplate(ctx context.Context, templateId string) (*sdk.CloneTemplateResponse, error)
+type Client struct {
+	baseURL string
+	caller  *internal.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
-	options := core.NewClientOptions()
-	for _, opt := range opts {
-		opt(options)
+func NewClient(opts ...option.RequestOption) *Client {
+	options := core.NewRequestOptions(opts...)
+	return &Client{
+		baseURL: options.BaseURL,
+		caller: internal.NewCaller(
+			&internal.CallerParams{
+				Client:      options.HTTPClient,
+				MaxAttempts: options.MaxAttempts,
+			},
+		),
+		header: options.ToHeader(),
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
-	}
-}
-
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
 }
 
 // Initializes template creation by generating a unique ID and providing a presigned URL for template ZIP upload. Sets unfinished tag for tracking incomplete templates.
-func (c *client) InitializeTemplateCreation(ctx context.Context) (*sdk.InitializeTemplateCreationResponse, error) {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := baseURL + "/" + "templates/init"
+func (c *Client) InitializeTemplateCreation(
+	ctx context.Context,
+	opts ...option.RequestOption,
+) (*sdk.InitializeTemplateCreationResponse, error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := baseURL + "/templates/init"
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
 
 	var response *sdk.InitializeTemplateCreationResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodGet,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Response:        &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Finalizes template creation by saving template info to Strapi, copying preview files to permanent storage, and creating template index. Removes unfinished tag upon completion.
-func (c *client) SaveCreatedTemplate(ctx context.Context, templateId string, request *sdk.SaveCreatedTemplateRequest) error {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"templates/%v", templateId)
+func (c *Client) SaveCreatedTemplate(
+	ctx context.Context,
+	templateId string,
+	request *sdk.SaveCreatedTemplateRequest,
+	opts ...option.RequestOption,
+) error {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := internal.EncodeURL(
+		baseURL+"/templates/%v",
+		templateId,
+	)
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
+	headers.Set("Content-Type", "application/json")
 
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		nil,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodPost,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Request:         request,
+		},
 	); err != nil {
 		return err
 	}
@@ -91,48 +109,80 @@ func (c *client) SaveCreatedTemplate(ctx context.Context, templateId string, req
 }
 
 // Updates template content, handles S3 storage cleanup for old content, updates template metadata in Strapi, and manages preview files. Removes unfinished tags after successful update.
-func (c *client) UpdateTemplate(ctx context.Context, templateId string, request *sdk.UpdateTemplateRequest) (*sdk.UpdateTemplateResponse, error) {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"templates/%v", templateId)
+func (c *Client) UpdateTemplate(
+	ctx context.Context,
+	templateId string,
+	request *sdk.UpdateTemplateRequest,
+	opts ...option.RequestOption,
+) (*sdk.UpdateTemplateResponse, error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := internal.EncodeURL(
+		baseURL+"/templates/%v",
+		templateId,
+	)
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
+	headers.Set("Content-Type", "application/json")
 
 	var response *sdk.UpdateTemplateResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPut,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodPut,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Request:         request,
+			Response:        &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Deletes a template from Strapi and associated S3 storage. Removes all associated files and metadata.
-func (c *client) DeleteTemplate(ctx context.Context, templateId string) error {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"templates/%v", templateId)
+func (c *Client) DeleteTemplate(
+	ctx context.Context,
+	templateId string,
+	opts ...option.RequestOption,
+) error {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := internal.EncodeURL(
+		baseURL+"/templates/%v",
+		templateId,
+	)
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
 
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodDelete,
-		nil,
-		nil,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodDelete,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+		},
 	); err != nil {
 		return err
 	}
@@ -140,23 +190,39 @@ func (c *client) DeleteTemplate(ctx context.Context, templateId string) error {
 }
 
 // Extracts contents from an uploaded template ZIP file and stores individual files in the appropriate S3 storage structure.
-func (c *client) ExtractTemplateFiles(ctx context.Context, templateId string, request *sdk.ExtractTemplateFilesRequest) error {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"templates/%v/unzip", templateId)
+func (c *Client) ExtractTemplateFiles(
+	ctx context.Context,
+	templateId string,
+	request *sdk.ExtractTemplateFilesRequest,
+	opts ...option.RequestOption,
+) error {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := internal.EncodeURL(
+		baseURL+"/templates/%v/unzip",
+		templateId,
+	)
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
 
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPatch,
-		request,
-		nil,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodPatch,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Request:         request,
+		},
 	); err != nil {
 		return err
 	}
@@ -164,98 +230,163 @@ func (c *client) ExtractTemplateFiles(ctx context.Context, templateId string, re
 }
 
 // Creates both PNG and PDF preview files for template visualization. Generates previews in parallel and returns URLs for both formats.
-func (c *client) GenerateTemplatePreviews(ctx context.Context, templateId string, request *sdk.GenerateTemplatePreviewsRequest) (*sdk.GenerateTemplatePreviewsResponse, error) {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"templates/%v/render-previews", templateId)
+func (c *Client) GenerateTemplatePreviews(
+	ctx context.Context,
+	templateId string,
+	request *sdk.GenerateTemplatePreviewsRequest,
+	opts ...option.RequestOption,
+) (*sdk.GenerateTemplatePreviewsResponse, error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := internal.EncodeURL(
+		baseURL+"/templates/%v/render-previews",
+		templateId,
+	)
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
+	headers.Set("Content-Type", "application/json")
 
 	var response *sdk.GenerateTemplatePreviewsResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		&response,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodPost,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Request:         request,
+			Response:        &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Generates a presigned URL for template access. Used for downloading template files from S3 storage.
-func (c *client) GeneratePresignedGetUrl(ctx context.Context, templateId string) (*sdk.GeneratePresignedGetUrlResponse, error) {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"templates/%v/presigned-url", templateId)
+func (c *Client) GeneratePresignedGetUrl(
+	ctx context.Context,
+	templateId string,
+	opts ...option.RequestOption,
+) (*sdk.GeneratePresignedGetUrlResponse, error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := internal.EncodeURL(
+		baseURL+"/templates/%v/presigned-url",
+		templateId,
+	)
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
 
 	var response *sdk.GeneratePresignedGetUrlResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodGet,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Response:        &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Retrieves the template index.html file from S3 storage. Used for rendering the template in the browser.
-func (c *client) GetTemplateIndexHtml(ctx context.Context, templateId string) (*sdk.GetTemplateIndexHtmlResponse, error) {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"templates/%v/index-html", templateId)
+func (c *Client) GetTemplateIndexHtml(
+	ctx context.Context,
+	templateId string,
+	opts ...option.RequestOption,
+) (*sdk.GetTemplateIndexHtmlResponse, error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := internal.EncodeURL(
+		baseURL+"/templates/%v/index-html",
+		templateId,
+	)
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
 
 	var response *sdk.GetTemplateIndexHtmlResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodGet,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodGet,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Response:        &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }
 
 // Uploads the template index.html file to S3 storage. Used for rendering the template in the browser.
-func (c *client) UploadTemplateIndexHtml(ctx context.Context, templateId string, request *sdk.UploadTemplateIndexHtmlRequest) error {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"templates/%v/index-html", templateId)
+func (c *Client) UploadTemplateIndexHtml(
+	ctx context.Context,
+	templateId string,
+	request *sdk.UploadTemplateIndexHtmlRequest,
+	opts ...option.RequestOption,
+) error {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := internal.EncodeURL(
+		baseURL+"/templates/%v/index-html",
+		templateId,
+	)
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
+	headers.Set("Content-Type", "application/json")
 
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		request,
-		nil,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodPost,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Request:         request,
+		},
 	); err != nil {
 		return err
 	}
@@ -263,26 +394,41 @@ func (c *client) UploadTemplateIndexHtml(ctx context.Context, templateId string,
 }
 
 // Creates a new template by duplicating an existing template's content and metadata. Includes copying preview files and template index.
-func (c *client) CloneTemplate(ctx context.Context, templateId string) (*sdk.CloneTemplateResponse, error) {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"templates/%v/clone", templateId)
+func (c *Client) CloneTemplate(
+	ctx context.Context,
+	templateId string,
+	opts ...option.RequestOption,
+) (*sdk.CloneTemplateResponse, error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := internal.EncodeURL(
+		baseURL+"/templates/%v/clone",
+		templateId,
+	)
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
 
 	var response *sdk.CloneTemplateResponse
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodPost,
-		nil,
-		&response,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodPost,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Response:        &response,
+		},
 	); err != nil {
-		return response, err
+		return nil, err
 	}
 	return response, nil
 }

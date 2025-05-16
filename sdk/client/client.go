@@ -6,48 +6,35 @@ import (
 	http "net/http"
 	core "pogodoc/go/sdk/core"
 	documents "pogodoc/go/sdk/documents"
+	internal "pogodoc/go/sdk/internal"
+	option "pogodoc/go/sdk/option"
 	templates "pogodoc/go/sdk/templates"
 	tokens "pogodoc/go/sdk/tokens"
 )
 
-type Client interface {
-	Templates() templates.Client
-	Documents() documents.Client
-	Tokens() tokens.Client
+type Client struct {
+	baseURL string
+	caller  *internal.Caller
+	header  http.Header
+
+	Templates *templates.Client
+	Documents *documents.Client
+	Tokens    *tokens.Client
 }
 
-func NewClient(opts ...core.ClientOption) Client {
-	options := core.NewClientOptions()
-	for _, opt := range opts {
-		opt(options)
+func NewClient(opts ...option.RequestOption) *Client {
+	options := core.NewRequestOptions(opts...)
+	return &Client{
+		baseURL: options.BaseURL,
+		caller: internal.NewCaller(
+			&internal.CallerParams{
+				Client:      options.HTTPClient,
+				MaxAttempts: options.MaxAttempts,
+			},
+		),
+		header:    options.ToHeader(),
+		Templates: templates.NewClient(opts...),
+		Documents: documents.NewClient(opts...),
+		Tokens:    tokens.NewClient(opts...),
 	}
-	return &client{
-		baseURL:         options.BaseURL,
-		httpClient:      options.HTTPClient,
-		header:          options.ToHeader(),
-		templatesClient: templates.NewClient(opts...),
-		documentsClient: documents.NewClient(opts...),
-		tokensClient:    tokens.NewClient(opts...),
-	}
-}
-
-type client struct {
-	baseURL         string
-	httpClient      core.HTTPClient
-	header          http.Header
-	templatesClient templates.Client
-	documentsClient documents.Client
-	tokensClient    tokens.Client
-}
-
-func (c *client) Templates() templates.Client {
-	return c.templatesClient
-}
-
-func (c *client) Documents() documents.Client {
-	return c.documentsClient
-}
-
-func (c *client) Tokens() tokens.Client {
-	return c.tokensClient
 }

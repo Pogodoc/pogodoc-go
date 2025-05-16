@@ -5,6 +5,7 @@ import (
 	"fmt"
 	api "pogodoc/go/sdk"
 	"pogodoc/go/sdk/client"
+	"pogodoc/go/sdk/option"
 )
 
 func PogodocClientInit(baseURL string, tokenString string) (*PogodocClient, error) {
@@ -12,11 +13,11 @@ func PogodocClientInit(baseURL string, tokenString string) (*PogodocClient, erro
 		return nil, fmt.Errorf("PogodocClientInit: token or baseURL is empty")
 	}
 	c := client.NewClient(
-		client.ClientWithBaseURL(baseURL),
-		client.ClientWithAuthToken(tokenString),
+		option.WithBaseURL(baseURL),
+		option.WithToken(tokenString),
 	)
 
-	return &PogodocClient{c}, nil
+	return &PogodocClient{*c}, nil
 }
 
 func (c *PogodocClient) SaveTemplate(filePath string, metadata api.SaveCreatedTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
@@ -40,7 +41,7 @@ func (c *PogodocClient) SaveTemplate(filePath string, metadata api.SaveCreatedTe
 }
 
 func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, metadata api.SaveCreatedTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
-	response, err := c.Templates().InitializeTemplateCreation(ctx)
+	response, err := c.Templates.InitializeTemplateCreation(ctx)
 	if err != nil {
 		fmt.Println("Error initializing template creation:", err)
 		return "", err
@@ -53,7 +54,7 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 		return "", err
 	}
 
-	err = c.Templates().ExtractTemplateFiles(ctx, templateId, nil)
+	err = c.Templates.ExtractTemplateFiles(ctx, templateId, nil)
 	if err != nil {
 		fmt.Println("Error extracting template files:", err)
 		return "", err
@@ -63,7 +64,7 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 		Data: metadata.SampleData,
 	}
 
-	previewResponse, err := c.Templates().GenerateTemplatePreviews(ctx, templateId, &request)
+	previewResponse, err := c.Templates.GenerateTemplatePreviews(ctx, templateId, &request)
 	if err != nil {
 		fmt.Println("Error generating template previews:", err)
 		return "", err
@@ -86,7 +87,7 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 		},
 	}
 
-	err = c.Templates().SaveCreatedTemplate(ctx, templateId, &saveCreatedTemplateRequest)
+	err = c.Templates.SaveCreatedTemplate(ctx, templateId, &saveCreatedTemplateRequest)
 	if err != nil {
 		fmt.Println("Error saving created template:", err)
 		return "", err
@@ -114,7 +115,7 @@ func (c *PogodocClient) UpdateTemplate(templateId string, filePath string, metad
 }
 
 func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps FileStreamProps, metadata api.UpdateTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
-	response, err := c.Templates().InitializeTemplateCreation(ctx)
+	response, err := c.Templates.InitializeTemplateCreation(ctx)
 	if err != nil {
 		fmt.Println("Error initializing template creation:", err)
 		return "", err
@@ -127,7 +128,7 @@ func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps 
 		return "", err
 	}
 
-	err = c.Templates().ExtractTemplateFiles(ctx, contentId, nil)
+	err = c.Templates.ExtractTemplateFiles(ctx, contentId, nil)
 	if err != nil {
 		fmt.Println("Error extracting template files:", err)
 		return "", err
@@ -137,7 +138,7 @@ func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps 
 		Type: api.GenerateTemplatePreviewsRequestType(metadata.Type),
 		Data: metadata.SampleData,
 	}
-	previewResponse, err := c.Templates().GenerateTemplatePreviews(ctx, contentId, &request)
+	previewResponse, err := c.Templates.GenerateTemplatePreviews(ctx, contentId, &request)
 	if err != nil {
 		fmt.Println("Error generating template previews:", err)
 		return "", err
@@ -159,7 +160,7 @@ func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps 
 		ContentId: contentId,
 	}
 
-	_, err = c.Templates().UpdateTemplate(ctx, templateId, updateTemplateReq)
+	_, err = c.Templates.UpdateTemplate(ctx, templateId, updateTemplateReq)
 	if err != nil {
 		fmt.Println("Error updating template:", err)
 		return "", err
@@ -172,7 +173,7 @@ func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps 
 func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx context.Context) (*api.GetJobStatusResponse, error) {
 
 	initRequest := gdProps.InitializeRenderJobRequest
-	initResponse, err := c.Documents().InitializeRenderJob(ctx, &initRequest)
+	initResponse, err := c.Documents.InitializeRenderJob(ctx, &initRequest)
 	if err != nil {
 		fmt.Println("Error initializing render job:", err)
 		return nil, err
@@ -203,7 +204,7 @@ func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx cont
 		}
 	}
 
-	_, err = c.Documents().StartRenderJob(
+	_, err = c.Documents.StartRenderJob(
 		ctx,
 		initResponse.JobId,
 		&gdProps.StartRenderJobRequest,
@@ -215,7 +216,7 @@ func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx cont
 
 	}
 
-	result, err := c.Documents().GetJobStatus(ctx, initResponse.JobId)
+	result, err := c.Documents.GetJobStatus(ctx, initResponse.JobId)
 	if err != nil {
 		fmt.Println("Error getting job status:", err)
 		return nil, err

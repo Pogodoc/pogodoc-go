@@ -4,51 +4,64 @@ package tokens
 
 import (
 	context "context"
-	fmt "fmt"
 	http "net/http"
 	core "pogodoc/go/sdk/core"
+	internal "pogodoc/go/sdk/internal"
+	option "pogodoc/go/sdk/option"
 )
 
-type Client interface {
-	DeleteApiToken(ctx context.Context, tokenId string) error
+type Client struct {
+	baseURL string
+	caller  *internal.Caller
+	header  http.Header
 }
 
-func NewClient(opts ...core.ClientOption) Client {
-	options := core.NewClientOptions()
-	for _, opt := range opts {
-		opt(options)
+func NewClient(opts ...option.RequestOption) *Client {
+	options := core.NewRequestOptions(opts...)
+	return &Client{
+		baseURL: options.BaseURL,
+		caller: internal.NewCaller(
+			&internal.CallerParams{
+				Client:      options.HTTPClient,
+				MaxAttempts: options.MaxAttempts,
+			},
+		),
+		header: options.ToHeader(),
 	}
-	return &client{
-		baseURL:    options.BaseURL,
-		httpClient: options.HTTPClient,
-		header:     options.ToHeader(),
-	}
-}
-
-type client struct {
-	baseURL    string
-	httpClient core.HTTPClient
-	header     http.Header
 }
 
 // Invalidates an API token by storing it in the deleted tokens S3 bucket, preventing future use of the token for authentication.
-func (c *client) DeleteApiToken(ctx context.Context, tokenId string) error {
-	baseURL := "https://api.pogodoc.com"
-	if c.baseURL != "" {
-		baseURL = c.baseURL
-	}
-	endpointURL := fmt.Sprintf(baseURL+"/"+"api-tokens/%v", tokenId)
+func (c *Client) DeleteApiToken(
+	ctx context.Context,
+	tokenId string,
+	opts ...option.RequestOption,
+) error {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := internal.EncodeURL(
+		baseURL+"/api-tokens/%v",
+		tokenId,
+	)
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
 
-	if err := core.DoRequest(
+	if err := c.caller.Call(
 		ctx,
-		c.httpClient,
-		endpointURL,
-		http.MethodDelete,
-		nil,
-		nil,
-		false,
-		c.header,
-		nil,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodDelete,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+		},
 	); err != nil {
 		return err
 	}
