@@ -12,7 +12,7 @@ import (
 	"reflect"
 	"strings"
 
-	"pogodoc/go/sdk/core"
+	"github.com/pogodoc/pogodoc-go/sdk/core"
 )
 
 const (

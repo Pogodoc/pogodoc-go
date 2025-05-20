@@ -4,10 +4,10 @@ package tokens
 
 import (
 	context "context"
+	core "github.com/pogodoc/pogodoc-go/sdk/core"
+	internal "github.com/pogodoc/pogodoc-go/sdk/internal"
+	option "github.com/pogodoc/pogodoc-go/sdk/option"
 	http "net/http"
-	core "pogodoc/go/sdk/core"
-	internal "pogodoc/go/sdk/internal"
-	option "pogodoc/go/sdk/option"
 )
 
 type Client struct {

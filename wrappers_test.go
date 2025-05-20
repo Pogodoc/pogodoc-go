@@ -1,4 +1,4 @@
-package main
+package pogodoc
 
 import (
 	"context"
@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	api "pogodoc/go/sdk"
 	"testing"
+
+	api "github.com/pogodoc/pogodoc-go/sdk"
 
 	"github.com/joho/godotenv"
 )
@@ -37,6 +38,7 @@ func PrepareData() TestData {
 	c, err := PogodocClientInit(pogodocEnv.baseURL, pogodocEnv.token)
 	if err != nil {
 		fmt.Errorf("Error initializing PogodocClient")
+		return TestData{}
 	}
 	ctx := context.Background()
 	

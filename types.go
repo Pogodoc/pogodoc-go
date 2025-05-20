@@ -1,12 +1,12 @@
-package main
+package pogodoc
 
 import (
-	api "pogodoc/go/sdk"
-	"pogodoc/go/sdk/client"
+	api "github.com/pogodoc/pogodoc-go/sdk"
+	"github.com/pogodoc/pogodoc-go/sdk/client"
 )
 
 type PogodocClient struct {
-	client.Client
+	*client.Client
 }
 type FileStreamProps struct {
 	payload       []byte

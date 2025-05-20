@@ -4,13 +4,13 @@ package client
 
 import (
 	context "context"
+	core "github.com/pogodoc/pogodoc-go/sdk/core"
+	documents "github.com/pogodoc/pogodoc-go/sdk/documents"
+	internal "github.com/pogodoc/pogodoc-go/sdk/internal"
+	option "github.com/pogodoc/pogodoc-go/sdk/option"
+	templates "github.com/pogodoc/pogodoc-go/sdk/templates"
+	tokens "github.com/pogodoc/pogodoc-go/sdk/tokens"
 	http "net/http"
-	core "pogodoc/go/sdk/core"
-	documents "pogodoc/go/sdk/documents"
-	internal "pogodoc/go/sdk/internal"
-	option "pogodoc/go/sdk/option"
-	templates "pogodoc/go/sdk/templates"
-	tokens "pogodoc/go/sdk/tokens"
 )
 
 type Client struct {

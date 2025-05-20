@@ -5,7 +5,7 @@ package api
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "pogodoc/go/sdk/internal"
+	internal "github.com/pogodoc/pogodoc-go/sdk/internal"
 )
 
 type GenerateDocumentPreviewRequest struct {

@@ -3,9 +3,9 @@
 package client
 
 import (
+	option "github.com/pogodoc/pogodoc-go/sdk/option"
 	assert "github.com/stretchr/testify/assert"
 	http "net/http"
-	option "pogodoc/go/sdk/option"
 	testing "testing"
 	time "time"
 )

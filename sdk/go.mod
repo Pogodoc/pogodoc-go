@@ -1,4 +1,4 @@
-module pogodoc/go/sdk
+module github.com/pogodoc/pogodoc-go/sdk
 
 go 1.13
 
