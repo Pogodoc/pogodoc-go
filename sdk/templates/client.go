@@ -193,7 +193,6 @@ func (c *Client) DeleteTemplate(
 func (c *Client) ExtractTemplateFiles(
 	ctx context.Context,
 	templateId string,
-	request *sdk.ExtractTemplateFilesRequest,
 	opts ...option.RequestOption,
 ) error {
 	options := core.NewRequestOptions(opts...)
@@ -221,7 +220,6 @@ func (c *Client) ExtractTemplateFiles(
 			BodyProperties:  options.BodyProperties,
 			QueryParameters: options.QueryParameters,
 			Client:          options.HTTPClient,
-			Request:         request,
 		},
 	); err != nil {
 		return err

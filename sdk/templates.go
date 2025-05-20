@@ -65,43 +65,6 @@ func (c *CloneTemplateResponse) String() string {
 	return fmt.Sprintf("%#v", c)
 }
 
-type ExtractTemplateFilesRequest struct {
-	extraProperties map[string]interface{}
-	rawJSON         json.RawMessage
-}
-
-func (e *ExtractTemplateFilesRequest) GetExtraProperties() map[string]interface{} {
-	return e.extraProperties
-}
-
-func (e *ExtractTemplateFilesRequest) UnmarshalJSON(data []byte) error {
-	type unmarshaler ExtractTemplateFilesRequest
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*e = ExtractTemplateFilesRequest(value)
-	extraProperties, err := internal.ExtractExtraProperties(data, *e)
-	if err != nil {
-		return err
-	}
-	e.extraProperties = extraProperties
-	e.rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (e *ExtractTemplateFilesRequest) String() string {
-	if len(e.rawJSON) > 0 {
-		if value, err := internal.StringifyJSON(e.rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := internal.StringifyJSON(e); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", e)
-}
-
 type GeneratePresignedGetUrlResponse struct {
 	PresignedUrl string `json:"presignedUrl" url:"presignedUrl"`
 

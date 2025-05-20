@@ -47,6 +47,7 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 		return "", err
 	}
 	templateId := response.JobId
+	fmt.Println("templateId", templateId)
 
 	err = UploadToS3WithURL(response.PresignedTemplateUploadUrl, fsProps, "application/zip")
 	if err != nil {
@@ -54,7 +55,7 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 		return "", err
 	}
 
-	err = c.Templates.ExtractTemplateFiles(ctx, templateId, nil)
+	err = c.Templates.ExtractTemplateFiles(ctx, templateId)
 	if err != nil {
 		fmt.Println("Error extracting template files:", err)
 		return "", err
@@ -128,7 +129,7 @@ func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps 
 		return "", err
 	}
 
-	err = c.Templates.ExtractTemplateFiles(ctx, contentId, nil)
+	err = c.Templates.ExtractTemplateFiles(ctx, contentId)
 	if err != nil {
 		fmt.Println("Error extracting template files:", err)
 		return "", err

@@ -3,6 +3,7 @@
 package client
 
 import (
+	context "context"
 	http "net/http"
 	core "pogodoc/go/sdk/core"
 	documents "pogodoc/go/sdk/documents"
@@ -37,4 +38,37 @@ func NewClient(opts ...option.RequestOption) *Client {
 		Documents: documents.NewClient(opts...),
 		Tokens:    tokens.NewClient(opts...),
 	}
+}
+
+func (c *Client) PostBoshe(
+	ctx context.Context,
+	opts ...option.RequestOption,
+) error {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com",
+	)
+	endpointURL := baseURL + "/boshe"
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
+
+	if err := c.caller.Call(
+		ctx,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodPost,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+		},
+	); err != nil {
+		return err
+	}
+	return nil
 }

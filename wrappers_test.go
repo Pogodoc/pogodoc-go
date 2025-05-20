@@ -13,8 +13,8 @@ import (
 )
 
 type PogodocEnv struct {
-	baseURL string `env:"POGODOC_BASE_URL"`
-	token   string `env:"POGODOC_TOKEN"`
+	baseURL string `env:"LAMBDA_BASE_URL"`
+	token   string `env:"POGODOC_API_TOKEN"`
 }
 
 type TestData struct {
@@ -31,19 +31,15 @@ func PrepareData() TestData {
 		log.Fatal("Error loading .env file")
 	}
 	pogodocEnv := PogodocEnv{
-		baseURL: os.Getenv("POGODOC_BASE_URL"),
-		token:   os.Getenv("POGODOC_TOKEN"),
+		baseURL: os.Getenv("LAMBDA_BASE_URL"),
+		token:   os.Getenv("POGODOC_API_TOKEN"),
 	}
 	c, err := PogodocClientInit(pogodocEnv.baseURL, pogodocEnv.token)
 	if err != nil {
 		fmt.Errorf("Error initializing PogodocClient")
 	}
 	ctx := context.Background()
-	response, err := c.Templates.InitializeTemplateCreation(ctx)
-	if err != nil {
-		fmt.Print(err)
-	}
-	fmt.Println(response.JobId)
+	
 	sampledata, _ := ReadFile("../../data/json_data/react.json")
 
 	var sampleDataMap map[string]interface{}
@@ -53,7 +49,6 @@ func PrepareData() TestData {
 		PogodocEnv:    pogodocEnv,
 		client:        *c,
 		ctx:           ctx,
-		templateId:    response.JobId,
 		sampleDataMap: sampleDataMap,
 	}
 }
