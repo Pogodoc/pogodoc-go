@@ -4,12 +4,12 @@ package client
 
 import (
 	context "context"
-	core "github.com/pogodoc/pogodoc-go/sdk/core"
-	documents "github.com/pogodoc/pogodoc-go/sdk/documents"
-	internal "github.com/pogodoc/pogodoc-go/sdk/internal"
-	option "github.com/pogodoc/pogodoc-go/sdk/option"
-	templates "github.com/pogodoc/pogodoc-go/sdk/templates"
-	tokens "github.com/pogodoc/pogodoc-go/sdk/tokens"
+	core "github.com/Pogodoc/pogodoc-go/sdk/core"
+	documents "github.com/Pogodoc/pogodoc-go/sdk/documents"
+	internal "github.com/Pogodoc/pogodoc-go/sdk/internal"
+	option "github.com/Pogodoc/pogodoc-go/sdk/option"
+	templates "github.com/Pogodoc/pogodoc-go/sdk/templates"
+	tokens "github.com/Pogodoc/pogodoc-go/sdk/tokens"
 	http "net/http"
 )
 

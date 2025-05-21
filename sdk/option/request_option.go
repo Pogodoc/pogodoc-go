@@ -3,7 +3,7 @@
 package option
 
 import (
-	core "github.com/pogodoc/pogodoc-go/sdk/core"
+	core "github.com/Pogodoc/pogodoc-go/sdk/core"
 	http "net/http"
 	url "net/url"
 )

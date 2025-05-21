@@ -4,10 +4,10 @@ package documents
 
 import (
 	context "context"
-	sdk "github.com/pogodoc/pogodoc-go/sdk"
-	core "github.com/pogodoc/pogodoc-go/sdk/core"
-	internal "github.com/pogodoc/pogodoc-go/sdk/internal"
-	option "github.com/pogodoc/pogodoc-go/sdk/option"
+	sdk "github.com/Pogodoc/pogodoc-go/sdk"
+	core "github.com/Pogodoc/pogodoc-go/sdk/core"
+	internal "github.com/Pogodoc/pogodoc-go/sdk/internal"
+	option "github.com/Pogodoc/pogodoc-go/sdk/option"
 	http "net/http"
 )
 
