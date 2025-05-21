@@ -3,7 +3,7 @@
 package client
 
 import (
-	option "github.com/pogodoc/pogodoc-go/sdk/option"
+	option "github.com/Pogodoc/pogodoc-go/sdk/option"
 	assert "github.com/stretchr/testify/assert"
 	http "net/http"
 	testing "testing"

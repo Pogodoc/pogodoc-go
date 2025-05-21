@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/pogodoc/pogodoc-go/sdk/core"
+	"github.com/Pogodoc/pogodoc-go/sdk/core"
 )
 
 // ErrorDecoder decodes *http.Response errors and returns a
