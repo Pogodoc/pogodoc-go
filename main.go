@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	api "github.com/Pogodoc-go/sdk"
-	"github.com/Pogodoc-go/sdk/client"
-	"github.com/Pogodoc-go/sdk/option"
+	api "github./Pogodoc/pogodoc-go/sdk"
+	"github.com/Pogodoc/pogodc-go/sdk/client"
+	"github.com/Pogodoc/pogodoc-go/sdk/option"
 )
 
 func PogodocClientInit(baseURL string, tokenString string) (*PogodocClient, error) {
