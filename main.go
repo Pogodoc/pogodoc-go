@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	api "github./Pogodoc/pogodoc-go/sdk"
-	"github.com/Pogodoc/pogodc-go/sdk/client"
+	"github.com/Pogodoc/pogodoc-go/sdk/client"
 	"github.com/Pogodoc/pogodoc-go/sdk/option"
 )
 
