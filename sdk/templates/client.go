@@ -154,9 +154,10 @@ func (c *Client) UpdateTemplate(
 // Deletes a template from Strapi and associated S3 storage. Removes all associated files and metadata.
 func (c *Client) DeleteTemplate(
 	ctx context.Context,
+	// ID of the template to be deleted
 	templateId string,
 	opts ...option.RequestOption,
-) error {
+) (*sdk.DeleteTemplateResponse, error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -172,6 +173,7 @@ func (c *Client) DeleteTemplate(
 		options.ToHeader(),
 	)
 
+	var response *sdk.DeleteTemplateResponse
 	if err := c.caller.Call(
 		ctx,
 		&internal.CallParams{
@@ -182,16 +184,18 @@ func (c *Client) DeleteTemplate(
 			BodyProperties:  options.BodyProperties,
 			QueryParameters: options.QueryParameters,
 			Client:          options.HTTPClient,
+			Response:        &response,
 		},
 	); err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return response, nil
 }
 
 // Extracts contents from an uploaded template ZIP file and stores individual files in the appropriate S3 storage structure.
 func (c *Client) ExtractTemplateFiles(
 	ctx context.Context,
+	// ID of the template to be used
 	templateId string,
 	opts ...option.RequestOption,
 ) error {
@@ -230,6 +234,7 @@ func (c *Client) ExtractTemplateFiles(
 // Creates both PNG and PDF preview files for template visualization. Generates previews in parallel and returns URLs for both formats.
 func (c *Client) GenerateTemplatePreviews(
 	ctx context.Context,
+	// ID of the template to be used
 	templateId string,
 	request *sdk.GenerateTemplatePreviewsRequest,
 	opts ...option.RequestOption,
@@ -273,6 +278,7 @@ func (c *Client) GenerateTemplatePreviews(
 // Generates a presigned URL for template access. Used for downloading template files from S3 storage.
 func (c *Client) GeneratePresignedGetUrl(
 	ctx context.Context,
+	// ID of the template that is being downloaded
 	templateId string,
 	opts ...option.RequestOption,
 ) (*sdk.GeneratePresignedGetUrlResponse, error) {
@@ -313,6 +319,7 @@ func (c *Client) GeneratePresignedGetUrl(
 // Retrieves the template index.html file from S3 storage. Used for rendering the template in the browser.
 func (c *Client) GetTemplateIndexHtml(
 	ctx context.Context,
+	// ID of the template to be used
 	templateId string,
 	opts ...option.RequestOption,
 ) (*sdk.GetTemplateIndexHtmlResponse, error) {
@@ -353,6 +360,7 @@ func (c *Client) GetTemplateIndexHtml(
 // Uploads the template index.html file to S3 storage. Used for rendering the template in the browser.
 func (c *Client) UploadTemplateIndexHtml(
 	ctx context.Context,
+	// ID of the template to be used
 	templateId string,
 	request *sdk.UploadTemplateIndexHtmlRequest,
 	opts ...option.RequestOption,
@@ -394,6 +402,7 @@ func (c *Client) UploadTemplateIndexHtml(
 // Creates a new template by duplicating an existing template's content and metadata. Includes copying preview files and template index.
 func (c *Client) CloneTemplate(
 	ctx context.Context,
+	// ID of the template to be used
 	templateId string,
 	opts ...option.RequestOption,
 ) (*sdk.CloneTemplateResponse, error) {

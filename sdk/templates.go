@@ -9,8 +9,11 @@ import (
 )
 
 type GenerateTemplatePreviewsRequest struct {
-	Type       GenerateTemplatePreviewsRequestType        `json:"type" url:"-"`
-	Data       map[string]interface{}                     `json:"data,omitempty" url:"-"`
+	// Type of template to be rendered
+	Type GenerateTemplatePreviewsRequestType `json:"type" url:"-"`
+	// Sample data for the template
+	Data map[string]interface{} `json:"data,omitempty" url:"-"`
+	// Format options for the rendered document
 	FormatOpts *GenerateTemplatePreviewsRequestFormatOpts `json:"formatOpts,omitempty" url:"-"`
 }
 
@@ -20,6 +23,7 @@ type SaveCreatedTemplateRequest struct {
 }
 
 type CloneTemplateResponse struct {
+	// ID of the new template
 	NewTemplateId string `json:"newTemplateId" url:"newTemplateId"`
 
 	extraProperties map[string]interface{}
@@ -65,7 +69,54 @@ func (c *CloneTemplateResponse) String() string {
 	return fmt.Sprintf("%#v", c)
 }
 
+type DeleteTemplateResponse struct {
+	TemplateId string `json:"templateId" url:"templateId"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (d *DeleteTemplateResponse) GetTemplateId() string {
+	if d == nil {
+		return ""
+	}
+	return d.TemplateId
+}
+
+func (d *DeleteTemplateResponse) GetExtraProperties() map[string]interface{} {
+	return d.extraProperties
+}
+
+func (d *DeleteTemplateResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler DeleteTemplateResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = DeleteTemplateResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *d)
+	if err != nil {
+		return err
+	}
+	d.extraProperties = extraProperties
+	d.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *DeleteTemplateResponse) String() string {
+	if len(d.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(d.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
+}
+
 type GeneratePresignedGetUrlResponse struct {
+	// Presigned URL to get the template
 	PresignedUrl string `json:"presignedUrl" url:"presignedUrl"`
 
 	extraProperties map[string]interface{}
@@ -111,11 +162,13 @@ func (g *GeneratePresignedGetUrlResponse) String() string {
 	return fmt.Sprintf("%#v", g)
 }
 
+// Format options for the rendered document
 type GenerateTemplatePreviewsRequestFormatOpts struct {
-	FromPage        *float64                                         `json:"fromPage,omitempty" url:"fromPage,omitempty"`
-	ToPage          *float64                                         `json:"toPage,omitempty" url:"toPage,omitempty"`
-	Format          *GenerateTemplatePreviewsRequestFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
-	WaitForSelector *string                                          `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
+	FromPage *float64                                         `json:"fromPage,omitempty" url:"fromPage,omitempty"`
+	ToPage   *float64                                         `json:"toPage,omitempty" url:"toPage,omitempty"`
+	Format   *GenerateTemplatePreviewsRequestFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
+	// Selector to wait for to know when the page is loaded and can be saved as pdf, png, etc.
+	WaitForSelector *string `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -230,6 +283,7 @@ func (g GenerateTemplatePreviewsRequestFormatOptsFormat) Ptr() *GenerateTemplate
 	return &g
 }
 
+// Type of template to be rendered
 type GenerateTemplatePreviewsRequestType string
 
 const (
@@ -322,16 +376,18 @@ func (g *GenerateTemplatePreviewsResponse) String() string {
 }
 
 type GenerateTemplatePreviewsResponsePdfPreview struct {
-	Url   *string `json:"url,omitempty" url:"url,omitempty"`
-	JobId string  `json:"jobId" url:"jobId"`
+	// URL of the rendered preview
+	Url string `json:"url" url:"url"`
+	// ID of the render job
+	JobId string `json:"jobId" url:"jobId"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
 
-func (g *GenerateTemplatePreviewsResponsePdfPreview) GetUrl() *string {
+func (g *GenerateTemplatePreviewsResponsePdfPreview) GetUrl() string {
 	if g == nil {
-		return nil
+		return ""
 	}
 	return g.Url
 }
@@ -376,16 +432,18 @@ func (g *GenerateTemplatePreviewsResponsePdfPreview) String() string {
 }
 
 type GenerateTemplatePreviewsResponsePngPreview struct {
-	Url   *string `json:"url,omitempty" url:"url,omitempty"`
-	JobId string  `json:"jobId" url:"jobId"`
+	// URL of the rendered preview
+	Url string `json:"url" url:"url"`
+	// ID of the render job
+	JobId string `json:"jobId" url:"jobId"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
 
-func (g *GenerateTemplatePreviewsResponsePngPreview) GetUrl() *string {
+func (g *GenerateTemplatePreviewsResponsePngPreview) GetUrl() string {
 	if g == nil {
-		return nil
+		return ""
 	}
 	return g.Url
 }
@@ -430,6 +488,7 @@ func (g *GenerateTemplatePreviewsResponsePngPreview) String() string {
 }
 
 type GetTemplateIndexHtmlResponse struct {
+	// Index.html file of the template
 	TemplateIndex string `json:"templateIndex" url:"templateIndex"`
 
 	extraProperties map[string]interface{}
@@ -476,18 +535,20 @@ func (g *GetTemplateIndexHtmlResponse) String() string {
 }
 
 type InitializeTemplateCreationResponse struct {
-	JobId                      string `json:"jobId" url:"jobId"`
+	// ID of the template
+	TemplateId string `json:"templateId" url:"templateId"`
+	// Presigned URL to upload the template to S3
 	PresignedTemplateUploadUrl string `json:"presignedTemplateUploadUrl" url:"presignedTemplateUploadUrl"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
 
-func (i *InitializeTemplateCreationResponse) GetJobId() string {
+func (i *InitializeTemplateCreationResponse) GetTemplateId() string {
 	if i == nil {
 		return ""
 	}
-	return i.JobId
+	return i.TemplateId
 }
 
 func (i *InitializeTemplateCreationResponse) GetPresignedTemplateUploadUrl() string {
@@ -530,7 +591,9 @@ func (i *InitializeTemplateCreationResponse) String() string {
 }
 
 type SaveCreatedTemplateRequestPreviewIds struct {
+	// ID of the job for the PNG preview
 	PngJobId string `json:"pngJobId" url:"pngJobId"`
+	// ID of the job for the PDF preview
 	PdfJobId string `json:"pdfJobId" url:"pdfJobId"`
 
 	extraProperties map[string]interface{}
@@ -584,12 +647,17 @@ func (s *SaveCreatedTemplateRequestPreviewIds) String() string {
 }
 
 type SaveCreatedTemplateRequestTemplateInfo struct {
-	Title       string                                                 `json:"title" url:"title"`
-	Description string                                                 `json:"description" url:"description"`
-	Type        SaveCreatedTemplateRequestTemplateInfoType             `json:"type" url:"type"`
-	SampleData  map[string]interface{}                                 `json:"sampleData,omitempty" url:"sampleData,omitempty"`
-	SourceCode  *string                                                `json:"sourceCode,omitempty" url:"sourceCode,omitempty"`
-	Categories  []SaveCreatedTemplateRequestTemplateInfoCategoriesItem `json:"categories,omitempty" url:"categories,omitempty"`
+	// Title of the template
+	Title string `json:"title" url:"title"`
+	// Description of the template
+	Description string `json:"description" url:"description"`
+	// Type of template to be rendered
+	Type SaveCreatedTemplateRequestTemplateInfoType `json:"type" url:"type"`
+	// Sample data for the template
+	SampleData map[string]interface{} `json:"sampleData,omitempty" url:"sampleData,omitempty"`
+	SourceCode *string                `json:"sourceCode,omitempty" url:"sourceCode,omitempty"`
+	// Categories of the template
+	Categories []SaveCreatedTemplateRequestTemplateInfoCategoriesItem `json:"categories,omitempty" url:"categories,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -700,6 +768,7 @@ func (s SaveCreatedTemplateRequestTemplateInfoCategoriesItem) Ptr() *SaveCreated
 	return &s
 }
 
+// Type of template to be rendered
 type SaveCreatedTemplateRequestTemplateInfoType string
 
 const (
@@ -738,7 +807,9 @@ func (s SaveCreatedTemplateRequestTemplateInfoType) Ptr() *SaveCreatedTemplateRe
 }
 
 type UpdateTemplateRequestPreviewIds struct {
+	// ID of the job for the PNG preview
 	PngJobId string `json:"pngJobId" url:"pngJobId"`
+	// ID of the job for the PDF preview
 	PdfJobId string `json:"pdfJobId" url:"pdfJobId"`
 
 	extraProperties map[string]interface{}
@@ -792,12 +863,17 @@ func (u *UpdateTemplateRequestPreviewIds) String() string {
 }
 
 type UpdateTemplateRequestTemplateInfo struct {
-	Title       string                                            `json:"title" url:"title"`
-	Description string                                            `json:"description" url:"description"`
-	Type        UpdateTemplateRequestTemplateInfoType             `json:"type" url:"type"`
-	SampleData  map[string]interface{}                            `json:"sampleData,omitempty" url:"sampleData,omitempty"`
-	SourceCode  *string                                           `json:"sourceCode,omitempty" url:"sourceCode,omitempty"`
-	Categories  []UpdateTemplateRequestTemplateInfoCategoriesItem `json:"categories,omitempty" url:"categories,omitempty"`
+	// Title of the template
+	Title string `json:"title" url:"title"`
+	// Description of the template
+	Description string `json:"description" url:"description"`
+	// Type of template to be rendered
+	Type UpdateTemplateRequestTemplateInfoType `json:"type" url:"type"`
+	// Sample data for the template
+	SampleData map[string]interface{} `json:"sampleData,omitempty" url:"sampleData,omitempty"`
+	SourceCode *string                `json:"sourceCode,omitempty" url:"sourceCode,omitempty"`
+	// Categories of the template
+	Categories []UpdateTemplateRequestTemplateInfoCategoriesItem `json:"categories,omitempty" url:"categories,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -908,6 +984,7 @@ func (u UpdateTemplateRequestTemplateInfoCategoriesItem) Ptr() *UpdateTemplateRe
 	return &u
 }
 
+// Type of template to be rendered
 type UpdateTemplateRequestTemplateInfoType string
 
 const (
@@ -994,9 +1071,11 @@ func (u *UpdateTemplateResponse) String() string {
 type UpdateTemplateRequest struct {
 	TemplateInfo *UpdateTemplateRequestTemplateInfo `json:"templateInfo,omitempty" url:"-"`
 	PreviewIds   *UpdateTemplateRequestPreviewIds   `json:"previewIds,omitempty" url:"-"`
-	ContentId    string                             `json:"contentId" url:"-"`
+	// ID by which the new template content is saved
+	ContentId string `json:"contentId" url:"-"`
 }
 
 type UploadTemplateIndexHtmlRequest struct {
+	// New index.html file of the template
 	TemplateIndex string `json:"templateIndex" url:"-"`
 }

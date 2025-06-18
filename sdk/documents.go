@@ -8,248 +8,46 @@ import (
 	internal "github.com/Pogodoc/pogodoc-go/sdk/internal"
 )
 
-type GenerateDocumentPreviewRequest struct {
-	TemplateId string                                    `json:"-" url:"templateId"`
-	Type       GenerateDocumentPreviewRequestType        `json:"type" url:"-"`
-	Data       map[string]interface{}                    `json:"data,omitempty" url:"-"`
-	FormatOpts *GenerateDocumentPreviewRequestFormatOpts `json:"formatOpts,omitempty" url:"-"`
-}
-
 type InitializeRenderJobRequest struct {
-	Data       map[string]interface{}                `json:"data,omitempty" url:"-"`
-	Type       InitializeRenderJobRequestType        `json:"type" url:"-"`
-	Target     InitializeRenderJobRequestTarget      `json:"target" url:"-"`
-	TemplateId *string                               `json:"templateId,omitempty" url:"-"`
+	// Sample data for the template
+	Data map[string]interface{} `json:"data,omitempty" url:"-"`
+	// Type of template to be rendered
+	Type InitializeRenderJobRequestType `json:"type" url:"-"`
+	// Type of output to be rendered
+	Target InitializeRenderJobRequestTarget `json:"target" url:"-"`
+	// ID of the template to be used
+	TemplateId *string `json:"templateId,omitempty" url:"-"`
+	// Format options for the rendered document
 	FormatOpts *InitializeRenderJobRequestFormatOpts `json:"formatOpts,omitempty" url:"-"`
 }
 
 type StartImmediateRenderRequest struct {
-	StartImmediateRenderRequestData map[string]interface{}                 `json:"data,omitempty" url:"-"`
-	Type                            StartImmediateRenderRequestType        `json:"type" url:"-"`
-	Target                          StartImmediateRenderRequestTarget      `json:"target" url:"-"`
-	TemplateId                      *string                                `json:"templateId,omitempty" url:"-"`
-	FormatOpts                      *StartImmediateRenderRequestFormatOpts `json:"formatOpts,omitempty" url:"-"`
-	Template                        *string                                `json:"template,omitempty" url:"-"`
+	// Sample data for the template
+	StartImmediateRenderRequestData map[string]interface{} `json:"data,omitempty" url:"-"`
+	// Type of template to be rendered
+	Type StartImmediateRenderRequestType `json:"type" url:"-"`
+	// Type of output to be rendered
+	Target StartImmediateRenderRequestTarget `json:"target" url:"-"`
+	// ID of the template to be used
+	TemplateId *string `json:"templateId,omitempty" url:"-"`
+	// Format options for the rendered document
+	FormatOpts *StartImmediateRenderRequestFormatOpts `json:"formatOpts,omitempty" url:"-"`
+	// index.html or ejs file of the template as a string
+	Template *string `json:"template,omitempty" url:"-"`
 }
 
 type StartRenderJobRequest struct {
+	// Whether to wait for the render job to complete, if false, the job will be returned immediately
 	ShouldWaitForRenderCompletion *bool   `json:"shouldWaitForRenderCompletion,omitempty" url:"-"`
 	UploadPresignedS3Url          *string `json:"uploadPresignedS3Url,omitempty" url:"-"`
 }
 
-type GenerateDocumentPreviewRequestFormatOpts struct {
-	FromPage        *float64                                        `json:"fromPage,omitempty" url:"fromPage,omitempty"`
-	ToPage          *float64                                        `json:"toPage,omitempty" url:"toPage,omitempty"`
-	Format          *GenerateDocumentPreviewRequestFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
-	WaitForSelector *string                                         `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
-
-	extraProperties map[string]interface{}
-	rawJSON         json.RawMessage
-}
-
-func (g *GenerateDocumentPreviewRequestFormatOpts) GetFromPage() *float64 {
-	if g == nil {
-		return nil
-	}
-	return g.FromPage
-}
-
-func (g *GenerateDocumentPreviewRequestFormatOpts) GetToPage() *float64 {
-	if g == nil {
-		return nil
-	}
-	return g.ToPage
-}
-
-func (g *GenerateDocumentPreviewRequestFormatOpts) GetFormat() *GenerateDocumentPreviewRequestFormatOptsFormat {
-	if g == nil {
-		return nil
-	}
-	return g.Format
-}
-
-func (g *GenerateDocumentPreviewRequestFormatOpts) GetWaitForSelector() *string {
-	if g == nil {
-		return nil
-	}
-	return g.WaitForSelector
-}
-
-func (g *GenerateDocumentPreviewRequestFormatOpts) GetExtraProperties() map[string]interface{} {
-	return g.extraProperties
-}
-
-func (g *GenerateDocumentPreviewRequestFormatOpts) UnmarshalJSON(data []byte) error {
-	type unmarshaler GenerateDocumentPreviewRequestFormatOpts
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*g = GenerateDocumentPreviewRequestFormatOpts(value)
-	extraProperties, err := internal.ExtractExtraProperties(data, *g)
-	if err != nil {
-		return err
-	}
-	g.extraProperties = extraProperties
-	g.rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (g *GenerateDocumentPreviewRequestFormatOpts) String() string {
-	if len(g.rawJSON) > 0 {
-		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := internal.StringifyJSON(g); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", g)
-}
-
-type GenerateDocumentPreviewRequestFormatOptsFormat string
-
-const (
-	GenerateDocumentPreviewRequestFormatOptsFormatLetter  GenerateDocumentPreviewRequestFormatOptsFormat = "letter"
-	GenerateDocumentPreviewRequestFormatOptsFormatLegal   GenerateDocumentPreviewRequestFormatOptsFormat = "legal"
-	GenerateDocumentPreviewRequestFormatOptsFormatTabloid GenerateDocumentPreviewRequestFormatOptsFormat = "tabloid"
-	GenerateDocumentPreviewRequestFormatOptsFormatLedger  GenerateDocumentPreviewRequestFormatOptsFormat = "ledger"
-	GenerateDocumentPreviewRequestFormatOptsFormatA0      GenerateDocumentPreviewRequestFormatOptsFormat = "a0"
-	GenerateDocumentPreviewRequestFormatOptsFormatA1      GenerateDocumentPreviewRequestFormatOptsFormat = "a1"
-	GenerateDocumentPreviewRequestFormatOptsFormatA2      GenerateDocumentPreviewRequestFormatOptsFormat = "a2"
-	GenerateDocumentPreviewRequestFormatOptsFormatA3      GenerateDocumentPreviewRequestFormatOptsFormat = "a3"
-	GenerateDocumentPreviewRequestFormatOptsFormatA4      GenerateDocumentPreviewRequestFormatOptsFormat = "a4"
-	GenerateDocumentPreviewRequestFormatOptsFormatA5      GenerateDocumentPreviewRequestFormatOptsFormat = "a5"
-	GenerateDocumentPreviewRequestFormatOptsFormatA6      GenerateDocumentPreviewRequestFormatOptsFormat = "a6"
-)
-
-func NewGenerateDocumentPreviewRequestFormatOptsFormatFromString(s string) (GenerateDocumentPreviewRequestFormatOptsFormat, error) {
-	switch s {
-	case "letter":
-		return GenerateDocumentPreviewRequestFormatOptsFormatLetter, nil
-	case "legal":
-		return GenerateDocumentPreviewRequestFormatOptsFormatLegal, nil
-	case "tabloid":
-		return GenerateDocumentPreviewRequestFormatOptsFormatTabloid, nil
-	case "ledger":
-		return GenerateDocumentPreviewRequestFormatOptsFormatLedger, nil
-	case "a0":
-		return GenerateDocumentPreviewRequestFormatOptsFormatA0, nil
-	case "a1":
-		return GenerateDocumentPreviewRequestFormatOptsFormatA1, nil
-	case "a2":
-		return GenerateDocumentPreviewRequestFormatOptsFormatA2, nil
-	case "a3":
-		return GenerateDocumentPreviewRequestFormatOptsFormatA3, nil
-	case "a4":
-		return GenerateDocumentPreviewRequestFormatOptsFormatA4, nil
-	case "a5":
-		return GenerateDocumentPreviewRequestFormatOptsFormatA5, nil
-	case "a6":
-		return GenerateDocumentPreviewRequestFormatOptsFormatA6, nil
-	}
-	var t GenerateDocumentPreviewRequestFormatOptsFormat
-	return "", fmt.Errorf("%s is not a valid %T", s, t)
-}
-
-func (g GenerateDocumentPreviewRequestFormatOptsFormat) Ptr() *GenerateDocumentPreviewRequestFormatOptsFormat {
-	return &g
-}
-
-type GenerateDocumentPreviewRequestType string
-
-const (
-	GenerateDocumentPreviewRequestTypeDocx  GenerateDocumentPreviewRequestType = "docx"
-	GenerateDocumentPreviewRequestTypeXlsx  GenerateDocumentPreviewRequestType = "xlsx"
-	GenerateDocumentPreviewRequestTypePptx  GenerateDocumentPreviewRequestType = "pptx"
-	GenerateDocumentPreviewRequestTypeEjs   GenerateDocumentPreviewRequestType = "ejs"
-	GenerateDocumentPreviewRequestTypeHtml  GenerateDocumentPreviewRequestType = "html"
-	GenerateDocumentPreviewRequestTypeLatex GenerateDocumentPreviewRequestType = "latex"
-	GenerateDocumentPreviewRequestTypeReact GenerateDocumentPreviewRequestType = "react"
-)
-
-func NewGenerateDocumentPreviewRequestTypeFromString(s string) (GenerateDocumentPreviewRequestType, error) {
-	switch s {
-	case "docx":
-		return GenerateDocumentPreviewRequestTypeDocx, nil
-	case "xlsx":
-		return GenerateDocumentPreviewRequestTypeXlsx, nil
-	case "pptx":
-		return GenerateDocumentPreviewRequestTypePptx, nil
-	case "ejs":
-		return GenerateDocumentPreviewRequestTypeEjs, nil
-	case "html":
-		return GenerateDocumentPreviewRequestTypeHtml, nil
-	case "latex":
-		return GenerateDocumentPreviewRequestTypeLatex, nil
-	case "react":
-		return GenerateDocumentPreviewRequestTypeReact, nil
-	}
-	var t GenerateDocumentPreviewRequestType
-	return "", fmt.Errorf("%s is not a valid %T", s, t)
-}
-
-func (g GenerateDocumentPreviewRequestType) Ptr() *GenerateDocumentPreviewRequestType {
-	return &g
-}
-
-type GenerateDocumentPreviewResponse struct {
-	Url   *string `json:"url,omitempty" url:"url,omitempty"`
-	JobId string  `json:"jobId" url:"jobId"`
-
-	extraProperties map[string]interface{}
-	rawJSON         json.RawMessage
-}
-
-func (g *GenerateDocumentPreviewResponse) GetUrl() *string {
-	if g == nil {
-		return nil
-	}
-	return g.Url
-}
-
-func (g *GenerateDocumentPreviewResponse) GetJobId() string {
-	if g == nil {
-		return ""
-	}
-	return g.JobId
-}
-
-func (g *GenerateDocumentPreviewResponse) GetExtraProperties() map[string]interface{} {
-	return g.extraProperties
-}
-
-func (g *GenerateDocumentPreviewResponse) UnmarshalJSON(data []byte) error {
-	type unmarshaler GenerateDocumentPreviewResponse
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*g = GenerateDocumentPreviewResponse(value)
-	extraProperties, err := internal.ExtractExtraProperties(data, *g)
-	if err != nil {
-		return err
-	}
-	g.extraProperties = extraProperties
-	g.rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (g *GenerateDocumentPreviewResponse) String() string {
-	if len(g.rawJSON) > 0 {
-		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := internal.StringifyJSON(g); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", g)
-}
-
 type GetJobStatusResponse struct {
-	Type    GetJobStatusResponseType    `json:"type" url:"type"`
-	JobId   string                      `json:"jobId" url:"jobId"`
+	// Type of template to be rendered
+	Type GetJobStatusResponseType `json:"type" url:"type"`
+	// ID of the render job
+	JobId string `json:"jobId" url:"jobId"`
+	// Type of output to be rendered
 	Target  GetJobStatusResponseTarget  `json:"target" url:"target"`
 	Output  *GetJobStatusResponseOutput `json:"output,omitempty" url:"output,omitempty"`
 	Success *bool                       `json:"success,omitempty" url:"success,omitempty"`
@@ -388,6 +186,7 @@ func (g *GetJobStatusResponseOutput) String() string {
 }
 
 type GetJobStatusResponseOutputData struct {
+	// URL of the rendered output
 	Url string `json:"url" url:"url"`
 
 	extraProperties map[string]interface{}
@@ -434,6 +233,7 @@ func (g *GetJobStatusResponseOutputData) String() string {
 }
 
 type GetJobStatusResponseOutputMetadata struct {
+	// Time taken to render the output
 	RenderTime float64 `json:"renderTime" url:"renderTime"`
 
 	extraProperties map[string]interface{}
@@ -479,6 +279,7 @@ func (g *GetJobStatusResponseOutputMetadata) String() string {
 	return fmt.Sprintf("%#v", g)
 }
 
+// Type of output to be rendered
 type GetJobStatusResponseTarget string
 
 const (
@@ -516,6 +317,7 @@ func (g GetJobStatusResponseTarget) Ptr() *GetJobStatusResponseTarget {
 	return &g
 }
 
+// Type of template to be rendered
 type GetJobStatusResponseType string
 
 const (
@@ -553,11 +355,13 @@ func (g GetJobStatusResponseType) Ptr() *GetJobStatusResponseType {
 	return &g
 }
 
+// Format options for the rendered document
 type InitializeRenderJobRequestFormatOpts struct {
-	FromPage        *float64                                    `json:"fromPage,omitempty" url:"fromPage,omitempty"`
-	ToPage          *float64                                    `json:"toPage,omitempty" url:"toPage,omitempty"`
-	Format          *InitializeRenderJobRequestFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
-	WaitForSelector *string                                     `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
+	FromPage *float64                                    `json:"fromPage,omitempty" url:"fromPage,omitempty"`
+	ToPage   *float64                                    `json:"toPage,omitempty" url:"toPage,omitempty"`
+	Format   *InitializeRenderJobRequestFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
+	// Selector to wait for to know when the page is loaded and can be saved as pdf, png, etc.
+	WaitForSelector *string `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -672,6 +476,7 @@ func (i InitializeRenderJobRequestFormatOptsFormat) Ptr() *InitializeRenderJobRe
 	return &i
 }
 
+// Type of output to be rendered
 type InitializeRenderJobRequestTarget string
 
 const (
@@ -709,6 +514,7 @@ func (i InitializeRenderJobRequestTarget) Ptr() *InitializeRenderJobRequestTarge
 	return &i
 }
 
+// Type of template to be rendered
 type InitializeRenderJobRequestType string
 
 const (
@@ -747,10 +553,14 @@ func (i InitializeRenderJobRequestType) Ptr() *InitializeRenderJobRequestType {
 }
 
 type InitializeRenderJobResponse struct {
-	JobId                      string                            `json:"jobId" url:"jobId"`
-	Target                     InitializeRenderJobResponseTarget `json:"target" url:"target"`
-	PresignedDataUploadUrl     *string                           `json:"presignedDataUploadUrl,omitempty" url:"presignedDataUploadUrl,omitempty"`
-	PresignedTemplateUploadUrl *string                           `json:"presignedTemplateUploadUrl,omitempty" url:"presignedTemplateUploadUrl,omitempty"`
+	// ID of the render job
+	JobId string `json:"jobId" url:"jobId"`
+	// Type of output to be rendered
+	Target InitializeRenderJobResponseTarget `json:"target" url:"target"`
+	// Presigned URL to upload the data for the render job to S3
+	PresignedDataUploadUrl *string `json:"presignedDataUploadUrl,omitempty" url:"presignedDataUploadUrl,omitempty"`
+	// Presigned URL to upload the template for the render job to S3. Only works with EJS templates
+	PresignedTemplateUploadUrl *string `json:"presignedTemplateUploadUrl,omitempty" url:"presignedTemplateUploadUrl,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -816,6 +626,7 @@ func (i *InitializeRenderJobResponse) String() string {
 	return fmt.Sprintf("%#v", i)
 }
 
+// Type of output to be rendered
 type InitializeRenderJobResponseTarget string
 
 const (
@@ -853,11 +664,13 @@ func (i InitializeRenderJobResponseTarget) Ptr() *InitializeRenderJobResponseTar
 	return &i
 }
 
+// Format options for the rendered document
 type StartImmediateRenderRequestFormatOpts struct {
-	FromPage        *float64                                     `json:"fromPage,omitempty" url:"fromPage,omitempty"`
-	ToPage          *float64                                     `json:"toPage,omitempty" url:"toPage,omitempty"`
-	Format          *StartImmediateRenderRequestFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
-	WaitForSelector *string                                      `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
+	FromPage *float64                                     `json:"fromPage,omitempty" url:"fromPage,omitempty"`
+	ToPage   *float64                                     `json:"toPage,omitempty" url:"toPage,omitempty"`
+	Format   *StartImmediateRenderRequestFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
+	// Selector to wait for to know when the page is loaded and can be saved as pdf, png, etc.
+	WaitForSelector *string `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -972,6 +785,7 @@ func (s StartImmediateRenderRequestFormatOptsFormat) Ptr() *StartImmediateRender
 	return &s
 }
 
+// Type of output to be rendered
 type StartImmediateRenderRequestTarget string
 
 const (
@@ -1009,6 +823,7 @@ func (s StartImmediateRenderRequestTarget) Ptr() *StartImmediateRenderRequestTar
 	return &s
 }
 
+// Type of template to be rendered
 type StartImmediateRenderRequestType string
 
 const (
@@ -1047,6 +862,7 @@ func (s StartImmediateRenderRequestType) Ptr() *StartImmediateRenderRequestType 
 }
 
 type StartImmediateRenderResponse struct {
+	// URL of the rendered output
 	Url string `json:"url" url:"url"`
 
 	extraProperties map[string]interface{}
@@ -1093,6 +909,7 @@ func (s *StartImmediateRenderResponse) String() string {
 }
 
 type StartRenderJobResponse struct {
+	// ID of the render job
 	JobId string `json:"jobId" url:"jobId"`
 
 	extraProperties map[string]interface{}

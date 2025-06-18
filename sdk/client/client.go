@@ -3,13 +3,11 @@
 package client
 
 import (
-	context "context"
 	core "github.com/Pogodoc/pogodoc-go/sdk/core"
 	documents "github.com/Pogodoc/pogodoc-go/sdk/documents"
 	internal "github.com/Pogodoc/pogodoc-go/sdk/internal"
 	option "github.com/Pogodoc/pogodoc-go/sdk/option"
 	templates "github.com/Pogodoc/pogodoc-go/sdk/templates"
-	tokens "github.com/Pogodoc/pogodoc-go/sdk/tokens"
 	http "net/http"
 )
 
@@ -20,7 +18,6 @@ type Client struct {
 
 	Templates *templates.Client
 	Documents *documents.Client
-	Tokens    *tokens.Client
 }
 
 func NewClient(opts ...option.RequestOption) *Client {
@@ -36,39 +33,5 @@ func NewClient(opts ...option.RequestOption) *Client {
 		header:    options.ToHeader(),
 		Templates: templates.NewClient(opts...),
 		Documents: documents.NewClient(opts...),
-		Tokens:    tokens.NewClient(opts...),
 	}
-}
-
-func (c *Client) PostBoshe(
-	ctx context.Context,
-	opts ...option.RequestOption,
-) error {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"https://api.pogodoc.com",
-	)
-	endpointURL := baseURL + "/boshe"
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodPost,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-		},
-	); err != nil {
-		return err
-	}
-	return nil
 }

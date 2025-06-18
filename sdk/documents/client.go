@@ -113,52 +113,6 @@ func (c *Client) StartRenderJob(
 	return response, nil
 }
 
-// Generates a preview by creating a single-page render job, processing it immediately, and returning the output URL. Used for template visualization.
-func (c *Client) GenerateDocumentPreview(
-	ctx context.Context,
-	request *sdk.GenerateDocumentPreviewRequest,
-	opts ...option.RequestOption,
-) (*sdk.GenerateDocumentPreviewResponse, error) {
-	options := core.NewRequestOptions(opts...)
-	baseURL := internal.ResolveBaseURL(
-		options.BaseURL,
-		c.baseURL,
-		"https://api.pogodoc.com",
-	)
-	endpointURL := baseURL + "/documents/render-preview"
-	queryParams, err := internal.QueryValues(request)
-	if err != nil {
-		return nil, err
-	}
-	if len(queryParams) > 0 {
-		endpointURL += "?" + queryParams.Encode()
-	}
-	headers := internal.MergeHeaders(
-		c.header.Clone(),
-		options.ToHeader(),
-	)
-	headers.Set("Content-Type", "application/json")
-
-	var response *sdk.GenerateDocumentPreviewResponse
-	if err := c.caller.Call(
-		ctx,
-		&internal.CallParams{
-			URL:             endpointURL,
-			Method:          http.MethodPost,
-			Headers:         headers,
-			MaxAttempts:     options.MaxAttempts,
-			BodyProperties:  options.BodyProperties,
-			QueryParameters: options.QueryParameters,
-			Client:          options.HTTPClient,
-			Request:         request,
-			Response:        &response,
-		},
-	); err != nil {
-		return nil, err
-	}
-	return response, nil
-}
-
 // Combines initialization and rendering in one step. Creates a job, uploads template/data directly, starts rendering, and adds the document to Strapi. Requires subscription check.
 func (c *Client) StartImmediateRender(
 	ctx context.Context,
@@ -201,6 +155,7 @@ func (c *Client) StartImmediateRender(
 // Fetches detailed job information from S3 storage including job status, template ID, target format, and output details if available.
 func (c *Client) GetJobStatus(
 	ctx context.Context,
+	// ID of the render job
 	jobId string,
 	opts ...option.RequestOption,
 ) (*sdk.GetJobStatusResponse, error) {
