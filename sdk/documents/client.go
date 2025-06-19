@@ -41,7 +41,7 @@ func (c *Client) InitializeRenderJob(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"https://api.pogodoc.com",
+		"https://api.pogodoc.com/v1",
 	)
 	endpointURL := baseURL + "/documents/init"
 	headers := internal.MergeHeaders(
@@ -81,7 +81,7 @@ func (c *Client) StartRenderJob(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"https://api.pogodoc.com",
+		"https://api.pogodoc.com/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/documents/%v/render",
@@ -123,7 +123,7 @@ func (c *Client) StartImmediateRender(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"https://api.pogodoc.com",
+		"https://api.pogodoc.com/v1",
 	)
 	endpointURL := baseURL + "/documents/immediate-render"
 	headers := internal.MergeHeaders(
@@ -163,7 +163,7 @@ func (c *Client) GetJobStatus(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"https://api.pogodoc.com",
+		"https://api.pogodoc.com/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/jobs/%v",

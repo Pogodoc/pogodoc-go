@@ -40,7 +40,7 @@ func (c *Client) InitializeTemplateCreation(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"https://api.pogodoc.com",
+		"https://api.pogodoc.com/v1",
 	)
 	endpointURL := baseURL + "/templates/init"
 	headers := internal.MergeHeaders(
@@ -78,7 +78,7 @@ func (c *Client) SaveCreatedTemplate(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"https://api.pogodoc.com",
+		"https://api.pogodoc.com/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/templates/%v",
@@ -119,7 +119,7 @@ func (c *Client) UpdateTemplate(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"https://api.pogodoc.com",
+		"https://api.pogodoc.com/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/templates/%v",
@@ -162,7 +162,7 @@ func (c *Client) DeleteTemplate(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"https://api.pogodoc.com",
+		"https://api.pogodoc.com/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/templates/%v",
@@ -203,7 +203,7 @@ func (c *Client) ExtractTemplateFiles(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"https://api.pogodoc.com",
+		"https://api.pogodoc.com/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/templates/%v/unzip",
@@ -243,7 +243,7 @@ func (c *Client) GenerateTemplatePreviews(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"https://api.pogodoc.com",
+		"https://api.pogodoc.com/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/templates/%v/render-previews",
@@ -286,7 +286,7 @@ func (c *Client) GeneratePresignedGetUrl(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"https://api.pogodoc.com",
+		"https://api.pogodoc.com/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/templates/%v/presigned-url",
@@ -327,7 +327,7 @@ func (c *Client) GetTemplateIndexHtml(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"https://api.pogodoc.com",
+		"https://api.pogodoc.com/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/templates/%v/index-html",
@@ -369,7 +369,7 @@ func (c *Client) UploadTemplateIndexHtml(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"https://api.pogodoc.com",
+		"https://api.pogodoc.com/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/templates/%v/index-html",
@@ -410,7 +410,7 @@ func (c *Client) CloneTemplate(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		c.baseURL,
-		"https://api.pogodoc.com",
+		"https://api.pogodoc.com/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/templates/%v/clone",

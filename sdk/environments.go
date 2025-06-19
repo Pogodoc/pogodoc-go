@@ -9,5 +9,5 @@ package api
 var Environments = struct {
 	Default string
 }{
-	Default: "https://api.pogodoc.com",
+	Default: "https://api.pogodoc.com/v1",
 }
