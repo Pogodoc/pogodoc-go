@@ -8,16 +8,24 @@ import (
 	"github.com/Pogodoc/pogodoc-go/sdk/option"
 )
 
-func PogodocClientInit(baseURL string, tokenString string) (*PogodocClient, error) {
-	if tokenString == "" || baseURL == "" {
-		return &PogodocClient{}, fmt.Errorf("PogodocClientInit: token or baseURL is empty")
+func PogodocClientInit(baseURL *string, tokenString string) (*PogodocClient, error) {
+	if tokenString == "" || (baseURL != nil && *baseURL == "") {
+		return nil, fmt.Errorf("PogodocClientInit: token or baseURL is empty")
 	}
-	c := client.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithToken(tokenString),
-	)
 
-	return &PogodocClient{c}, nil
+	var c *client.Client
+	if baseURL == nil {
+		c = client.NewClient(
+			option.WithToken(tokenString),
+		)
+	} else {
+		c = client.NewClient(
+			option.WithToken(tokenString),
+			option.WithBaseURL(*baseURL),
+		)
+	}
+
+	return &PogodocClient{Client: c}, nil
 }
 
 func (c *PogodocClient) SaveTemplate(filePath string, metadata api.SaveCreatedTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
