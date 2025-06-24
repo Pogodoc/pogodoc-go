@@ -3,28 +3,48 @@ package pogodoc
 import (
 	"context"
 	"fmt"
+	"os"
+
 	api "github.com/Pogodoc/pogodoc-go/sdk"
 	"github.com/Pogodoc/pogodoc-go/sdk/client"
 	"github.com/Pogodoc/pogodoc-go/sdk/option"
+	"github.com/joho/godotenv"
 )
 
-func PogodocClientInit(baseURL *string, tokenString string) (*PogodocClient, error) {
-	if tokenString == "" || (baseURL != nil && *baseURL == "") {
-		return nil, fmt.Errorf("PogodocClientInit: token or baseURL is empty")
+func PogodocClientInit() (*PogodocClient, error) {
+	err := godotenv.Load()
+	if err != nil {
+		return nil, fmt.Errorf("error loading .env file: %v", err)
 	}
-
-	var c *client.Client
-	if baseURL == nil {
-		c = client.NewClient(
-			option.WithToken(tokenString),
-		)
-	} else {
-		c = client.NewClient(
-			option.WithToken(tokenString),
-			option.WithBaseURL(*baseURL),
-		)
+	var tokenString string
+	var baseURL string
+	if os.Getenv("POGODOC_BASE_URL") != "" {
+		baseURL = os.Getenv("POGODOC_BASE_URL")
 	}
+	if os.Getenv("POGODOC_TOKEN") != "" {
+		tokenString = os.Getenv("POGODOC_TOKEN")
+	}
+	c := client.NewClient(
+		option.WithToken(tokenString),
+		option.WithBaseURL(baseURL),
+	)
+	return &PogodocClient{Client: c}, nil
+}
 
+func PogodocClientInitWithConfig(baseURL string, tokenString string) (*PogodocClient, error) {
+
+	c := client.NewClient(
+		option.WithToken(tokenString),
+		option.WithBaseURL(baseURL),
+	)
+
+	return &PogodocClient{Client: c}, nil
+}
+
+func PogodocClientInitWithToken(tokenString string) (*PogodocClient, error) {
+	c := client.NewClient(
+		option.WithToken(tokenString),
+	)
 	return &PogodocClient{Client: c}, nil
 }
 
@@ -44,7 +64,6 @@ func (c *PogodocClient) SaveTemplate(filePath string, metadata api.SaveCreatedTe
 	}
 
 	return c.SaveTemplateFromFileStream(fsProps, metadata, ctx)
-
 }
 
 func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, metadata api.SaveCreatedTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
@@ -52,7 +71,7 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 	if err != nil {
 		return "", fmt.Errorf("initializing template creation: %v", err)
 	}
-	templateId := response.JobId
+	templateId := response.TemplateId
 	fmt.Println("Create templateId: ", templateId)
 
 	err = UploadToS3WithURL(response.PresignedTemplateUploadUrl, fsProps, "application/zip")
@@ -122,7 +141,7 @@ func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps 
 	if err != nil {
 		return "", fmt.Errorf("initializing template creation: %v", err)
 	}
-	contentId := response.JobId
+	contentId := response.TemplateId
 
 	err = UploadToS3WithURL(response.PresignedTemplateUploadUrl, fsProps, "application/zip")
 	if err != nil {

@@ -35,7 +35,7 @@ func PrepareData() TestData {
 		baseURL: os.Getenv("LAMBDA_BASE_URL"),
 		token:   os.Getenv("POGODOC_API_TOKEN"),
 	}
-	c, err := PogodocClientInit(pogodocEnv.baseURL, pogodocEnv.token)
+	c, err := PogodocClientInit()
 	if err != nil {
 		fmt.Errorf("Error initializing PogodocClient")
 		return TestData{}
@@ -57,7 +57,7 @@ func PrepareData() TestData {
 
 func TestPogodocClient(t *testing.T) {
 	data := PrepareData()
-	_, err := PogodocClientInit(data.PogodocEnv.baseURL, data.PogodocEnv.token)
+	_, err := PogodocClientInitWithConfig(data.PogodocEnv.baseURL, data.PogodocEnv.token)
 	if err != nil {
 		t.Errorf("PogodocClientInit failed: %v", err)
 	}
