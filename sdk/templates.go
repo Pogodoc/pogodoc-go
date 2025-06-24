@@ -489,17 +489,17 @@ func (g *GenerateTemplatePreviewsResponsePngPreview) String() string {
 
 type GetTemplateIndexHtmlResponse struct {
 	// Index.html file of the template
-	TemplateIndex string `json:"templateIndex" url:"templateIndex"`
+	IndexHtml string `json:"indexHtml" url:"indexHtml"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
 
-func (g *GetTemplateIndexHtmlResponse) GetTemplateIndex() string {
+func (g *GetTemplateIndexHtmlResponse) GetIndexHtml() string {
 	if g == nil {
 		return ""
 	}
-	return g.TemplateIndex
+	return g.IndexHtml
 }
 
 func (g *GetTemplateIndexHtmlResponse) GetExtraProperties() map[string]interface{} {
@@ -1077,5 +1077,5 @@ type UpdateTemplateRequest struct {
 
 type UploadTemplateIndexHtmlRequest struct {
 	// New index.html file of the template
-	TemplateIndex string `json:"templateIndex" url:"-"`
+	IndexHtml string `json:"indexHtml" url:"-"`
 }
