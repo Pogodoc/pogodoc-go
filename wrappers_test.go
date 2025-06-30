@@ -22,7 +22,6 @@ type TestData struct {
 	PogodocEnv    PogodocEnv
 	client        PogodocClient
 	ctx           context.Context
-	templateId    string
 	sampleDataMap map[string]interface{}
 }
 
@@ -37,7 +36,7 @@ func PrepareData() TestData {
 	}
 	c, err := PogodocClientInit()
 	if err != nil {
-		fmt.Errorf("Error initializing PogodocClient")
+		fmt.Println("Error initializing PogodocClient")
 		return TestData{}
 	}
 	ctx := context.Background()

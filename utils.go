@@ -14,30 +14,30 @@ func UploadToS3WithURL(predsignedURL string, fsProps FileStreamProps, contentTyp
 	if contentType != "" {
 		headers.Set("Content-Type", string(contentType))
 	} else {
-		return fmt.Errorf("Error: Content-Type is empty")
+		return fmt.Errorf(" Content-Type is empty")
 	}
 
 	if fsProps.payloadLength > 0 {
 		headers.Set("Content-Length", fmt.Sprintf("%d", fsProps.payloadLength))
 	} else {
-		return fmt.Errorf("Error: Content-Length is empty")
+		return fmt.Errorf(" Content-Length is empty")
 	}
 	client := &http.Client{}
 
 	req, err := http.NewRequest("PUT", predsignedURL, bytes.NewBuffer(fsProps.payload))
 	if err != nil {
-		return fmt.Errorf("Error creating request: %v", err)
+		return fmt.Errorf("creating request: %v", err)
 	}
 	req.Header = headers
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("Error uploading file: %v", err)
+		return fmt.Errorf("uploading file: %v", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Error uploading file: %s", resp.Status)
+		return fmt.Errorf("uploading file: %s", resp.Status)
 	}
 
 	return nil
