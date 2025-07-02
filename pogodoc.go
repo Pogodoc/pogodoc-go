@@ -20,6 +20,8 @@ func PogodocClientInit() (*PogodocClient, error) {
 	var baseURL string
 	if os.Getenv("POGODOC_BASE_URL") != "" {
 		baseURL = os.Getenv("POGODOC_BASE_URL")
+	}else{
+		baseURL = api.Environments.Default;
 	}
 	if os.Getenv("POGODOC_TOKEN") != "" {
 		tokenString = os.Getenv("POGODOC_TOKEN")
@@ -113,7 +115,7 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 
 	err = c.Templates.SaveCreatedTemplate(ctx, templateId, &saveCreatedTemplateRequest)
 	if err != nil {
-		return "", fmt.Errorf(" saving created template: %v", err)
+		return "", fmt.Errorf("saving created template: %v", err)
 	}
 
 	return templateId, nil
