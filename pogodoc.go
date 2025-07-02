@@ -23,8 +23,11 @@ func PogodocClientInit() (*PogodocClient, error) {
 	}else{
 		baseURL = api.Environments.Default;
 	}
-	if os.Getenv("POGODOC_TOKEN") != "" {
-		tokenString = os.Getenv("POGODOC_TOKEN")
+	if os.Getenv("POGODOC_API_TOKEN") != "" {
+		tokenString = os.Getenv("POGODOC_API_TOKEN")
+
+	}else {
+		return nil, fmt.Errorf("API token is required. Please provide it either as a parameter or set the POGODOC_API_TOKEN environment variable")
 	}
 	c := client.NewClient(
 		option.WithToken(tokenString),
@@ -74,7 +77,6 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 		return "", fmt.Errorf("initializing template creation: %v", err)
 	}
 	templateId := response.TemplateId
-	fmt.Println("Create templateId: ", templateId)
 
 	err = UploadToS3WithURL(response.PresignedTemplateUploadUrl, fsProps, "application/zip")
 	if err != nil {
