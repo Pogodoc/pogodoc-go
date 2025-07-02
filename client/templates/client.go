@@ -4,10 +4,10 @@ package templates
 
 import (
 	context "context"
-	sdk "github.com/Pogodoc/pogodoc-go/sdk"
-	core "github.com/Pogodoc/pogodoc-go/sdk/core"
-	internal "github.com/Pogodoc/pogodoc-go/sdk/internal"
-	option "github.com/Pogodoc/pogodoc-go/sdk/option"
+	pogodocgoclient "github.com/Pogodoc/pogodoc-go/client"
+	core "github.com/Pogodoc/pogodoc-go/client/core"
+	internal "github.com/Pogodoc/pogodoc-go/client/internal"
+	option "github.com/Pogodoc/pogodoc-go/client/option"
 	http "net/http"
 )
 
@@ -35,7 +35,7 @@ func NewClient(opts ...option.RequestOption) *Client {
 func (c *Client) InitializeTemplateCreation(
 	ctx context.Context,
 	opts ...option.RequestOption,
-) (*sdk.InitializeTemplateCreationResponse, error) {
+) (*pogodocgoclient.InitializeTemplateCreationResponse, error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -48,7 +48,7 @@ func (c *Client) InitializeTemplateCreation(
 		options.ToHeader(),
 	)
 
-	var response *sdk.InitializeTemplateCreationResponse
+	var response *pogodocgoclient.InitializeTemplateCreationResponse
 	if err := c.caller.Call(
 		ctx,
 		&internal.CallParams{
@@ -71,7 +71,7 @@ func (c *Client) InitializeTemplateCreation(
 func (c *Client) SaveCreatedTemplate(
 	ctx context.Context,
 	templateId string,
-	request *sdk.SaveCreatedTemplateRequest,
+	request *pogodocgoclient.SaveCreatedTemplateRequest,
 	opts ...option.RequestOption,
 ) error {
 	options := core.NewRequestOptions(opts...)
@@ -112,9 +112,9 @@ func (c *Client) SaveCreatedTemplate(
 func (c *Client) UpdateTemplate(
 	ctx context.Context,
 	templateId string,
-	request *sdk.UpdateTemplateRequest,
+	request *pogodocgoclient.UpdateTemplateRequest,
 	opts ...option.RequestOption,
-) (*sdk.UpdateTemplateResponse, error) {
+) (*pogodocgoclient.UpdateTemplateResponse, error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -131,7 +131,7 @@ func (c *Client) UpdateTemplate(
 	)
 	headers.Set("Content-Type", "application/json")
 
-	var response *sdk.UpdateTemplateResponse
+	var response *pogodocgoclient.UpdateTemplateResponse
 	if err := c.caller.Call(
 		ctx,
 		&internal.CallParams{
@@ -157,7 +157,7 @@ func (c *Client) DeleteTemplate(
 	// ID of the template to be deleted
 	templateId string,
 	opts ...option.RequestOption,
-) (*sdk.DeleteTemplateResponse, error) {
+) (*pogodocgoclient.DeleteTemplateResponse, error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -173,7 +173,7 @@ func (c *Client) DeleteTemplate(
 		options.ToHeader(),
 	)
 
-	var response *sdk.DeleteTemplateResponse
+	var response *pogodocgoclient.DeleteTemplateResponse
 	if err := c.caller.Call(
 		ctx,
 		&internal.CallParams{
@@ -236,9 +236,9 @@ func (c *Client) GenerateTemplatePreviews(
 	ctx context.Context,
 	// ID of the template to be used
 	templateId string,
-	request *sdk.GenerateTemplatePreviewsRequest,
+	request *pogodocgoclient.GenerateTemplatePreviewsRequest,
 	opts ...option.RequestOption,
-) (*sdk.GenerateTemplatePreviewsResponse, error) {
+) (*pogodocgoclient.GenerateTemplatePreviewsResponse, error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -255,7 +255,7 @@ func (c *Client) GenerateTemplatePreviews(
 	)
 	headers.Set("Content-Type", "application/json")
 
-	var response *sdk.GenerateTemplatePreviewsResponse
+	var response *pogodocgoclient.GenerateTemplatePreviewsResponse
 	if err := c.caller.Call(
 		ctx,
 		&internal.CallParams{
@@ -281,7 +281,7 @@ func (c *Client) GeneratePresignedGetUrl(
 	// ID of the template that is being downloaded
 	templateId string,
 	opts ...option.RequestOption,
-) (*sdk.GeneratePresignedGetUrlResponse, error) {
+) (*pogodocgoclient.GeneratePresignedGetUrlResponse, error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -297,7 +297,7 @@ func (c *Client) GeneratePresignedGetUrl(
 		options.ToHeader(),
 	)
 
-	var response *sdk.GeneratePresignedGetUrlResponse
+	var response *pogodocgoclient.GeneratePresignedGetUrlResponse
 	if err := c.caller.Call(
 		ctx,
 		&internal.CallParams{
@@ -322,7 +322,7 @@ func (c *Client) GetTemplateIndexHtml(
 	// ID of the template to be used
 	templateId string,
 	opts ...option.RequestOption,
-) (*sdk.GetTemplateIndexHtmlResponse, error) {
+) (*pogodocgoclient.GetTemplateIndexHtmlResponse, error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -338,7 +338,7 @@ func (c *Client) GetTemplateIndexHtml(
 		options.ToHeader(),
 	)
 
-	var response *sdk.GetTemplateIndexHtmlResponse
+	var response *pogodocgoclient.GetTemplateIndexHtmlResponse
 	if err := c.caller.Call(
 		ctx,
 		&internal.CallParams{
@@ -362,7 +362,7 @@ func (c *Client) UploadTemplateIndexHtml(
 	ctx context.Context,
 	// ID of the template to be used
 	templateId string,
-	request *sdk.UploadTemplateIndexHtmlRequest,
+	request *pogodocgoclient.UploadTemplateIndexHtmlRequest,
 	opts ...option.RequestOption,
 ) error {
 	options := core.NewRequestOptions(opts...)
@@ -405,7 +405,7 @@ func (c *Client) CloneTemplate(
 	// ID of the template to be used
 	templateId string,
 	opts ...option.RequestOption,
-) (*sdk.CloneTemplateResponse, error) {
+) (*pogodocgoclient.CloneTemplateResponse, error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -421,7 +421,7 @@ func (c *Client) CloneTemplate(
 		options.ToHeader(),
 	)
 
-	var response *sdk.CloneTemplateResponse
+	var response *pogodocgoclient.CloneTemplateResponse
 	if err := c.caller.Call(
 		ctx,
 		&internal.CallParams{

@@ -5,7 +5,7 @@ package api
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/Pogodoc/pogodoc-go/sdk/internal"
+	internal "github.com/Pogodoc/pogodoc-go/client/internal"
 )
 
 type InitializeRenderJobRequest struct {

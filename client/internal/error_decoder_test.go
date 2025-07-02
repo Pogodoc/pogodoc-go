@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/Pogodoc/pogodoc-go/sdk/core"
+	"github.com/Pogodoc/pogodoc-go/client/core"
 	"github.com/stretchr/testify/assert"
 )
 

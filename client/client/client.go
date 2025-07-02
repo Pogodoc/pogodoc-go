@@ -3,11 +3,11 @@
 package client
 
 import (
-	core "github.com/Pogodoc/pogodoc-go/sdk/core"
-	documents "github.com/Pogodoc/pogodoc-go/sdk/documents"
-	internal "github.com/Pogodoc/pogodoc-go/sdk/internal"
-	option "github.com/Pogodoc/pogodoc-go/sdk/option"
-	templates "github.com/Pogodoc/pogodoc-go/sdk/templates"
+	core "github.com/Pogodoc/pogodoc-go/client/core"
+	documents "github.com/Pogodoc/pogodoc-go/client/documents"
+	internal "github.com/Pogodoc/pogodoc-go/client/internal"
+	option "github.com/Pogodoc/pogodoc-go/client/option"
+	templates "github.com/Pogodoc/pogodoc-go/client/templates"
 	http "net/http"
 )
 

@@ -1,4 +1,4 @@
-module github.com/Pogodoc/pogodoc-go/sdk
+module github.com/Pogodoc/pogodoc-go/client
 
 go 1.13
 

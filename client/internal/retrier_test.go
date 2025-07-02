@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Pogodoc/pogodoc-go/sdk/core"
+	"github.com/Pogodoc/pogodoc-go/client/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -4,10 +4,10 @@ package documents
 
 import (
 	context "context"
-	sdk "github.com/Pogodoc/pogodoc-go/sdk"
-	core "github.com/Pogodoc/pogodoc-go/sdk/core"
-	internal "github.com/Pogodoc/pogodoc-go/sdk/internal"
-	option "github.com/Pogodoc/pogodoc-go/sdk/option"
+	pogodocgoclient "github.com/Pogodoc/pogodoc-go/client"
+	core "github.com/Pogodoc/pogodoc-go/client/core"
+	internal "github.com/Pogodoc/pogodoc-go/client/internal"
+	option "github.com/Pogodoc/pogodoc-go/client/option"
 	http "net/http"
 )
 
@@ -34,9 +34,9 @@ func NewClient(opts ...option.RequestOption) *Client {
 // Creates a new render job with a unique ID, sets up S3 storage for template and data files, and generates presigned upload URLs if needed. Requires subscription check.
 func (c *Client) InitializeRenderJob(
 	ctx context.Context,
-	request *sdk.InitializeRenderJobRequest,
+	request *pogodocgoclient.InitializeRenderJobRequest,
 	opts ...option.RequestOption,
-) (*sdk.InitializeRenderJobResponse, error) {
+) (*pogodocgoclient.InitializeRenderJobResponse, error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -50,7 +50,7 @@ func (c *Client) InitializeRenderJob(
 	)
 	headers.Set("Content-Type", "application/json")
 
-	var response *sdk.InitializeRenderJobResponse
+	var response *pogodocgoclient.InitializeRenderJobResponse
 	if err := c.caller.Call(
 		ctx,
 		&internal.CallParams{
@@ -74,9 +74,9 @@ func (c *Client) InitializeRenderJob(
 func (c *Client) StartRenderJob(
 	ctx context.Context,
 	jobId string,
-	request *sdk.StartRenderJobRequest,
+	request *pogodocgoclient.StartRenderJobRequest,
 	opts ...option.RequestOption,
-) (*sdk.StartRenderJobResponse, error) {
+) (*pogodocgoclient.StartRenderJobResponse, error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -93,7 +93,7 @@ func (c *Client) StartRenderJob(
 	)
 	headers.Set("Content-Type", "application/json")
 
-	var response *sdk.StartRenderJobResponse
+	var response *pogodocgoclient.StartRenderJobResponse
 	if err := c.caller.Call(
 		ctx,
 		&internal.CallParams{
@@ -116,9 +116,9 @@ func (c *Client) StartRenderJob(
 // Combines initialization and rendering in one step. Creates a job, uploads template/data directly, starts rendering, and adds the document to Strapi. Requires subscription check.
 func (c *Client) StartImmediateRender(
 	ctx context.Context,
-	request *sdk.StartImmediateRenderRequest,
+	request *pogodocgoclient.StartImmediateRenderRequest,
 	opts ...option.RequestOption,
-) (*sdk.StartImmediateRenderResponse, error) {
+) (*pogodocgoclient.StartImmediateRenderResponse, error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -132,7 +132,7 @@ func (c *Client) StartImmediateRender(
 	)
 	headers.Set("Content-Type", "application/json")
 
-	var response *sdk.StartImmediateRenderResponse
+	var response *pogodocgoclient.StartImmediateRenderResponse
 	if err := c.caller.Call(
 		ctx,
 		&internal.CallParams{
@@ -158,7 +158,7 @@ func (c *Client) GetJobStatus(
 	// ID of the render job
 	jobId string,
 	opts ...option.RequestOption,
-) (*sdk.GetJobStatusResponse, error) {
+) (*pogodocgoclient.GetJobStatusResponse, error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -174,7 +174,7 @@ func (c *Client) GetJobStatus(
 		options.ToHeader(),
 	)
 
-	var response *sdk.GetJobStatusResponse
+	var response *pogodocgoclient.GetJobStatusResponse
 	if err := c.caller.Call(
 		ctx,
 		&internal.CallParams{

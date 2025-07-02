@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	api "github.com/Pogodoc/pogodoc-go/sdk"
-	"github.com/Pogodoc/pogodoc-go/sdk/client"
-	"github.com/Pogodoc/pogodoc-go/sdk/option"
+	api "github.com/Pogodoc/pogodoc-go/client"
+	"github.com/Pogodoc/pogodoc-go/client/client"
+	"github.com/Pogodoc/pogodoc-go/client/option"
 	"github.com/joho/godotenv"
 )
 
@@ -20,13 +20,13 @@ func PogodocClientInit() (*PogodocClient, error) {
 	var baseURL string
 	if os.Getenv("POGODOC_BASE_URL") != "" {
 		baseURL = os.Getenv("POGODOC_BASE_URL")
-	}else{
-		baseURL = api.Environments.Default;
+	} else {
+		baseURL = api.Environments.Default
 	}
 	if os.Getenv("POGODOC_API_TOKEN") != "" {
 		tokenString = os.Getenv("POGODOC_API_TOKEN")
 
-	}else {
+	} else {
 		return nil, fmt.Errorf("API token is required. Please provide it either as a parameter or set the POGODOC_API_TOKEN environment variable")
 	}
 	c := client.NewClient(

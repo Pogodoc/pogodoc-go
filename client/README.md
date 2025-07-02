@@ -12,10 +12,10 @@ Instantiate and use the client with the following:
 package example
 
 import (
-    client "github.com/Pogodoc/pogodoc-go/sdk/client"
-    option "github.com/Pogodoc/pogodoc-go/sdk/option"
+    client "github.com/Pogodoc/pogodoc-go/client/client"
+    option "github.com/Pogodoc/pogodoc-go/client/option"
     context "context"
-    sdk "github.com/Pogodoc/pogodoc-go/sdk"
+    _client "github.com/Pogodoc/pogodoc-go/client"
 )
 
 func do() () {
@@ -27,22 +27,22 @@ func do() () {
     client.Templates.SaveCreatedTemplate(
         context.TODO(),
         "templateId",
-        &sdk.SaveCreatedTemplateRequest{
-            TemplateInfo: &sdk.SaveCreatedTemplateRequestTemplateInfo{
+        &_client.SaveCreatedTemplateRequest{
+            TemplateInfo: &_client.SaveCreatedTemplateRequestTemplateInfo{
                 Title: "title",
                 Description: "description",
-                Type: sdk.SaveCreatedTemplateRequestTemplateInfoTypeDocx,
+                Type: _client.SaveCreatedTemplateRequestTemplateInfoTypeDocx,
                 SampleData: map[string]interface{}{
                     "sampleData": map[string]interface{}{
                         "key": "value",
                     },
                 },
-                Categories: []sdk.SaveCreatedTemplateRequestTemplateInfoCategoriesItem{
-                    sdk.SaveCreatedTemplateRequestTemplateInfoCategoriesItemInvoice,
-                    sdk.SaveCreatedTemplateRequestTemplateInfoCategoriesItemInvoice,
+                Categories: []_client.SaveCreatedTemplateRequestTemplateInfoCategoriesItem{
+                    _client.SaveCreatedTemplateRequestTemplateInfoCategoriesItemInvoice,
+                    _client.SaveCreatedTemplateRequestTemplateInfoCategoriesItemInvoice,
                 },
             },
-            PreviewIds: &sdk.SaveCreatedTemplateRequestPreviewIds{
+            PreviewIds: &_client.SaveCreatedTemplateRequestPreviewIds{
                 PngJobId: "pngJobId",
                 PdfJobId: "pdfJobId",
             },

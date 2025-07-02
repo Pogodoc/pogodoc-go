@@ -1,8 +1,8 @@
 package pogodoc
 
 import (
-	api "github.com/Pogodoc/pogodoc-go/sdk"
-	"github.com/Pogodoc/pogodoc-go/sdk/client"
+	api "github.com/Pogodoc/pogodoc-go/client"
+	"github.com/Pogodoc/pogodoc-go/client/client"
 )
 
 type PogodocClient struct {

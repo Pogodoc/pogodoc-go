@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	api "github.com/Pogodoc/pogodoc-go/sdk"
+	api "github.com/Pogodoc/pogodoc-go/client"
 
 	"github.com/joho/godotenv"
 )
