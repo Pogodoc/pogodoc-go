@@ -5,23 +5,17 @@ import (
 	"fmt"
 	"os"
 
-	api "github.com/Pogodoc/pogodoc-go/client"
 	"github.com/Pogodoc/pogodoc-go/client/client"
 	"github.com/Pogodoc/pogodoc-go/client/option"
-	"github.com/joho/godotenv"
 )
 
 func PogodocClientInit() (*PogodocClient, error) {
-	err := godotenv.Load()
-	if err != nil {
-		return nil, fmt.Errorf("error loading .env file: %v", err)
-	}
 	var tokenString string
 	var baseURL string
 	if os.Getenv("POGODOC_BASE_URL") != "" {
 		baseURL = os.Getenv("POGODOC_BASE_URL")
 	} else {
-		baseURL = api.Environments.Default
+		baseURL = Environments.Default
 	}
 	if os.Getenv("POGODOC_API_TOKEN") != "" {
 		tokenString = os.Getenv("POGODOC_API_TOKEN")
@@ -53,7 +47,7 @@ func PogodocClientInitWithToken(tokenString string) (*PogodocClient, error) {
 	return &PogodocClient{Client: c}, nil
 }
 
-func (c *PogodocClient) SaveTemplate(filePath string, metadata api.SaveCreatedTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
+func (c *PogodocClient) SaveTemplate(filePath string, metadata SaveCreatedTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
 	payload, err := ReadFile(filePath)
 	if err != nil {
 		return "", err
@@ -71,7 +65,7 @@ func (c *PogodocClient) SaveTemplate(filePath string, metadata api.SaveCreatedTe
 	return c.SaveTemplateFromFileStream(fsProps, metadata, ctx)
 }
 
-func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, metadata api.SaveCreatedTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
+func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, metadata SaveCreatedTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
 	response, err := c.Templates.InitializeTemplateCreation(ctx)
 	if err != nil {
 		return "", fmt.Errorf("initializing template creation: %v", err)
@@ -87,8 +81,8 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 	if err != nil {
 		return "", fmt.Errorf("extracting template files: %v", err)
 	}
-	request := api.GenerateTemplatePreviewsRequest{
-		Type: api.GenerateTemplatePreviewsRequestType(metadata.Type),
+	request := GenerateTemplatePreviewsRequest{
+		Type: GenerateTemplatePreviewsRequestType(metadata.Type),
 		Data: metadata.SampleData,
 	}
 
@@ -100,8 +94,8 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 	previewPng := previewResponse.PngPreview.JobId
 	previewPdf := previewResponse.PdfPreview.JobId
 
-	saveCreatedTemplateRequest := api.SaveCreatedTemplateRequest{
-		TemplateInfo: &api.SaveCreatedTemplateRequestTemplateInfo{
+	saveCreatedTemplateRequest := SaveCreatedTemplateRequest{
+		TemplateInfo: &SaveCreatedTemplateRequestTemplateInfo{
 			Title:       metadata.Title,
 			Description: metadata.Description,
 			Categories:  metadata.Categories,
@@ -109,7 +103,7 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 			SourceCode:  metadata.SourceCode,
 			SampleData:  metadata.SampleData,
 		},
-		PreviewIds: &api.SaveCreatedTemplateRequestPreviewIds{
+		PreviewIds: &SaveCreatedTemplateRequestPreviewIds{
 			PngJobId: previewPng,
 			PdfJobId: previewPdf,
 		},
@@ -124,7 +118,7 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 
 }
 
-func (c *PogodocClient) UpdateTemplate(templateId string, filePath string, metadata api.UpdateTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
+func (c *PogodocClient) UpdateTemplate(templateId string, filePath string, metadata UpdateTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
 	payload, err := ReadFile(filePath)
 	if err != nil {
 		return "", fmt.Errorf("file is empty: %v", err)
@@ -140,7 +134,7 @@ func (c *PogodocClient) UpdateTemplate(templateId string, filePath string, metad
 
 }
 
-func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps FileStreamProps, metadata api.UpdateTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
+func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps FileStreamProps, metadata UpdateTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
 	response, err := c.Templates.InitializeTemplateCreation(ctx)
 	if err != nil {
 		return "", fmt.Errorf("initializing template creation: %v", err)
@@ -157,8 +151,8 @@ func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps 
 		return "", fmt.Errorf("extracting template files: %v", err)
 	}
 
-	request := api.GenerateTemplatePreviewsRequest{
-		Type: api.GenerateTemplatePreviewsRequestType(metadata.Type),
+	request := GenerateTemplatePreviewsRequest{
+		Type: GenerateTemplatePreviewsRequestType(metadata.Type),
 		Data: metadata.SampleData,
 	}
 	previewResponse, err := c.Templates.GenerateTemplatePreviews(ctx, contentId, &request)
@@ -166,8 +160,8 @@ func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps 
 		return "", fmt.Errorf("generating template previews: %v", err)
 	}
 
-	updateTemplateReq := &api.UpdateTemplateRequest{
-		TemplateInfo: &api.UpdateTemplateRequestTemplateInfo{
+	updateTemplateReq := &UpdateTemplateRequest{
+		TemplateInfo: &UpdateTemplateRequestTemplateInfo{
 			Title:       metadata.Title,
 			Type:        metadata.Type,
 			Description: metadata.Description,
@@ -175,7 +169,7 @@ func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps 
 			SourceCode:  metadata.SourceCode,
 			SampleData:  metadata.SampleData,
 		},
-		PreviewIds: &api.UpdateTemplateRequestPreviewIds{
+		PreviewIds: &UpdateTemplateRequestPreviewIds{
 			PngJobId: previewResponse.PngPreview.JobId,
 			PdfJobId: previewResponse.PdfPreview.JobId,
 		},
@@ -191,7 +185,7 @@ func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps 
 
 }
 
-func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx context.Context) (*api.GetJobStatusResponse, error) {
+func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx context.Context) (*GetJobStatusResponse, error) {
 
 	initRequest := gdProps.InitializeRenderJobRequest
 	initResponse, err := c.Documents.InitializeRenderJob(ctx, &initRequest)
