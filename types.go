@@ -7,15 +7,20 @@ import (
 	"github.com/Pogodoc/pogodoc-go/client/option"
 )
 
+// PogodocClient is an interface wrapper for the generated client.
 type PogodocClient struct {
 	*client.Client
 }
 
+// FileStreamProps is a struct that holds the properties for file streams.
+// It contains the payload as a byte slice and its length.
+// This struct is mainly used to pass file data when saving or updating templates.
 type FileStreamProps struct {
 	payload       []byte
 	payloadLength int
 }
 
+// GenerateDocumentProps is a struct that holds the properties for generating documents.
 type GenerateDocumentProps struct {
 	InitializeRenderJobRequest InitializeRenderJobRequest
 	StartRenderJobRequest      StartRenderJobRequest

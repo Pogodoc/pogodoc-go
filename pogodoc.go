@@ -9,6 +9,7 @@ import (
 	"github.com/Pogodoc/pogodoc-go/client/option"
 )
 
+// PogodocClient is a client constructor for interacting with the Pogodoc API.
 func PogodocClientInit() (*PogodocClient, error) {
 	var tokenString string
 	var baseURL string
@@ -30,6 +31,7 @@ func PogodocClientInit() (*PogodocClient, error) {
 	return &PogodocClient{Client: c}, nil
 }
 
+// PogodocClientInitWithConfig initializes a PogodocClient with a custom base URL and token.
 func PogodocClientInitWithConfig(baseURL string, tokenString string) (*PogodocClient, error) {
 
 	c := client.NewClient(
@@ -40,6 +42,7 @@ func PogodocClientInitWithConfig(baseURL string, tokenString string) (*PogodocCl
 	return &PogodocClient{Client: c}, nil
 }
 
+// PogodocClientInitWithToken initializes a PogodocClient with only a token, using the default base URL.
 func PogodocClientInitWithToken(tokenString string) (*PogodocClient, error) {
 	c := client.NewClient(
 		option.WithToken(tokenString),
@@ -47,6 +50,7 @@ func PogodocClientInitWithToken(tokenString string) (*PogodocClient, error) {
 	return &PogodocClient{Client: c}, nil
 }
 
+// SaveTemplate is a method to save a template from a file path to the Pogodoc service. It wraps the SaveTemplateFromFileStream method.\
 func (c *PogodocClient) SaveTemplate(filePath string, metadata SaveCreatedTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
 	payload, err := ReadFile(filePath)
 	if err != nil {
@@ -65,6 +69,7 @@ func (c *PogodocClient) SaveTemplate(filePath string, metadata SaveCreatedTempla
 	return c.SaveTemplateFromFileStream(fsProps, metadata, ctx)
 }
 
+// SaveTemplateFromFileStream is a method extension of SaveTemplate that allows saving a template from a file stream.
 func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, metadata SaveCreatedTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
 	response, err := c.Templates.InitializeTemplateCreation(ctx)
 	if err != nil {
@@ -118,6 +123,8 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 
 }
 
+
+// UpdateTemplate is a method to update an existing template from a file path. It wraps the UpdateTemplateFromFileStream method.
 func (c *PogodocClient) UpdateTemplate(templateId string, filePath string, metadata UpdateTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
 	payload, err := ReadFile(filePath)
 	if err != nil {
@@ -134,6 +141,10 @@ func (c *PogodocClient) UpdateTemplate(templateId string, filePath string, metad
 
 }
 
+// UpdateTemplateFromFileStream is a method extension of UpdateTemplate that allows updating a template from a file stream.
+// It initializes the template creation, uploads the file to the Pogodoc service, extracts the template files,
+// generates previews, and updates the template with the provided metadata.
+// It returns the template ID or an error if any step fails.
 func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps FileStreamProps, metadata UpdateTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
 	response, err := c.Templates.InitializeTemplateCreation(ctx)
 	if err != nil {
@@ -185,6 +196,11 @@ func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps 
 
 }
 
+
+// GenerateDocument generates a document using the provided properties and context.
+// It initializes a render job, uploads the necessary data and template, starts the render job,
+// and retrieves the job status.
+// It returns the job status response or an error if any step fails.
 func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx context.Context) (*GetJobStatusResponse, error) {
 
 	initRequest := gdProps.InitializeRenderJobRequest
