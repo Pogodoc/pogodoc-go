@@ -1,3 +1,10 @@
+// Package pogodoc provides an SDK for interacting with the Pogodoc API,
+// a document generation and template management service.
+// This package allows users to create, update, and generate documents
+// using predefined templates.
+// Designed to integrate seamlessly with the Pogodoc platform,
+// this SDK provides an easy-to-use interface for managing templates
+// and documents within the service.
 package pogodoc
 
 import (
@@ -9,7 +16,8 @@ import (
 	"github.com/Pogodoc/pogodoc-go/client/option"
 )
 
-// PogodocClient is a client constructor for interacting with the Pogodoc API.
+// PogodocClient is a client for interacting with the Pogodoc API.
+// PogodocClientInit initializes a PogodocClient with the base URL and token from environment variables.
 func PogodocClientInit() (*PogodocClient, error) {
 	var tokenString string
 	var baseURL string
@@ -50,7 +58,7 @@ func PogodocClientInitWithToken(tokenString string) (*PogodocClient, error) {
 	return &PogodocClient{Client: c}, nil
 }
 
-// SaveTemplate is a method to save a template from a file path to the Pogodoc service. It wraps the SaveTemplateFromFileStream method.\
+// SaveTemplate is a method to save a template from a file path to the Pogodoc service. It wraps the SaveTemplateFromFileStream method.
 func (c *PogodocClient) SaveTemplate(filePath string, metadata SaveCreatedTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
 	payload, err := ReadFile(filePath)
 	if err != nil {
@@ -70,6 +78,9 @@ func (c *PogodocClient) SaveTemplate(filePath string, metadata SaveCreatedTempla
 }
 
 // SaveTemplateFromFileStream is a method extension of SaveTemplate that allows saving a template from a file stream.
+// It initializes the template creation, uploads the file to the Pogodoc service, extracts the template files,
+// generates previews, and saves the template with the provided metadata.
+// It returns the template ID or an error if any step fails.
 func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, metadata SaveCreatedTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
 	response, err := c.Templates.InitializeTemplateCreation(ctx)
 	if err != nil {
