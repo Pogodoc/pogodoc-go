@@ -58,7 +58,8 @@ func PogodocClientInitWithToken(tokenString string) (*PogodocClient, error) {
 	return &PogodocClient{Client: c}, nil
 }
 
-// SaveTemplate is a method to save a template from a file path to the Pogodoc service. It wraps the SaveTemplateFromFileStream method.
+// SaveTemplate is a method extension to SaveTeamplateFromFileStream to save a template from a file path to the Pogodoc service. 
+// It wraps the SaveTemplateFromFileStream method.
 func (c *PogodocClient) SaveTemplate(filePath string, metadata SaveCreatedTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
 	payload, err := ReadFile(filePath)
 	if err != nil {
@@ -77,7 +78,7 @@ func (c *PogodocClient) SaveTemplate(filePath string, metadata SaveCreatedTempla
 	return c.SaveTemplateFromFileStream(fsProps, metadata, ctx)
 }
 
-// SaveTemplateFromFileStream is a method extension of SaveTemplate that allows saving a template from a file stream.
+// SaveTemplateFromFileStream is a method that allows saving a template from a file stream.
 // It initializes the template creation, uploads the file to the Pogodoc service, extracts the template files,
 // generates previews, and saves the template with the provided metadata.
 // It returns the template ID or an error if any step fails.
@@ -135,7 +136,8 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 }
 
 
-// UpdateTemplate is a method to update an existing template from a file path. It wraps the UpdateTemplateFromFileStream method.
+// UpdateTemplate is a method extension to UpdateTemplateFromFileStream to update an existing template directly from a file path.
+// It wraps the UpdateTemplateFromFileStream method.
 func (c *PogodocClient) UpdateTemplate(templateId string, filePath string, metadata UpdateTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
 	payload, err := ReadFile(filePath)
 	if err != nil {
@@ -152,7 +154,7 @@ func (c *PogodocClient) UpdateTemplate(templateId string, filePath string, metad
 
 }
 
-// UpdateTemplateFromFileStream is a method extension of UpdateTemplate that allows updating a template from a file stream.
+// UpdateTemplateFromFileStream is a method that allows updating a template from a file stream.
 // It initializes the template creation, uploads the file to the Pogodoc service, extracts the template files,
 // generates previews, and updates the template with the provided metadata.
 // It returns the template ID or an error if any step fails.
@@ -231,10 +233,10 @@ func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx cont
 	}
 
 	template := gdProps.template
-	if template != nil && *template != "" && initResponse.PresignedTemplateUploadUrl != nil {
+	if template != "" && initResponse.PresignedTemplateUploadUrl != nil {
 		err = UploadToS3WithURL(*initResponse.PresignedTemplateUploadUrl, FileStreamProps{
-			payload:       []byte(*template),
-			payloadLength: len(*template),
+			payload:       []byte(template),
+			payloadLength: len(template),
 		}, "text/html")
 		if err != nil {
 			return nil, fmt.Errorf("uploading document: %v", err)

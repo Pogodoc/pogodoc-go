@@ -24,7 +24,7 @@ type FileStreamProps struct {
 type GenerateDocumentProps struct {
 	InitializeRenderJobRequest InitializeRenderJobRequest
 	StartRenderJobRequest      StartRenderJobRequest
-	template                   *string
+	template                   string
 }
 
 // Document Types

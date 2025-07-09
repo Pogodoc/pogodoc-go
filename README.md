@@ -55,13 +55,13 @@ func main() {
 
 	documentProps := pogodoc.GenerateDocumentProps{
 		InitializeRenderJobRequest: pogodoc.InitializeRenderJobRequest{
-			TemplateId: pogodoc.Pointer(templateId),
+			TemplateId: pogodoc.String(templateId),
 			Type:       pogodoc.InitializeRenderJobRequestType("ejs"),
 			Target:     pogodoc.InitializeRenderJobRequestTargetPdf,
 			Data:       sampleData,
 		},
 		StartRenderJobRequest: pogodoc.StartRenderJobRequest{
-			ShouldWaitForRenderCompletion: pogodoc.Pointer(true),
+			ShouldWaitForRenderCompletion: pogodoc.Bool(true),
 		}}
 
 	doc, err := client.GenerateDocument(documentProps, ctx)
