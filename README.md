@@ -1,5 +1,7 @@
 ## Pogodoc Go SDK
 
+The Pogodoc Go SDK enables developers to seamlessly generate documents and manage templates using Pogodoc’s API.
+
 ### Installation
 
 To install the Go SDK, just execute the following command
@@ -10,7 +12,7 @@ go get github.com/Pogodoc/pogodoc-go
 
 ### Setup
 
-To use the SDK you will need an API key which can be obtained from the Pogodoc Dashboard
+To use the SDK you will need an API key which can be obtained from the [Pogodoc Dashboard](https://pogodoc.com)
 
 ### Example
 
@@ -74,3 +76,7 @@ func main() {
 }
 
 ```
+
+### License
+
+MIT License
