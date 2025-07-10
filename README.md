@@ -6,8 +6,8 @@ The Pogodoc Go SDK enables developers to seamlessly generate documents and manag
 
 To install the Go SDK, just execute the following command
 
-```
-go get github.com/Pogodoc/pogodoc-go
+```bash
+$ go get github.com/Pogodoc/pogodoc-go
 ```
 
 ### Setup
