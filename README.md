@@ -12,7 +12,7 @@ $ go get github.com/Pogodoc/pogodoc-go
 
 ### Setup
 
-To use the SDK you will need an API key which can be obtained from the [Pogodoc Dashboard](https://pogodoc.com)
+To use the SDK you will need an API key which can be obtained from the [Pogodoc Dashboard](https://app.pogodoc.com)
 
 ### Example
 
@@ -33,7 +33,9 @@ import (
 func main() {
 	err := godotenv.Load()
 	ctx := context.Background()
+
 	client, err := pogodoc.PogodocClientInit()
+
 	if err != nil {
 		fmt.Println("Error: %s", err)
 		return
@@ -42,14 +44,15 @@ func main() {
 	var sampleData map[string]interface{}
 
 	jsonData := `{
-		"subject": "Welcome to Our Service!",
-		"senderName": "Jane Smith",
-		"messageBody": "Thank you for joining our platform. We are thrilled to have you with us. Please feel free to explore our features and let us know if you have any questions.",
-		"contactEmail": "support@example.com",
-		"recipientName": "John Doe"
+		"name": "John Doe",
+		"email": "john.doe@example.com",
+		"phone": "1234567890",
+		"address": "123 Main St, Anytown, USA",
+		"city": "Anytown",
 	}`
 
 	err = json.Unmarshal([]byte(jsonData), &sampleData)
+
 	if err != nil {
 		fmt.Println("Error unmarshalling JSON: %s", err)
 		return
@@ -59,7 +62,7 @@ func main() {
 		InitializeRenderJobRequest: pogodoc.InitializeRenderJobRequest{
 			TemplateId: pogodoc.String(templateId),
 			Type:       pogodoc.InitializeRenderJobRequestType("ejs"),
-			Target:     pogodoc.InitializeRenderJobRequestTargetPdf,
+			Target:     pogodoc.InitializeRenderJobRequestTarget("pdf"),
 			Data:       sampleData,
 		},
 		StartRenderJobRequest: pogodoc.StartRenderJobRequest{
@@ -67,12 +70,13 @@ func main() {
 		}}
 
 	doc, err := client.GenerateDocument(documentProps, ctx)
+
 	if err != nil {
 		fmt.Println("Error: %s", err)
 		return
 	}
-	fmt.Println(doc.Output.Data.Url)
 
+	fmt.Println(doc.Output.Data.Url)
 }
 
 ```
