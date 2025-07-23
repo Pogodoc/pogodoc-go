@@ -117,38 +117,45 @@ func TestUpdateTemplate(t *testing.T) {
 func TestGenerateDocument(t *testing.T) {
 	data := PrepareData()
 
-	templateId, err := data.client.SaveTemplate(
-		"../../data/templates/React-Demo-App.zip",
-		api.SaveCreatedTemplateRequestTemplateInfo{
-			Title:       "Naslov",
-			Description: "Deksripshn",
-			Type:        api.SaveCreatedTemplateRequestTemplateInfoTypeReact,
-			SampleData:  data.sampleDataMap,
-			Categories:  []api.SaveCreatedTemplateRequestTemplateInfoCategoriesItem{"invoice", "report"},
-		},
-		data.ctx,
-	)
-	fmt.Println(templateId)
+	sampleData := make(map[string]interface{})
+
+	jsonData := `{
+		"name": "John Doe",
+		"email": "john.doe@example.com",
+		"phone": "1234567890",
+		"address": "123 Main St, Anytown, USA",
+		"city": "Anytown",
+	}`
+
+	err := json.Unmarshal([]byte(jsonData), &sampleData)
 	if err != nil {
-		t.Fatalf("SaveTemplate failed: %v", err)
+		t.Errorf("Unmarshal failed: %v", err)
 	}
 
-	documentProps := GenerateDocumentProps{
+	simpleDocumentProps := GenerateDocumentProps{
 		InitializeRenderJobRequest: api.InitializeRenderJobRequest{
-			TemplateId: &templateId,
-			Type:       api.InitializeRenderJobRequestTypeReact,
+			TemplateId: String(os.Getenv("TEMPLATE_ID")),
+			Type:       api.InitializeRenderJobRequestTypeHtml,
 			Target:     api.InitializeRenderJobRequestTargetPdf,
-			Data:       data.sampleDataMap,
+			Data:       sampleData,
 		},
-		StartRenderJobRequest: api.StartRenderJobRequest{
-			ShouldWaitForRenderCompletion: Pointer(true),
-		}}
+	}
 
-	doc, err := data.client.GenerateDocument(documentProps, data.ctx)
-	fmt.Println(doc.Output.Data.Url)
+	startRenderJobResponse, err := data.client.StartGenerateDocument(simpleDocumentProps, data.ctx)
+	fmt.Println(startRenderJobResponse.JobId)
 	if err != nil {
 		t.Errorf("GenerateDocument failed: %v", err)
-
 	}
 
+	generatedDocument, err := data.client.GenerateDocument(simpleDocumentProps, data.ctx)
+	fmt.Println(generatedDocument.Output.Data.Url)
+	if err != nil {
+		t.Errorf("GenerateDocument failed: %v", err)
+	}
+
+	immediateDocument, err := data.client.GenerateDocumentImmediate(simpleDocumentProps, data.ctx)
+	fmt.Println(immediateDocument.Url)
+	if err != nil {
+		t.Errorf("GenerateDocumentImmediate failed: %v", err)
+	}
 }

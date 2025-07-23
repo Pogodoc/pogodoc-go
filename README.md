@@ -25,7 +25,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	pogodoc "github.com/Pogodoc/pogodoc-go-test"
+	pogodoc "github.com/Pogodoc/pogodoc-go"
 
 	"github.com/joho/godotenv"
 )
@@ -60,7 +60,7 @@ func main() {
 
 	documentProps := pogodoc.GenerateDocumentProps{
 		InitializeRenderJobRequest: pogodoc.InitializeRenderJobRequest{
-			TemplateId: pogodoc.String(templateId),
+			TemplateId: pogodoc.String(os.Getenv("TEMPLATE_ID")),
 			Type:       pogodoc.InitializeRenderJobRequestType("ejs"),
 			Target:     pogodoc.InitializeRenderJobRequestTarget("pdf"),
 			Data:       sampleData,

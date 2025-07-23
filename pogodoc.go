@@ -11,6 +11,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/Pogodoc/pogodoc-go/client/client"
 	"github.com/Pogodoc/pogodoc-go/client/option"
@@ -214,7 +215,7 @@ func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps 
 // It initializes a render job, uploads the necessary data and template, starts the render job,
 // and retrieves the job status.
 // It returns the job status response or an error if any step fails.
-func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx context.Context) (*GetJobStatusResponse, error) {
+func (c *PogodocClient) StartGenerateDocument(gdProps GenerateDocumentProps, ctx context.Context) (*StartRenderJobResponse, error) {
 
 	initRequest := gdProps.InitializeRenderJobRequest
 	initResponse, err := c.Documents.InitializeRenderJob(ctx, &initRequest)
@@ -223,16 +224,19 @@ func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx cont
 	}
 
 	Data := []byte(fmt.Sprint(gdProps.InitializeRenderJobRequest.Data))
+
 	if initResponse != nil && initResponse.PresignedDataUploadUrl != nil {
 		err = UploadToS3WithURL(*initResponse.PresignedDataUploadUrl, FileStreamProps{
 			payload:       Data,
 			payloadLength: len(Data),
 		}, "application/json")
 		if err != nil {
+			return nil, fmt.Errorf("uploading document: %v", err)
 		}
 	}
 
 	template := gdProps.template
+
 	if template != "" && initResponse.PresignedTemplateUploadUrl != nil {
 		err = UploadToS3WithURL(*initResponse.PresignedTemplateUploadUrl, FileStreamProps{
 			payload:       []byte(template),
@@ -240,11 +244,10 @@ func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx cont
 		}, "text/html")
 		if err != nil {
 			return nil, fmt.Errorf("uploading document: %v", err)
-
 		}
 	}
 
-	_, err = c.Documents.StartRenderJob(
+	result, err := c.Documents.StartRenderJob(
 		ctx,
 		initResponse.JobId,
 		&gdProps.StartRenderJobRequest,
@@ -253,12 +256,50 @@ func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx cont
 		return nil, fmt.Errorf("starting render: %v", err)
 	}
 
-	result, err := c.Documents.GetJobStatus(ctx, initResponse.JobId)
-	if err != nil {
-		return nil, fmt.Errorf("getting job status: %v", err)
-
-	}
-
 	return result, nil
 
+}
+
+
+func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx context.Context) (*GetJobStatusResponse, error) {
+	initResponse, err := c.StartGenerateDocument(gdProps, ctx)
+	if err != nil {
+		return nil, fmt.Errorf("starting document generation: %v", err)
+	}
+
+	return c.PollForJobCompletion(initResponse.JobId, ctx)
+}
+
+func (c *PogodocClient) GenerateDocumentImmediate(gdProps GenerateDocumentProps, ctx context.Context) (*StartImmediateRenderResponse, error) {
+
+	return c.Documents.StartImmediateRender(ctx, &StartImmediateRenderRequest{
+		Template: &gdProps.template,
+		TemplateId: gdProps.InitializeRenderJobRequest.TemplateId,
+		StartImmediateRenderRequestData: gdProps.InitializeRenderJobRequest.Data,
+		Type: StartImmediateRenderRequestType(gdProps.InitializeRenderJobRequest.Type),
+		Target: StartImmediateRenderRequestTarget(gdProps.InitializeRenderJobRequest.Target),
+	})
+}
+
+func (c *PogodocClient) PollForJobCompletion(jobId string, ctx context.Context) (*GetJobStatusResponse, error) {
+	maxAttempts := 60
+	intervalMs := 500
+
+	time.Sleep(1 * time.Second)
+
+	fmt.Println("Polling for job completion")
+	fmt.Println(jobId)
+	for range maxAttempts {
+		jobStatus, err := c.Documents.GetJobStatus(ctx, jobId)
+		if err != nil {
+			return nil, fmt.Errorf("getting job status: %v", err)
+		}
+		fmt.Println(*jobStatus.Status)
+		if *jobStatus.Status == "done" {
+			return jobStatus, nil
+		}
+		time.Sleep(time.Duration(intervalMs) * time.Millisecond)
+	}
+
+	return nil, fmt.Errorf("job %s not found", jobId)
 }
