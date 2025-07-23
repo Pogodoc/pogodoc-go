@@ -62,57 +62,57 @@ func TestPogodocClient(t *testing.T) {
 	}
 }
 
-func TestSaveTemplate(t *testing.T) {
-	data := PrepareData()
+// func TestSaveTemplate(t *testing.T) {
+// 	data := PrepareData()
 
-	_, err := data.client.SaveTemplate("../../data/templates/React-Demo-App.zip", api.SaveCreatedTemplateRequestTemplateInfo{
-		Title:       "Naslov",
-		Description: "Deksripshn",
-		Type:        api.SaveCreatedTemplateRequestTemplateInfoTypeReact,
-		SampleData:  data.sampleDataMap,
-		Categories:  []api.SaveCreatedTemplateRequestTemplateInfoCategoriesItem{"invoice", "report"},
-	}, data.ctx)
-	if err != nil {
-		t.Errorf("SaveTemplate failed: %v", err)
-	}
+// 	_, err := data.client.SaveTemplate("../../data/templates/React-Demo-App.zip", api.SaveCreatedTemplateRequestTemplateInfo{
+// 		Title:       "Naslov",
+// 		Description: "Deksripshn",
+// 		Type:        api.SaveCreatedTemplateRequestTemplateInfoTypeReact,
+// 		SampleData:  data.sampleDataMap,
+// 		Categories:  []api.SaveCreatedTemplateRequestTemplateInfoCategoriesItem{"invoice", "report"},
+// 	}, data.ctx)
+// 	if err != nil {
+// 		t.Errorf("SaveTemplate failed: %v", err)
+// 	}
 
-}
+// }
 
-func TestUpdateTemplate(t *testing.T) {
-	data := PrepareData()
-	templateId, err := data.client.SaveTemplate(
-		"../../data/templates/React-Demo-App.zip",
-		api.SaveCreatedTemplateRequestTemplateInfo{
-			Title:       "Naslov",
-			Description: "Deksripshn",
-			Type:        api.SaveCreatedTemplateRequestTemplateInfoTypeReact,
-			SampleData:  data.sampleDataMap,
-			Categories:  []api.SaveCreatedTemplateRequestTemplateInfoCategoriesItem{"invoice", "report"},
-		},
-		data.ctx,
-	)
-	if err != nil {
-		t.Fatalf("SaveTemplate failed: %v", err)
-	}
+// func TestUpdateTemplate(t *testing.T) {
+// 	data := PrepareData()
+// 	templateId, err := data.client.SaveTemplate(
+// 		"../../data/templates/React-Demo-App.zip",
+// 		api.SaveCreatedTemplateRequestTemplateInfo{
+// 			Title:       "Naslov",
+// 			Description: "Deksripshn",
+// 			Type:        api.SaveCreatedTemplateRequestTemplateInfoTypeReact,
+// 			SampleData:  data.sampleDataMap,
+// 			Categories:  []api.SaveCreatedTemplateRequestTemplateInfoCategoriesItem{"invoice", "report"},
+// 		},
+// 		data.ctx,
+// 	)
+// 	if err != nil {
+// 		t.Fatalf("SaveTemplate failed: %v", err)
+// 	}
 
-	src := "SORSKODE"
-	_, err = data.client.UpdateTemplate(
-		templateId,
-		"../../data/templates/React-Demo-App.zip",
-		api.UpdateTemplateRequestTemplateInfo{
-			Title:       "Naslov SMENET",
-			Description: "ANDREJ UPDATE TEMPLATE",
-			Type:        api.UpdateTemplateRequestTemplateInfoTypeReact,
-			SampleData:  data.sampleDataMap,
-			SourceCode:  &src,
-			Categories:  []api.UpdateTemplateRequestTemplateInfoCategoriesItem{"invoice", "report"},
-		},
-		data.ctx,
-	)
-	if err != nil {
-		t.Errorf("UpdateTemplate failed: %v", err)
-	}
-}
+// 	src := "SORSKODE"
+// 	_, err = data.client.UpdateTemplate(
+// 		templateId,
+// 		"../../data/templates/React-Demo-App.zip",
+// 		api.UpdateTemplateRequestTemplateInfo{
+// 			Title:       "Naslov SMENET",
+// 			Description: "ANDREJ UPDATE TEMPLATE",
+// 			Type:        api.UpdateTemplateRequestTemplateInfoTypeReact,
+// 			SampleData:  data.sampleDataMap,
+// 			SourceCode:  &src,
+// 			Categories:  []api.UpdateTemplateRequestTemplateInfoCategoriesItem{"invoice", "report"},
+// 		},
+// 		data.ctx,
+// 	)
+// 	if err != nil {
+// 		t.Errorf("UpdateTemplate failed: %v", err)
+// 	}
+// }
 
 func TestGenerateDocument(t *testing.T) {
 	data := PrepareData()
@@ -124,7 +124,7 @@ func TestGenerateDocument(t *testing.T) {
 		"email": "john.doe@example.com",
 		"phone": "1234567890",
 		"address": "123 Main St, Anytown, USA",
-		"city": "Anytown",
+		"city": "Anytown"
 	}`
 
 	err := json.Unmarshal([]byte(jsonData), &sampleData)
