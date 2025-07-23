@@ -287,14 +287,12 @@ func (c *PogodocClient) PollForJobCompletion(jobId string, ctx context.Context) 
 
 	time.Sleep(1 * time.Second)
 
-	fmt.Println("Polling for job completion")
-	fmt.Println(jobId)
 	for range maxAttempts {
 		jobStatus, err := c.Documents.GetJobStatus(ctx, jobId)
 		if err != nil {
 			return nil, fmt.Errorf("getting job status: %v", err)
 		}
-		fmt.Println(*jobStatus.Status)
+
 		if *jobStatus.Status == "done" {
 			return jobStatus, nil
 		}

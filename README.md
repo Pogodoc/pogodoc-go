@@ -34,7 +34,7 @@ func main() {
 	err := godotenv.Load()
 	ctx := context.Background()
 
-	client, err := pogodoc.PogodocClientInit()
+	client, _ := pogodoc.PogodocClientInitWithToken("YOUR_POGODOC_API_TOKEN")
 
 	if err != nil {
 		fmt.Println("Error: %s", err)
@@ -44,11 +44,7 @@ func main() {
 	var sampleData map[string]interface{}
 
 	jsonData := `{
-		"name": "John Doe",
-		"email": "john.doe@example.com",
-		"phone": "1234567890",
-		"address": "123 Main St, Anytown, USA",
-		"city": "Anytown",
+		"name": "John Doe"
 	}`
 
 	err = json.Unmarshal([]byte(jsonData), &sampleData)
@@ -60,7 +56,7 @@ func main() {
 
 	documentProps := pogodoc.GenerateDocumentProps{
 		InitializeRenderJobRequest: pogodoc.InitializeRenderJobRequest{
-			TemplateId: pogodoc.String(os.Getenv("TEMPLATE_ID")),
+			TemplateId: pogodoc.String("some-template-id"),
 			Type:       pogodoc.InitializeRenderJobRequestType("ejs"),
 			Target:     pogodoc.InitializeRenderJobRequestTarget("pdf"),
 			Data:       sampleData,
