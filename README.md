@@ -34,11 +34,9 @@ func main() {
 	err := godotenv.Load()
 	ctx := context.Background()
 
-	client, _ := pogodoc.PogodocClientInitWithToken("YOUR_POGODOC_API_TOKEN")
-
+	client, err := pogodoc.PogodocClientInitWithToken("YOUR_POGODOC_API_TOKEN")
 	if err != nil {
-		fmt.Println("Error: %s", err)
-		return
+		t.Errorf("PogodocClientInit failed: %v", err)
 	}
 
 	var sampleData map[string]interface{}
@@ -48,15 +46,13 @@ func main() {
 	}`
 
 	err = json.Unmarshal([]byte(jsonData), &sampleData)
-
 	if err != nil {
-		fmt.Println("Error unmarshalling JSON: %s", err)
-		return
+		t.Errorf("Unmarshal failed: %v", err)
 	}
 
 	documentProps := pogodoc.GenerateDocumentProps{
 		InitializeRenderJobRequest: pogodoc.InitializeRenderJobRequest{
-			TemplateId: pogodoc.String("some-template-id"),
+			TemplateId: pogodoc.String("your-template-id"),
 			Type:       pogodoc.InitializeRenderJobRequestType("ejs"),
 			Target:     pogodoc.InitializeRenderJobRequestTarget("pdf"),
 			Data:       sampleData,
@@ -66,15 +62,12 @@ func main() {
 		}}
 
 	doc, err := client.GenerateDocument(documentProps, ctx)
-
 	if err != nil {
-		fmt.Println("Error: %s", err)
-		return
+		t.Errorf("GenerateDocument failed: %v", err)
 	}
 
 	fmt.Println(doc.Output.Data.Url)
 }
-
 ```
 
 ### License

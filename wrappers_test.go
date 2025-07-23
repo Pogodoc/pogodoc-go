@@ -158,9 +158,11 @@ func TestReadMeExample(t *testing.T) {
 	godotenv.Load()
 	ctx := context.Background()
 
-	token := os.Getenv("POGODOC_API_TOKEN")
+	client, err := PogodocClientInit()
 
-	client, _ := PogodocClientInitWithToken(token)
+	if err != nil {
+		t.Errorf("PogodocClientInit failed: %v", err)
+	}
 
 	var sampleData map[string]interface{}
 
@@ -168,7 +170,10 @@ func TestReadMeExample(t *testing.T) {
 		"name": "John Doe"
 	}`
 
-	json.Unmarshal([]byte(jsonData), &sampleData)
+	err = json.Unmarshal([]byte(jsonData), &sampleData)
+	if err != nil {
+		t.Errorf("Unmarshal failed: %v", err)
+	}
 
 	documentProps := GenerateDocumentProps{
 		InitializeRenderJobRequest: InitializeRenderJobRequest{
@@ -181,9 +186,10 @@ func TestReadMeExample(t *testing.T) {
 			ShouldWaitForRenderCompletion: Bool(true),
 		}}
 
-	doc, _ := client.GenerateDocument(documentProps, ctx)
-
-	
+	doc, err := client.GenerateDocument(documentProps, ctx)
+	if err != nil {
+		t.Errorf("GenerateDocument failed: %v", err)
+	}
 
 	fmt.Println(doc.Output.Data.Url)
 }
