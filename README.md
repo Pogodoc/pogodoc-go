@@ -26,12 +26,9 @@ import (
 	"fmt"
 
 	pogodoc "github.com/Pogodoc/pogodoc-go"
-
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := godotenv.Load()
 	ctx := context.Background()
 
 	client, err := pogodoc.PogodocClientInitWithToken("YOUR_POGODOC_API_TOKEN")
