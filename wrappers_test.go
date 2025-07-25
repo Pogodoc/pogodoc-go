@@ -136,19 +136,19 @@ func TestGenerateDocument(t *testing.T) {
 	}
 
 	startRenderJobResponse, err := data.client.StartGenerateDocument(simpleDocumentProps, data.ctx)
-	fmt.Println(startRenderJobResponse.JobId)
+	fmt.Println("START GENERATE DOCUMENT: ", startRenderJobResponse.JobId)
 	if err != nil {
 		t.Errorf("GenerateDocument failed: %v", err)
 	}
 
 	generatedDocument, err := data.client.GenerateDocument(simpleDocumentProps, data.ctx)
-	fmt.Println(generatedDocument.Output.Data.Url)
+	fmt.Println("GENERATE DOCUMENT: ", generatedDocument.Output.Data.Url)
 	if err != nil {
 		t.Errorf("GenerateDocument failed: %v", err)
 	}
 
 	immediateDocument, err := data.client.GenerateDocumentImmediate(simpleDocumentProps, data.ctx)
-	fmt.Println(immediateDocument.Url)
+	fmt.Println("GENERATE DOCUMENT IMMEDIATE: ", immediateDocument.Url)
 	if err != nil {
 		t.Errorf("GenerateDocumentImmediate failed: %v", err)
 	}
@@ -182,14 +182,12 @@ func TestReadMeExample(t *testing.T) {
 			Target:     InitializeRenderJobRequestTarget("pdf"),
 			Data:       sampleData,
 		},
-		StartRenderJobRequest: StartRenderJobRequest{
-			ShouldWaitForRenderCompletion: Bool(true),
-		}}
+	}
 
 	doc, err := client.GenerateDocument(documentProps, ctx)
 	if err != nil {
 		t.Errorf("GenerateDocument failed: %v", err)
 	}
 
-	fmt.Println(doc.Output.Data.Url)
+	fmt.Println("README EXAMPLE: ", doc.Output.Data.Url)
 }

@@ -54,9 +54,7 @@ func main() {
 			Target:     pogodoc.InitializeRenderJobRequestTarget("pdf"),
 			Data:       sampleData,
 		},
-		StartRenderJobRequest: pogodoc.StartRenderJobRequest{
-			ShouldWaitForRenderCompletion: pogodoc.Bool(true),
-		}}
+	}
 
 	doc, err := client.GenerateDocument(documentProps, ctx)
 	if err != nil {
