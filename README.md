@@ -50,9 +50,12 @@ func main() {
 	documentProps := pogodoc.GenerateDocumentProps{
 		InitializeRenderJobRequest: pogodoc.InitializeRenderJobRequest{
 			TemplateId: pogodoc.String("your-template-id"),
-			Type:       pogodoc.InitializeRenderJobRequestType("ejs"),
+			Type:       pogodoc.InitializeRenderJobRequestType("html"),
 			Target:     pogodoc.InitializeRenderJobRequestTarget("pdf"),
 			Data:       sampleData,
+			FormatOpts: &pogodoc.InitializeRenderJobRequestFormatOpts{
+				FromPage: pogodoc.Int(1),
+			},
 		},
 	}
 
