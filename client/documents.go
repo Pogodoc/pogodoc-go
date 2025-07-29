@@ -22,8 +22,6 @@ type InitializeRenderJobRequest struct {
 }
 
 type StartImmediateRenderRequest struct {
-	// Sample data for the template
-	StartImmediateRenderRequestData map[string]interface{} `json:"data,omitempty" url:"-"`
 	// Type of template to be rendered
 	Type StartImmediateRenderRequestType `json:"type" url:"-"`
 	// Type of output to be rendered
@@ -32,8 +30,11 @@ type StartImmediateRenderRequest struct {
 	TemplateId *string `json:"templateId,omitempty" url:"-"`
 	// Format options for the rendered document
 	FormatOpts *StartImmediateRenderRequestFormatOpts `json:"formatOpts,omitempty" url:"-"`
+	// Sample data for the template
+	Data map[string]interface{} `json:"data,omitempty" url:"-"`
 	// index.html or ejs file of the template as a string
-	Template *string `json:"template,omitempty" url:"-"`
+	Template             *string `json:"template,omitempty" url:"-"`
+	UploadPresignedS3Url *string `json:"uploadPresignedS3Url,omitempty" url:"-"`
 }
 
 type StartRenderJobRequest struct {

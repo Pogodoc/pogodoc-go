@@ -58,7 +58,7 @@ URL, which is particularly useful in test environments.
 
 ```go
 client := client.NewClient(
-    option.WithBaseURL(pogodoc.Environments.Default),
+    option.WithBaseURL(Pogodoc.Environments.Default),
 )
 ```
 
