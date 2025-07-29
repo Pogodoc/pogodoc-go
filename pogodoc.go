@@ -275,7 +275,7 @@ func (c *PogodocClient) GenerateDocumentImmediate(gdProps GenerateDocumentProps,
 	return c.Documents.StartImmediateRender(ctx, &StartImmediateRenderRequest{
 		Template: &gdProps.template,
 		TemplateId: gdProps.InitializeRenderJobRequest.TemplateId,
-		StartImmediateRenderRequestData: gdProps.InitializeRenderJobRequest.Data,
+		Data: gdProps.InitializeRenderJobRequest.Data,
 		Type: StartImmediateRenderRequestType(gdProps.InitializeRenderJobRequest.Type),
 		Target: StartImmediateRenderRequestTarget(gdProps.InitializeRenderJobRequest.Target),
 	})
