@@ -211,11 +211,13 @@ func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps 
 }
 
 
-// GenerateDocument generates a document using the provided properties and context.
-// It initializes a render job, uploads the necessary data and template, starts the render job,
-// and retrieves the job status.
-// It returns the job status response or an error if any step fails.
-func (c *PogodocClient) StartGenerateDocument(gdProps GenerateDocumentProps, ctx context.Context) (*StartRenderJobResponse, error) {
+// StartGenerateDocument starts an asynchronous document generation job.
+// This is a lower-level method that only initializes the job.
+// You can use this if you want to implement your own polling logic.
+// It returns the job ID.
+// Use PollForJobCompletion with the job ID to get the final result.
+// You must provide either a templateId of a saved template or a template string in GenerateDocumentProps.
+func (c *PogodocClient) StartGenerateDocument(gdProps GenerateDocumentProps, ctx context.Context) (*string , error) {
 
 	initRequest := gdProps.InitializeRenderJobRequest
 	initResponse, err := c.Documents.InitializeRenderJob(ctx, &initRequest)
@@ -256,20 +258,29 @@ func (c *PogodocClient) StartGenerateDocument(gdProps GenerateDocumentProps, ctx
 		return nil, fmt.Errorf("starting render: %v", err)
 	}
 
-	return result, nil
+	return &result.JobId, nil
 
 }
 
 
+// GenerateDocument generates a document by starting a job and polling for its completion.
+// This is the recommended method for most use cases, especially for larger documents.
+// It first calls StartGenerateDocument to begin the process, then PollForJobCompletion to wait for the result.
+// You must provide either a templateId of a saved template or a template string in GenerateDocumentProps.
 func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx context.Context) (*GetJobStatusResponse, error) {
-	initResponse, err := c.StartGenerateDocument(gdProps, ctx)
+	jobId, err := c.StartGenerateDocument(gdProps, ctx)
 	if err != nil {
 		return nil, fmt.Errorf("starting document generation: %v", err)
 	}
 
-	return c.PollForJobCompletion(initResponse.JobId, ctx)
+	return c.PollForJobCompletion(*jobId, ctx)
 }
 
+// GenerateDocumentImmediate generates a document and returns the result immediately.
+// Use this method for quick, synchronous rendering of small documents.
+// The result is returned directly in the response.
+// For larger documents or when you need to handle rendering asynchronously, use GenerateDocument.
+// You must provide either a templateId of a saved template or a template string in GenerateDocumentProps.
 func (c *PogodocClient) GenerateDocumentImmediate(gdProps GenerateDocumentProps, ctx context.Context) (*StartImmediateRenderResponse, error) {
 
 	return c.Documents.StartImmediateRender(ctx, &StartImmediateRenderRequest{
@@ -281,6 +292,9 @@ func (c *PogodocClient) GenerateDocumentImmediate(gdProps GenerateDocumentProps,
 	})
 }
 
+// PollForJobCompletion polls for the completion of a rendering job.
+// This method repeatedly checks the status of a job until it is 'done'.
+// It will attempt to get the status up to 60 times with a 500ms interval.
 func (c *PogodocClient) PollForJobCompletion(jobId string, ctx context.Context) (*GetJobStatusResponse, error) {
 	maxAttempts := 60
 	intervalMs := 500

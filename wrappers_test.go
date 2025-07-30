@@ -135,8 +135,8 @@ func TestGenerateDocument(t *testing.T) {
 		},
 	}
 
-	startRenderJobResponse, err := data.client.StartGenerateDocument(simpleDocumentProps, data.ctx)
-	fmt.Println("START GENERATE DOCUMENT: ", startRenderJobResponse.JobId)
+	jobId, err := data.client.StartGenerateDocument(simpleDocumentProps, data.ctx)
+	fmt.Println("START GENERATE DOCUMENT: ", *jobId)
 	if err != nil {
 		t.Errorf("GenerateDocument failed: %v", err)
 	}
