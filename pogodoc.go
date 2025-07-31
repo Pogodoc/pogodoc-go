@@ -237,12 +237,12 @@ func (c *PogodocClient) StartGenerateDocument(gdProps GenerateDocumentProps, ctx
 		}
 	}
 
-	template := gdProps.template
+	template := gdProps.Template
 
-	if template != "" && initResponse.PresignedTemplateUploadUrl != nil {
+	if template != nil && initResponse.PresignedTemplateUploadUrl != nil {
 		err = UploadToS3WithURL(*initResponse.PresignedTemplateUploadUrl, FileStreamProps{
-			payload:       []byte(template),
-			payloadLength: len(template),
+			payload:       []byte(*template),
+			payloadLength: len(*template),
 		}, "text/html")
 		if err != nil {
 			return nil, fmt.Errorf("uploading document: %v", err)
@@ -284,7 +284,7 @@ func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx cont
 func (c *PogodocClient) GenerateDocumentImmediate(gdProps GenerateDocumentProps, ctx context.Context) (*StartImmediateRenderResponse, error) {
 
 	return c.Documents.StartImmediateRender(ctx, &StartImmediateRenderRequest{
-		Template: &gdProps.template,
+		Template: gdProps.Template,
 		TemplateId: gdProps.InitializeRenderJobRequest.TemplateId,
 		Data: gdProps.InitializeRenderJobRequest.Data,
 		Type: StartImmediateRenderRequestType(gdProps.InitializeRenderJobRequest.Type),
