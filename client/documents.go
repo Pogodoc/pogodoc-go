@@ -33,7 +33,8 @@ type StartImmediateRenderRequest struct {
 	// Sample data for the template
 	Data map[string]interface{} `json:"data,omitempty" url:"-"`
 	// index.html or ejs file of the template as a string
-	Template             *string `json:"template,omitempty" url:"-"`
+	Template *string `json:"template,omitempty" url:"-"`
+	// Presigned URL to upload the data for the render job to S3
 	UploadPresignedS3Url *string `json:"uploadPresignedS3Url,omitempty" url:"-"`
 }
 
