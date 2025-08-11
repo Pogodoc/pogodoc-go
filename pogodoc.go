@@ -59,7 +59,7 @@ func PogodocClientInitWithToken(tokenString string) (*PogodocClient, error) {
 	return &PogodocClient{Client: c}, nil
 }
 
-// SaveTemplate is a method extension to SaveTeamplateFromFileStream to save a template from a file path to the Pogodoc service. 
+// SaveTemplate is a method extension to SaveTeamplateFromFileStream to save a template from a file path to the Pogodoc service.
 // It wraps the SaveTemplateFromFileStream method.
 func (c *PogodocClient) SaveTemplate(filePath string, metadata SaveCreatedTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
 	payload, err := ReadFile(filePath)
@@ -136,7 +136,6 @@ func (c *PogodocClient) SaveTemplateFromFileStream(fsProps FileStreamProps, meta
 
 }
 
-
 // UpdateTemplate is a method extension to UpdateTemplateFromFileStream to update an existing template directly from a file path.
 // It wraps the UpdateTemplateFromFileStream method.
 func (c *PogodocClient) UpdateTemplate(templateId string, filePath string, metadata UpdateTemplateRequestTemplateInfo, ctx context.Context) (string, error) {
@@ -210,14 +209,13 @@ func (c *PogodocClient) UpdateTemplateFromFileStream(templateId string, fsProps 
 
 }
 
-
 // StartGenerateDocument starts an asynchronous document generation job.
 // This is a lower-level method that only initializes the job.
 // You can use this if you want to implement your own polling logic.
 // It returns the job ID.
 // Use PollForJobCompletion with the job ID to get the final result.
 // You must provide either a templateId of a saved template or a template string in GenerateDocumentProps.
-func (c *PogodocClient) StartGenerateDocument(gdProps GenerateDocumentProps, ctx context.Context) (*string , error) {
+func (c *PogodocClient) StartGenerateDocument(gdProps GenerateDocumentProps, ctx context.Context) (*string, error) {
 
 	initRequest := gdProps.InitializeRenderJobRequest
 	initResponse, err := c.Documents.InitializeRenderJob(ctx, &initRequest)
@@ -262,7 +260,6 @@ func (c *PogodocClient) StartGenerateDocument(gdProps GenerateDocumentProps, ctx
 
 }
 
-
 // GenerateDocument generates a document by starting a job and polling for its completion.
 // This is the recommended method for most use cases, especially for larger documents.
 // It first calls StartGenerateDocument to begin the process, then PollForJobCompletion to wait for the result.
@@ -284,11 +281,11 @@ func (c *PogodocClient) GenerateDocument(gdProps GenerateDocumentProps, ctx cont
 func (c *PogodocClient) GenerateDocumentImmediate(gdProps GenerateDocumentProps, ctx context.Context) (*StartImmediateRenderResponse, error) {
 
 	return c.Documents.StartImmediateRender(ctx, &StartImmediateRenderRequest{
-		Template: gdProps.Template,
+		Template:   gdProps.Template,
 		TemplateId: gdProps.InitializeRenderJobRequest.TemplateId,
-		Data: gdProps.InitializeRenderJobRequest.Data,
-		Type: StartImmediateRenderRequestType(gdProps.InitializeRenderJobRequest.Type),
-		Target: StartImmediateRenderRequestTarget(gdProps.InitializeRenderJobRequest.Target),
+		Data:       gdProps.InitializeRenderJobRequest.Data,
+		Type:       StartImmediateRenderRequestType(gdProps.InitializeRenderJobRequest.Type),
+		Target:     StartImmediateRenderRequestTarget(gdProps.InitializeRenderJobRequest.Target),
 	})
 }
 
@@ -307,7 +304,7 @@ func (c *PogodocClient) PollForJobCompletion(jobId string, ctx context.Context) 
 			return nil, fmt.Errorf("getting job status: %v", err)
 		}
 
-		if *jobStatus.Status == "done" {
+		if jobStatus.Status == "done" {
 			return jobStatus, nil
 		}
 		time.Sleep(time.Duration(intervalMs) * time.Millisecond)

@@ -35,8 +35,6 @@ type GetJobStatusResponse = api.GetJobStatusResponse
 type GetJobStatusResponseOutput = api.GetJobStatusResponseOutput
 type GetJobStatusResponseOutputData = api.GetJobStatusResponseOutputData
 type GetJobStatusResponseOutputMetadata = api.GetJobStatusResponseOutputMetadata
-type GetJobStatusResponseTarget = api.GetJobStatusResponseTarget
-type GetJobStatusResponseType = api.GetJobStatusResponseType
 type InitializeRenderJobRequestFormatOpts = api.InitializeRenderJobRequestFormatOpts
 type InitializeRenderJobRequestFormatOptsFormat = api.InitializeRenderJobRequestFormatOptsFormat
 type InitializeRenderJobRequestTarget = api.InitializeRenderJobRequestTarget
@@ -126,29 +124,6 @@ var WithBodyProperties = option.WithBodyProperties
 var WithQueryParameters = option.WithQueryParameters
 var WithMaxAttempts = option.WithMaxAttempts
 var WithToken = option.WithToken
-
-// Constants for enums
-// Document Target Constants
-const (
-	GetJobStatusResponseTargetPdf  = api.GetJobStatusResponseTargetPdf
-	GetJobStatusResponseTargetHtml = api.GetJobStatusResponseTargetHtml
-	GetJobStatusResponseTargetDocx = api.GetJobStatusResponseTargetDocx
-	GetJobStatusResponseTargetXlsx = api.GetJobStatusResponseTargetXlsx
-	GetJobStatusResponseTargetPptx = api.GetJobStatusResponseTargetPptx
-	GetJobStatusResponseTargetPng  = api.GetJobStatusResponseTargetPng
-	GetJobStatusResponseTargetJpg  = api.GetJobStatusResponseTargetJpg
-)
-
-// Document Type Constants
-const (
-	GetJobStatusResponseTypeDocx  = api.GetJobStatusResponseTypeDocx
-	GetJobStatusResponseTypeXlsx  = api.GetJobStatusResponseTypeXlsx
-	GetJobStatusResponseTypePptx  = api.GetJobStatusResponseTypePptx
-	GetJobStatusResponseTypeEjs   = api.GetJobStatusResponseTypeEjs
-	GetJobStatusResponseTypeHtml  = api.GetJobStatusResponseTypeHtml
-	GetJobStatusResponseTypeLatex = api.GetJobStatusResponseTypeLatex
-	GetJobStatusResponseTypeReact = api.GetJobStatusResponseTypeReact
-)
 
 // Initialize Render Job Format Constants
 const (
@@ -302,8 +277,6 @@ const (
 )
 
 // Helper functions for creating types from strings
-var NewGetJobStatusResponseTargetFromString = api.NewGetJobStatusResponseTargetFromString
-var NewGetJobStatusResponseTypeFromString = api.NewGetJobStatusResponseTypeFromString
 var NewInitializeRenderJobRequestFormatOptsFormatFromString = api.NewInitializeRenderJobRequestFormatOptsFormatFromString
 var NewInitializeRenderJobRequestTargetFromString = api.NewInitializeRenderJobRequestTargetFromString
 var NewInitializeRenderJobRequestTypeFromString = api.NewInitializeRenderJobRequestTypeFromString
@@ -317,4 +290,3 @@ var NewSaveCreatedTemplateRequestTemplateInfoCategoriesItemFromString = api.NewS
 var NewSaveCreatedTemplateRequestTemplateInfoTypeFromString = api.NewSaveCreatedTemplateRequestTemplateInfoTypeFromString
 var NewUpdateTemplateRequestTemplateInfoCategoriesItemFromString = api.NewUpdateTemplateRequestTemplateInfoCategoriesItemFromString
 var NewUpdateTemplateRequestTemplateInfoTypeFromString = api.NewUpdateTemplateRequestTemplateInfoTypeFromString
-
