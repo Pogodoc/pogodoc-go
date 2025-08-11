@@ -56,7 +56,7 @@ type GetJobStatusResponse struct {
 	// Format options for the rendered document
 	FormatOpts *GetJobStatusResponseFormatOpts `json:"formatOpts,omitempty" url:"formatOpts,omitempty"`
 	// Status of the render job
-	Status *string `json:"status,omitempty" url:"status,omitempty"`
+	Status string `json:"status" url:"status"`
 	// Whether the render job was successful
 	Success *bool                       `json:"success,omitempty" url:"success,omitempty"`
 	Output  *GetJobStatusResponseOutput `json:"output,omitempty" url:"output,omitempty"`
@@ -102,9 +102,9 @@ func (g *GetJobStatusResponse) GetFormatOpts() *GetJobStatusResponseFormatOpts {
 	return g.FormatOpts
 }
 
-func (g *GetJobStatusResponse) GetStatus() *string {
+func (g *GetJobStatusResponse) GetStatus() string {
 	if g == nil {
-		return nil
+		return ""
 	}
 	return g.Status
 }
@@ -985,91 +985,21 @@ func (s *StartImmediateRenderResponse) String() string {
 }
 
 type StartRenderJobResponse struct {
-	StartRenderJobResponseError *StartRenderJobResponseError
-	StartRenderJobResponseOne   *StartRenderJobResponseOne
-
-	typ string
-}
-
-func NewStartRenderJobResponseFromStartRenderJobResponseError(value *StartRenderJobResponseError) *StartRenderJobResponse {
-	return &StartRenderJobResponse{typ: "StartRenderJobResponseError", StartRenderJobResponseError: value}
-}
-
-func NewStartRenderJobResponseFromStartRenderJobResponseOne(value *StartRenderJobResponseOne) *StartRenderJobResponse {
-	return &StartRenderJobResponse{typ: "StartRenderJobResponseOne", StartRenderJobResponseOne: value}
-}
-
-func (s *StartRenderJobResponse) GetStartRenderJobResponseError() *StartRenderJobResponseError {
-	if s == nil {
-		return nil
-	}
-	return s.StartRenderJobResponseError
-}
-
-func (s *StartRenderJobResponse) GetStartRenderJobResponseOne() *StartRenderJobResponseOne {
-	if s == nil {
-		return nil
-	}
-	return s.StartRenderJobResponseOne
-}
-
-func (s *StartRenderJobResponse) UnmarshalJSON(data []byte) error {
-	valueStartRenderJobResponseError := new(StartRenderJobResponseError)
-	if err := json.Unmarshal(data, &valueStartRenderJobResponseError); err == nil {
-		s.typ = "StartRenderJobResponseError"
-		s.StartRenderJobResponseError = valueStartRenderJobResponseError
-		return nil
-	}
-	valueStartRenderJobResponseOne := new(StartRenderJobResponseOne)
-	if err := json.Unmarshal(data, &valueStartRenderJobResponseOne); err == nil {
-		s.typ = "StartRenderJobResponseOne"
-		s.StartRenderJobResponseOne = valueStartRenderJobResponseOne
-		return nil
-	}
-	return fmt.Errorf("%s cannot be deserialized as a %T", data, s)
-}
-
-func (s StartRenderJobResponse) MarshalJSON() ([]byte, error) {
-	if s.typ == "StartRenderJobResponseError" || s.StartRenderJobResponseError != nil {
-		return json.Marshal(s.StartRenderJobResponseError)
-	}
-	if s.typ == "StartRenderJobResponseOne" || s.StartRenderJobResponseOne != nil {
-		return json.Marshal(s.StartRenderJobResponseOne)
-	}
-	return nil, fmt.Errorf("type %T does not include a non-empty union type", s)
-}
-
-type StartRenderJobResponseVisitor interface {
-	VisitStartRenderJobResponseError(*StartRenderJobResponseError) error
-	VisitStartRenderJobResponseOne(*StartRenderJobResponseOne) error
-}
-
-func (s *StartRenderJobResponse) Accept(visitor StartRenderJobResponseVisitor) error {
-	if s.typ == "StartRenderJobResponseError" || s.StartRenderJobResponseError != nil {
-		return visitor.VisitStartRenderJobResponseError(s.StartRenderJobResponseError)
-	}
-	if s.typ == "StartRenderJobResponseOne" || s.StartRenderJobResponseOne != nil {
-		return visitor.VisitStartRenderJobResponseOne(s.StartRenderJobResponseOne)
-	}
-	return fmt.Errorf("type %T does not include a non-empty union type", s)
-}
-
-type StartRenderJobResponseError struct {
 	// ID of the render job
 	JobId string `json:"jobId" url:"jobId"`
 	// ID of the template being used
 	TemplateId *string `json:"templateId,omitempty" url:"templateId,omitempty"`
-	// Target of the render job
-	Target string `json:"target" url:"target"`
+	// Type of output to be rendered
+	Target *StartRenderJobResponseTarget `json:"target,omitempty" url:"target,omitempty"`
 	// Presigned URL to upload the rendered output to S3
 	UploadPresignedS3Url *string `json:"uploadPresignedS3Url,omitempty" url:"uploadPresignedS3Url,omitempty"`
 	// Format options for the rendered document
-	FormatOpts *StartRenderJobResponseErrorFormatOpts `json:"formatOpts,omitempty" url:"formatOpts,omitempty"`
+	FormatOpts *StartRenderJobResponseFormatOpts `json:"formatOpts,omitempty" url:"formatOpts,omitempty"`
 	// Status of the render job
 	Status *string `json:"status,omitempty" url:"status,omitempty"`
 	// Whether the render job was successful
-	Success *bool                              `json:"success,omitempty" url:"success,omitempty"`
-	Output  *StartRenderJobResponseErrorOutput `json:"output,omitempty" url:"output,omitempty"`
+	Success *bool                         `json:"success,omitempty" url:"success,omitempty"`
+	Output  *StartRenderJobResponseOutput `json:"output,omitempty" url:"output,omitempty"`
 	// Error that occurred during render
 	Error *string `json:"error,omitempty" url:"error,omitempty"`
 
@@ -1077,80 +1007,80 @@ type StartRenderJobResponseError struct {
 	rawJSON         json.RawMessage
 }
 
-func (s *StartRenderJobResponseError) GetJobId() string {
+func (s *StartRenderJobResponse) GetJobId() string {
 	if s == nil {
 		return ""
 	}
 	return s.JobId
 }
 
-func (s *StartRenderJobResponseError) GetTemplateId() *string {
+func (s *StartRenderJobResponse) GetTemplateId() *string {
 	if s == nil {
 		return nil
 	}
 	return s.TemplateId
 }
 
-func (s *StartRenderJobResponseError) GetTarget() string {
+func (s *StartRenderJobResponse) GetTarget() *StartRenderJobResponseTarget {
 	if s == nil {
-		return ""
+		return nil
 	}
 	return s.Target
 }
 
-func (s *StartRenderJobResponseError) GetUploadPresignedS3Url() *string {
+func (s *StartRenderJobResponse) GetUploadPresignedS3Url() *string {
 	if s == nil {
 		return nil
 	}
 	return s.UploadPresignedS3Url
 }
 
-func (s *StartRenderJobResponseError) GetFormatOpts() *StartRenderJobResponseErrorFormatOpts {
+func (s *StartRenderJobResponse) GetFormatOpts() *StartRenderJobResponseFormatOpts {
 	if s == nil {
 		return nil
 	}
 	return s.FormatOpts
 }
 
-func (s *StartRenderJobResponseError) GetStatus() *string {
+func (s *StartRenderJobResponse) GetStatus() *string {
 	if s == nil {
 		return nil
 	}
 	return s.Status
 }
 
-func (s *StartRenderJobResponseError) GetSuccess() *bool {
+func (s *StartRenderJobResponse) GetSuccess() *bool {
 	if s == nil {
 		return nil
 	}
 	return s.Success
 }
 
-func (s *StartRenderJobResponseError) GetOutput() *StartRenderJobResponseErrorOutput {
+func (s *StartRenderJobResponse) GetOutput() *StartRenderJobResponseOutput {
 	if s == nil {
 		return nil
 	}
 	return s.Output
 }
 
-func (s *StartRenderJobResponseError) GetError() *string {
+func (s *StartRenderJobResponse) GetError() *string {
 	if s == nil {
 		return nil
 	}
 	return s.Error
 }
 
-func (s *StartRenderJobResponseError) GetExtraProperties() map[string]interface{} {
+func (s *StartRenderJobResponse) GetExtraProperties() map[string]interface{} {
 	return s.extraProperties
 }
 
-func (s *StartRenderJobResponseError) UnmarshalJSON(data []byte) error {
-	type unmarshaler StartRenderJobResponseError
+func (s *StartRenderJobResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler StartRenderJobResponse
 	var value unmarshaler
 	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	*s = StartRenderJobResponseError(value)
+	*s = StartRenderJobResponse(value)
 	extraProperties, err := internal.ExtractExtraProperties(data, *s)
 	if err != nil {
 		return err
@@ -1160,7 +1090,7 @@ func (s *StartRenderJobResponseError) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (s *StartRenderJobResponseError) String() string {
+func (s *StartRenderJobResponse) String() string {
 	if len(s.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
 			return value
@@ -1173,10 +1103,10 @@ func (s *StartRenderJobResponseError) String() string {
 }
 
 // Format options for the rendered document
-type StartRenderJobResponseErrorFormatOpts struct {
-	FromPage *float64                                     `json:"fromPage,omitempty" url:"fromPage,omitempty"`
-	ToPage   *float64                                     `json:"toPage,omitempty" url:"toPage,omitempty"`
-	Format   *StartRenderJobResponseErrorFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
+type StartRenderJobResponseFormatOpts struct {
+	FromPage *float64                                `json:"fromPage,omitempty" url:"fromPage,omitempty"`
+	ToPage   *float64                                `json:"toPage,omitempty" url:"toPage,omitempty"`
+	Format   *StartRenderJobResponseFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
 	// Selector to wait for to know when the page is loaded and can be saved as pdf, png, etc.
 	WaitForSelector *string `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
 
@@ -1184,45 +1114,45 @@ type StartRenderJobResponseErrorFormatOpts struct {
 	rawJSON         json.RawMessage
 }
 
-func (s *StartRenderJobResponseErrorFormatOpts) GetFromPage() *float64 {
+func (s *StartRenderJobResponseFormatOpts) GetFromPage() *float64 {
 	if s == nil {
 		return nil
 	}
 	return s.FromPage
 }
 
-func (s *StartRenderJobResponseErrorFormatOpts) GetToPage() *float64 {
+func (s *StartRenderJobResponseFormatOpts) GetToPage() *float64 {
 	if s == nil {
 		return nil
 	}
 	return s.ToPage
 }
 
-func (s *StartRenderJobResponseErrorFormatOpts) GetFormat() *StartRenderJobResponseErrorFormatOptsFormat {
+func (s *StartRenderJobResponseFormatOpts) GetFormat() *StartRenderJobResponseFormatOptsFormat {
 	if s == nil {
 		return nil
 	}
 	return s.Format
 }
 
-func (s *StartRenderJobResponseErrorFormatOpts) GetWaitForSelector() *string {
+func (s *StartRenderJobResponseFormatOpts) GetWaitForSelector() *string {
 	if s == nil {
 		return nil
 	}
 	return s.WaitForSelector
 }
 
-func (s *StartRenderJobResponseErrorFormatOpts) GetExtraProperties() map[string]interface{} {
+func (s *StartRenderJobResponseFormatOpts) GetExtraProperties() map[string]interface{} {
 	return s.extraProperties
 }
 
-func (s *StartRenderJobResponseErrorFormatOpts) UnmarshalJSON(data []byte) error {
-	type unmarshaler StartRenderJobResponseErrorFormatOpts
+func (s *StartRenderJobResponseFormatOpts) UnmarshalJSON(data []byte) error {
+	type unmarshaler StartRenderJobResponseFormatOpts
 	var value unmarshaler
 	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	*s = StartRenderJobResponseErrorFormatOpts(value)
+	*s = StartRenderJobResponseFormatOpts(value)
 	extraProperties, err := internal.ExtractExtraProperties(data, *s)
 	if err != nil {
 		return err
@@ -1232,7 +1162,7 @@ func (s *StartRenderJobResponseErrorFormatOpts) UnmarshalJSON(data []byte) error
 	return nil
 }
 
-func (s *StartRenderJobResponseErrorFormatOpts) String() string {
+func (s *StartRenderJobResponseFormatOpts) String() string {
 	if len(s.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
 			return value
@@ -1244,88 +1174,88 @@ func (s *StartRenderJobResponseErrorFormatOpts) String() string {
 	return fmt.Sprintf("%#v", s)
 }
 
-type StartRenderJobResponseErrorFormatOptsFormat string
+type StartRenderJobResponseFormatOptsFormat string
 
 const (
-	StartRenderJobResponseErrorFormatOptsFormatLetter  StartRenderJobResponseErrorFormatOptsFormat = "letter"
-	StartRenderJobResponseErrorFormatOptsFormatLegal   StartRenderJobResponseErrorFormatOptsFormat = "legal"
-	StartRenderJobResponseErrorFormatOptsFormatTabloid StartRenderJobResponseErrorFormatOptsFormat = "tabloid"
-	StartRenderJobResponseErrorFormatOptsFormatLedger  StartRenderJobResponseErrorFormatOptsFormat = "ledger"
-	StartRenderJobResponseErrorFormatOptsFormatA0      StartRenderJobResponseErrorFormatOptsFormat = "a0"
-	StartRenderJobResponseErrorFormatOptsFormatA1      StartRenderJobResponseErrorFormatOptsFormat = "a1"
-	StartRenderJobResponseErrorFormatOptsFormatA2      StartRenderJobResponseErrorFormatOptsFormat = "a2"
-	StartRenderJobResponseErrorFormatOptsFormatA3      StartRenderJobResponseErrorFormatOptsFormat = "a3"
-	StartRenderJobResponseErrorFormatOptsFormatA4      StartRenderJobResponseErrorFormatOptsFormat = "a4"
-	StartRenderJobResponseErrorFormatOptsFormatA5      StartRenderJobResponseErrorFormatOptsFormat = "a5"
-	StartRenderJobResponseErrorFormatOptsFormatA6      StartRenderJobResponseErrorFormatOptsFormat = "a6"
+	StartRenderJobResponseFormatOptsFormatLetter  StartRenderJobResponseFormatOptsFormat = "letter"
+	StartRenderJobResponseFormatOptsFormatLegal   StartRenderJobResponseFormatOptsFormat = "legal"
+	StartRenderJobResponseFormatOptsFormatTabloid StartRenderJobResponseFormatOptsFormat = "tabloid"
+	StartRenderJobResponseFormatOptsFormatLedger  StartRenderJobResponseFormatOptsFormat = "ledger"
+	StartRenderJobResponseFormatOptsFormatA0      StartRenderJobResponseFormatOptsFormat = "a0"
+	StartRenderJobResponseFormatOptsFormatA1      StartRenderJobResponseFormatOptsFormat = "a1"
+	StartRenderJobResponseFormatOptsFormatA2      StartRenderJobResponseFormatOptsFormat = "a2"
+	StartRenderJobResponseFormatOptsFormatA3      StartRenderJobResponseFormatOptsFormat = "a3"
+	StartRenderJobResponseFormatOptsFormatA4      StartRenderJobResponseFormatOptsFormat = "a4"
+	StartRenderJobResponseFormatOptsFormatA5      StartRenderJobResponseFormatOptsFormat = "a5"
+	StartRenderJobResponseFormatOptsFormatA6      StartRenderJobResponseFormatOptsFormat = "a6"
 )
 
-func NewStartRenderJobResponseErrorFormatOptsFormatFromString(s string) (StartRenderJobResponseErrorFormatOptsFormat, error) {
+func NewStartRenderJobResponseFormatOptsFormatFromString(s string) (StartRenderJobResponseFormatOptsFormat, error) {
 	switch s {
 	case "letter":
-		return StartRenderJobResponseErrorFormatOptsFormatLetter, nil
+		return StartRenderJobResponseFormatOptsFormatLetter, nil
 	case "legal":
-		return StartRenderJobResponseErrorFormatOptsFormatLegal, nil
+		return StartRenderJobResponseFormatOptsFormatLegal, nil
 	case "tabloid":
-		return StartRenderJobResponseErrorFormatOptsFormatTabloid, nil
+		return StartRenderJobResponseFormatOptsFormatTabloid, nil
 	case "ledger":
-		return StartRenderJobResponseErrorFormatOptsFormatLedger, nil
+		return StartRenderJobResponseFormatOptsFormatLedger, nil
 	case "a0":
-		return StartRenderJobResponseErrorFormatOptsFormatA0, nil
+		return StartRenderJobResponseFormatOptsFormatA0, nil
 	case "a1":
-		return StartRenderJobResponseErrorFormatOptsFormatA1, nil
+		return StartRenderJobResponseFormatOptsFormatA1, nil
 	case "a2":
-		return StartRenderJobResponseErrorFormatOptsFormatA2, nil
+		return StartRenderJobResponseFormatOptsFormatA2, nil
 	case "a3":
-		return StartRenderJobResponseErrorFormatOptsFormatA3, nil
+		return StartRenderJobResponseFormatOptsFormatA3, nil
 	case "a4":
-		return StartRenderJobResponseErrorFormatOptsFormatA4, nil
+		return StartRenderJobResponseFormatOptsFormatA4, nil
 	case "a5":
-		return StartRenderJobResponseErrorFormatOptsFormatA5, nil
+		return StartRenderJobResponseFormatOptsFormatA5, nil
 	case "a6":
-		return StartRenderJobResponseErrorFormatOptsFormatA6, nil
+		return StartRenderJobResponseFormatOptsFormatA6, nil
 	}
-	var t StartRenderJobResponseErrorFormatOptsFormat
+	var t StartRenderJobResponseFormatOptsFormat
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-func (s StartRenderJobResponseErrorFormatOptsFormat) Ptr() *StartRenderJobResponseErrorFormatOptsFormat {
+func (s StartRenderJobResponseFormatOptsFormat) Ptr() *StartRenderJobResponseFormatOptsFormat {
 	return &s
 }
 
-type StartRenderJobResponseErrorOutput struct {
-	Data     *StartRenderJobResponseErrorOutputData     `json:"data,omitempty" url:"data,omitempty"`
-	Metadata *StartRenderJobResponseErrorOutputMetadata `json:"metadata,omitempty" url:"metadata,omitempty"`
+type StartRenderJobResponseOutput struct {
+	Data     *StartRenderJobResponseOutputData     `json:"data,omitempty" url:"data,omitempty"`
+	Metadata *StartRenderJobResponseOutputMetadata `json:"metadata,omitempty" url:"metadata,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
 
-func (s *StartRenderJobResponseErrorOutput) GetData() *StartRenderJobResponseErrorOutputData {
+func (s *StartRenderJobResponseOutput) GetData() *StartRenderJobResponseOutputData {
 	if s == nil {
 		return nil
 	}
 	return s.Data
 }
 
-func (s *StartRenderJobResponseErrorOutput) GetMetadata() *StartRenderJobResponseErrorOutputMetadata {
+func (s *StartRenderJobResponseOutput) GetMetadata() *StartRenderJobResponseOutputMetadata {
 	if s == nil {
 		return nil
 	}
 	return s.Metadata
 }
 
-func (s *StartRenderJobResponseErrorOutput) GetExtraProperties() map[string]interface{} {
+func (s *StartRenderJobResponseOutput) GetExtraProperties() map[string]interface{} {
 	return s.extraProperties
 }
 
-func (s *StartRenderJobResponseErrorOutput) UnmarshalJSON(data []byte) error {
-	type unmarshaler StartRenderJobResponseErrorOutput
+func (s *StartRenderJobResponseOutput) UnmarshalJSON(data []byte) error {
+	type unmarshaler StartRenderJobResponseOutput
 	var value unmarshaler
 	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	*s = StartRenderJobResponseErrorOutput(value)
+	*s = StartRenderJobResponseOutput(value)
 	extraProperties, err := internal.ExtractExtraProperties(data, *s)
 	if err != nil {
 		return err
@@ -1335,7 +1265,7 @@ func (s *StartRenderJobResponseErrorOutput) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (s *StartRenderJobResponseErrorOutput) String() string {
+func (s *StartRenderJobResponseOutput) String() string {
 	if len(s.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
 			return value
@@ -1347,7 +1277,7 @@ func (s *StartRenderJobResponseErrorOutput) String() string {
 	return fmt.Sprintf("%#v", s)
 }
 
-type StartRenderJobResponseErrorOutputData struct {
+type StartRenderJobResponseOutputData struct {
 	// URL of the rendered output
 	Url string `json:"url" url:"url"`
 
@@ -1355,24 +1285,24 @@ type StartRenderJobResponseErrorOutputData struct {
 	rawJSON         json.RawMessage
 }
 
-func (s *StartRenderJobResponseErrorOutputData) GetUrl() string {
+func (s *StartRenderJobResponseOutputData) GetUrl() string {
 	if s == nil {
 		return ""
 	}
 	return s.Url
 }
 
-func (s *StartRenderJobResponseErrorOutputData) GetExtraProperties() map[string]interface{} {
+func (s *StartRenderJobResponseOutputData) GetExtraProperties() map[string]interface{} {
 	return s.extraProperties
 }
 
-func (s *StartRenderJobResponseErrorOutputData) UnmarshalJSON(data []byte) error {
-	type unmarshaler StartRenderJobResponseErrorOutputData
+func (s *StartRenderJobResponseOutputData) UnmarshalJSON(data []byte) error {
+	type unmarshaler StartRenderJobResponseOutputData
 	var value unmarshaler
 	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	*s = StartRenderJobResponseErrorOutputData(value)
+	*s = StartRenderJobResponseOutputData(value)
 	extraProperties, err := internal.ExtractExtraProperties(data, *s)
 	if err != nil {
 		return err
@@ -1382,7 +1312,7 @@ func (s *StartRenderJobResponseErrorOutputData) UnmarshalJSON(data []byte) error
 	return nil
 }
 
-func (s *StartRenderJobResponseErrorOutputData) String() string {
+func (s *StartRenderJobResponseOutputData) String() string {
 	if len(s.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
 			return value
@@ -1394,7 +1324,7 @@ func (s *StartRenderJobResponseErrorOutputData) String() string {
 	return fmt.Sprintf("%#v", s)
 }
 
-type StartRenderJobResponseErrorOutputMetadata struct {
+type StartRenderJobResponseOutputMetadata struct {
 	// Time taken to render the output
 	RenderTime float64 `json:"renderTime" url:"renderTime"`
 
@@ -1402,24 +1332,24 @@ type StartRenderJobResponseErrorOutputMetadata struct {
 	rawJSON         json.RawMessage
 }
 
-func (s *StartRenderJobResponseErrorOutputMetadata) GetRenderTime() float64 {
+func (s *StartRenderJobResponseOutputMetadata) GetRenderTime() float64 {
 	if s == nil {
 		return 0
 	}
 	return s.RenderTime
 }
 
-func (s *StartRenderJobResponseErrorOutputMetadata) GetExtraProperties() map[string]interface{} {
+func (s *StartRenderJobResponseOutputMetadata) GetExtraProperties() map[string]interface{} {
 	return s.extraProperties
 }
 
-func (s *StartRenderJobResponseErrorOutputMetadata) UnmarshalJSON(data []byte) error {
-	type unmarshaler StartRenderJobResponseErrorOutputMetadata
+func (s *StartRenderJobResponseOutputMetadata) UnmarshalJSON(data []byte) error {
+	type unmarshaler StartRenderJobResponseOutputMetadata
 	var value unmarshaler
 	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	*s = StartRenderJobResponseErrorOutputMetadata(value)
+	*s = StartRenderJobResponseOutputMetadata(value)
 	extraProperties, err := internal.ExtractExtraProperties(data, *s)
 	if err != nil {
 		return err
@@ -1429,7 +1359,7 @@ func (s *StartRenderJobResponseErrorOutputMetadata) UnmarshalJSON(data []byte) e
 	return nil
 }
 
-func (s *StartRenderJobResponseErrorOutputMetadata) String() string {
+func (s *StartRenderJobResponseOutputMetadata) String() string {
 	if len(s.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
 			return value
@@ -1441,49 +1371,40 @@ func (s *StartRenderJobResponseErrorOutputMetadata) String() string {
 	return fmt.Sprintf("%#v", s)
 }
 
-type StartRenderJobResponseOne struct {
-	// ID of the render job
-	JobId string `json:"jobId" url:"jobId"`
+// Type of output to be rendered
+type StartRenderJobResponseTarget string
 
-	extraProperties map[string]interface{}
-	rawJSON         json.RawMessage
+const (
+	StartRenderJobResponseTargetPdf  StartRenderJobResponseTarget = "pdf"
+	StartRenderJobResponseTargetHtml StartRenderJobResponseTarget = "html"
+	StartRenderJobResponseTargetDocx StartRenderJobResponseTarget = "docx"
+	StartRenderJobResponseTargetXlsx StartRenderJobResponseTarget = "xlsx"
+	StartRenderJobResponseTargetPptx StartRenderJobResponseTarget = "pptx"
+	StartRenderJobResponseTargetPng  StartRenderJobResponseTarget = "png"
+	StartRenderJobResponseTargetJpg  StartRenderJobResponseTarget = "jpg"
+)
+
+func NewStartRenderJobResponseTargetFromString(s string) (StartRenderJobResponseTarget, error) {
+	switch s {
+	case "pdf":
+		return StartRenderJobResponseTargetPdf, nil
+	case "html":
+		return StartRenderJobResponseTargetHtml, nil
+	case "docx":
+		return StartRenderJobResponseTargetDocx, nil
+	case "xlsx":
+		return StartRenderJobResponseTargetXlsx, nil
+	case "pptx":
+		return StartRenderJobResponseTargetPptx, nil
+	case "png":
+		return StartRenderJobResponseTargetPng, nil
+	case "jpg":
+		return StartRenderJobResponseTargetJpg, nil
+	}
+	var t StartRenderJobResponseTarget
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
 }
 
-func (s *StartRenderJobResponseOne) GetJobId() string {
-	if s == nil {
-		return ""
-	}
-	return s.JobId
-}
-
-func (s *StartRenderJobResponseOne) GetExtraProperties() map[string]interface{} {
-	return s.extraProperties
-}
-
-func (s *StartRenderJobResponseOne) UnmarshalJSON(data []byte) error {
-	type unmarshaler StartRenderJobResponseOne
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*s = StartRenderJobResponseOne(value)
-	extraProperties, err := internal.ExtractExtraProperties(data, *s)
-	if err != nil {
-		return err
-	}
-	s.extraProperties = extraProperties
-	s.rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (s *StartRenderJobResponseOne) String() string {
-	if len(s.rawJSON) > 0 {
-		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := internal.StringifyJSON(s); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", s)
+func (s StartRenderJobResponseTarget) Ptr() *StartRenderJobResponseTarget {
+	return &s
 }
