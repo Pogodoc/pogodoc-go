@@ -2,7 +2,18 @@
 
 [![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-Built%20with%20Fern-brightgreen)](https://buildwithfern.com?utm_source=github&utm_medium=github&utm_campaign=readme&utm_source=Pogodoc%2FGo)
 
-The Pogodoc Go library provides convenient access to the Pogodoc API from Go.
+The Pogodoc Go library provides convenient access to the Pogodoc APIs from Go.
+
+## Table of Contents
+
+- [Usage](#usage)
+- [Environments](#environments)
+- [Errors](#errors)
+- [Request Options](#request-options)
+- [Advanced](#advanced)
+  - [Retries](#retries)
+  - [Timeouts](#timeouts)
+- [Contributing](#contributing)
 
 ## Usage
 

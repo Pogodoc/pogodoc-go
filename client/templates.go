@@ -740,11 +740,12 @@ func (s *SaveCreatedTemplateRequestTemplateInfo) String() string {
 type SaveCreatedTemplateRequestTemplateInfoCategoriesItem string
 
 const (
-	SaveCreatedTemplateRequestTemplateInfoCategoriesItemInvoice SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "invoice"
-	SaveCreatedTemplateRequestTemplateInfoCategoriesItemMail    SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "mail"
-	SaveCreatedTemplateRequestTemplateInfoCategoriesItemReport  SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "report"
-	SaveCreatedTemplateRequestTemplateInfoCategoriesItemCv      SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "cv"
-	SaveCreatedTemplateRequestTemplateInfoCategoriesItemOther   SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "other"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemInvoice  SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "invoice"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemMail     SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "mail"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemReport   SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "report"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemCv       SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "cv"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemOther    SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "other"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemFavorite SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "favorite"
 )
 
 func NewSaveCreatedTemplateRequestTemplateInfoCategoriesItemFromString(s string) (SaveCreatedTemplateRequestTemplateInfoCategoriesItem, error) {
@@ -759,6 +760,8 @@ func NewSaveCreatedTemplateRequestTemplateInfoCategoriesItemFromString(s string)
 		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemCv, nil
 	case "other":
 		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemOther, nil
+	case "favorite":
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemFavorite, nil
 	}
 	var t SaveCreatedTemplateRequestTemplateInfoCategoriesItem
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -956,11 +959,12 @@ func (u *UpdateTemplateRequestTemplateInfo) String() string {
 type UpdateTemplateRequestTemplateInfoCategoriesItem string
 
 const (
-	UpdateTemplateRequestTemplateInfoCategoriesItemInvoice UpdateTemplateRequestTemplateInfoCategoriesItem = "invoice"
-	UpdateTemplateRequestTemplateInfoCategoriesItemMail    UpdateTemplateRequestTemplateInfoCategoriesItem = "mail"
-	UpdateTemplateRequestTemplateInfoCategoriesItemReport  UpdateTemplateRequestTemplateInfoCategoriesItem = "report"
-	UpdateTemplateRequestTemplateInfoCategoriesItemCv      UpdateTemplateRequestTemplateInfoCategoriesItem = "cv"
-	UpdateTemplateRequestTemplateInfoCategoriesItemOther   UpdateTemplateRequestTemplateInfoCategoriesItem = "other"
+	UpdateTemplateRequestTemplateInfoCategoriesItemInvoice  UpdateTemplateRequestTemplateInfoCategoriesItem = "invoice"
+	UpdateTemplateRequestTemplateInfoCategoriesItemMail     UpdateTemplateRequestTemplateInfoCategoriesItem = "mail"
+	UpdateTemplateRequestTemplateInfoCategoriesItemReport   UpdateTemplateRequestTemplateInfoCategoriesItem = "report"
+	UpdateTemplateRequestTemplateInfoCategoriesItemCv       UpdateTemplateRequestTemplateInfoCategoriesItem = "cv"
+	UpdateTemplateRequestTemplateInfoCategoriesItemOther    UpdateTemplateRequestTemplateInfoCategoriesItem = "other"
+	UpdateTemplateRequestTemplateInfoCategoriesItemFavorite UpdateTemplateRequestTemplateInfoCategoriesItem = "favorite"
 )
 
 func NewUpdateTemplateRequestTemplateInfoCategoriesItemFromString(s string) (UpdateTemplateRequestTemplateInfoCategoriesItem, error) {
@@ -975,6 +979,8 @@ func NewUpdateTemplateRequestTemplateInfoCategoriesItemFromString(s string) (Upd
 		return UpdateTemplateRequestTemplateInfoCategoriesItemCv, nil
 	case "other":
 		return UpdateTemplateRequestTemplateInfoCategoriesItemOther, nil
+	case "favorite":
+		return UpdateTemplateRequestTemplateInfoCategoriesItemFavorite, nil
 	}
 	var t UpdateTemplateRequestTemplateInfoCategoriesItem
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
