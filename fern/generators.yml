@@ -1,0 +1,15 @@
+api:
+  specs:
+    - openapi: ./openapi/openApiSpec.json
+default-group: local
+groups:
+  local:
+    generators:
+      - name: fernapi/fern-go-sdk
+        version: 0.38.0
+        output:
+          location: local-file-system
+          path: ../client
+        config:
+          module:
+            path: github.com/Pogodoc/pogodoc-go/client
