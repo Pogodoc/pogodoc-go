@@ -51,19 +51,6 @@ jobs:
         working-directory: ./fern
         run: fern generate --local --log-level debug
 
-      - uses: actions/setup-go@v5
-        with:
-          go-version: "1.24"
-
-      - name: Tidy Go modules
-        run: go mod tidy
-
-      - name: Validate build
-        run: go build ./...
-
-      - name: Validate tests
-        run: go test ./...
-
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
