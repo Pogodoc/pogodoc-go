@@ -47,14 +47,8 @@ type StartRenderJobRequest struct {
 type GetJobStatusResponse struct {
 	// ID of the render job
 	JobId string `json:"jobId" url:"jobId"`
-	// ID of the template being used
-	TemplateId *string `json:"templateId,omitempty" url:"templateId,omitempty"`
 	// Target of the render job
 	Target string `json:"target" url:"target"`
-	// Presigned URL to upload the rendered output to S3
-	UploadPresignedS3Url *string `json:"uploadPresignedS3Url,omitempty" url:"uploadPresignedS3Url,omitempty"`
-	// Format options for the rendered document
-	FormatOpts *GetJobStatusResponseFormatOpts `json:"formatOpts,omitempty" url:"formatOpts,omitempty"`
 	// Status of the render job
 	Status string `json:"status" url:"status"`
 	// Whether the render job was successful
@@ -74,32 +68,11 @@ func (g *GetJobStatusResponse) GetJobId() string {
 	return g.JobId
 }
 
-func (g *GetJobStatusResponse) GetTemplateId() *string {
-	if g == nil {
-		return nil
-	}
-	return g.TemplateId
-}
-
 func (g *GetJobStatusResponse) GetTarget() string {
 	if g == nil {
 		return ""
 	}
 	return g.Target
-}
-
-func (g *GetJobStatusResponse) GetUploadPresignedS3Url() *string {
-	if g == nil {
-		return nil
-	}
-	return g.UploadPresignedS3Url
-}
-
-func (g *GetJobStatusResponse) GetFormatOpts() *GetJobStatusResponseFormatOpts {
-	if g == nil {
-		return nil
-	}
-	return g.FormatOpts
 }
 
 func (g *GetJobStatusResponse) GetStatus() string {
@@ -160,127 +133,6 @@ func (g *GetJobStatusResponse) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", g)
-}
-
-// Format options for the rendered document
-type GetJobStatusResponseFormatOpts struct {
-	FromPage *float64                              `json:"fromPage,omitempty" url:"fromPage,omitempty"`
-	ToPage   *float64                              `json:"toPage,omitempty" url:"toPage,omitempty"`
-	Format   *GetJobStatusResponseFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
-	// Selector to wait for to know when the page is loaded and can be saved as pdf, png, etc.
-	WaitForSelector *string `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
-
-	extraProperties map[string]interface{}
-	rawJSON         json.RawMessage
-}
-
-func (g *GetJobStatusResponseFormatOpts) GetFromPage() *float64 {
-	if g == nil {
-		return nil
-	}
-	return g.FromPage
-}
-
-func (g *GetJobStatusResponseFormatOpts) GetToPage() *float64 {
-	if g == nil {
-		return nil
-	}
-	return g.ToPage
-}
-
-func (g *GetJobStatusResponseFormatOpts) GetFormat() *GetJobStatusResponseFormatOptsFormat {
-	if g == nil {
-		return nil
-	}
-	return g.Format
-}
-
-func (g *GetJobStatusResponseFormatOpts) GetWaitForSelector() *string {
-	if g == nil {
-		return nil
-	}
-	return g.WaitForSelector
-}
-
-func (g *GetJobStatusResponseFormatOpts) GetExtraProperties() map[string]interface{} {
-	return g.extraProperties
-}
-
-func (g *GetJobStatusResponseFormatOpts) UnmarshalJSON(data []byte) error {
-	type unmarshaler GetJobStatusResponseFormatOpts
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*g = GetJobStatusResponseFormatOpts(value)
-	extraProperties, err := internal.ExtractExtraProperties(data, *g)
-	if err != nil {
-		return err
-	}
-	g.extraProperties = extraProperties
-	g.rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (g *GetJobStatusResponseFormatOpts) String() string {
-	if len(g.rawJSON) > 0 {
-		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := internal.StringifyJSON(g); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", g)
-}
-
-type GetJobStatusResponseFormatOptsFormat string
-
-const (
-	GetJobStatusResponseFormatOptsFormatLetter  GetJobStatusResponseFormatOptsFormat = "letter"
-	GetJobStatusResponseFormatOptsFormatLegal   GetJobStatusResponseFormatOptsFormat = "legal"
-	GetJobStatusResponseFormatOptsFormatTabloid GetJobStatusResponseFormatOptsFormat = "tabloid"
-	GetJobStatusResponseFormatOptsFormatLedger  GetJobStatusResponseFormatOptsFormat = "ledger"
-	GetJobStatusResponseFormatOptsFormatA0      GetJobStatusResponseFormatOptsFormat = "a0"
-	GetJobStatusResponseFormatOptsFormatA1      GetJobStatusResponseFormatOptsFormat = "a1"
-	GetJobStatusResponseFormatOptsFormatA2      GetJobStatusResponseFormatOptsFormat = "a2"
-	GetJobStatusResponseFormatOptsFormatA3      GetJobStatusResponseFormatOptsFormat = "a3"
-	GetJobStatusResponseFormatOptsFormatA4      GetJobStatusResponseFormatOptsFormat = "a4"
-	GetJobStatusResponseFormatOptsFormatA5      GetJobStatusResponseFormatOptsFormat = "a5"
-	GetJobStatusResponseFormatOptsFormatA6      GetJobStatusResponseFormatOptsFormat = "a6"
-)
-
-func NewGetJobStatusResponseFormatOptsFormatFromString(s string) (GetJobStatusResponseFormatOptsFormat, error) {
-	switch s {
-	case "letter":
-		return GetJobStatusResponseFormatOptsFormatLetter, nil
-	case "legal":
-		return GetJobStatusResponseFormatOptsFormatLegal, nil
-	case "tabloid":
-		return GetJobStatusResponseFormatOptsFormatTabloid, nil
-	case "ledger":
-		return GetJobStatusResponseFormatOptsFormatLedger, nil
-	case "a0":
-		return GetJobStatusResponseFormatOptsFormatA0, nil
-	case "a1":
-		return GetJobStatusResponseFormatOptsFormatA1, nil
-	case "a2":
-		return GetJobStatusResponseFormatOptsFormatA2, nil
-	case "a3":
-		return GetJobStatusResponseFormatOptsFormatA3, nil
-	case "a4":
-		return GetJobStatusResponseFormatOptsFormatA4, nil
-	case "a5":
-		return GetJobStatusResponseFormatOptsFormatA5, nil
-	case "a6":
-		return GetJobStatusResponseFormatOptsFormatA6, nil
-	}
-	var t GetJobStatusResponseFormatOptsFormat
-	return "", fmt.Errorf("%s is not a valid %T", s, t)
-}
-
-func (g GetJobStatusResponseFormatOptsFormat) Ptr() *GetJobStatusResponseFormatOptsFormat {
-	return &g
 }
 
 type GetJobStatusResponseOutput struct {
@@ -437,7 +289,9 @@ type InitializeRenderJobRequestFormatOpts struct {
 	ToPage   *float64                                    `json:"toPage,omitempty" url:"toPage,omitempty"`
 	Format   *InitializeRenderJobRequestFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
 	// Selector to wait for to know when the page is loaded and can be saved as pdf, png, etc.
-	WaitForSelector *string `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
+	WaitForSelector *string                                          `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
+	Orientation     *InitializeRenderJobRequestFormatOptsOrientation `json:"orientation,omitempty" url:"orientation,omitempty"`
+	Dimensions      *InitializeRenderJobRequestFormatOptsDimensions  `json:"dimensions,omitempty" url:"dimensions,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -471,6 +325,20 @@ func (i *InitializeRenderJobRequestFormatOpts) GetWaitForSelector() *string {
 	return i.WaitForSelector
 }
 
+func (i *InitializeRenderJobRequestFormatOpts) GetOrientation() *InitializeRenderJobRequestFormatOptsOrientation {
+	if i == nil {
+		return nil
+	}
+	return i.Orientation
+}
+
+func (i *InitializeRenderJobRequestFormatOpts) GetDimensions() *InitializeRenderJobRequestFormatOptsDimensions {
+	if i == nil {
+		return nil
+	}
+	return i.Dimensions
+}
+
 func (i *InitializeRenderJobRequestFormatOpts) GetExtraProperties() map[string]interface{} {
 	return i.extraProperties
 }
@@ -492,6 +360,60 @@ func (i *InitializeRenderJobRequestFormatOpts) UnmarshalJSON(data []byte) error 
 }
 
 func (i *InitializeRenderJobRequestFormatOpts) String() string {
+	if len(i.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(i.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
+}
+
+type InitializeRenderJobRequestFormatOptsDimensions struct {
+	Width  float64 `json:"width" url:"width"`
+	Height float64 `json:"height" url:"height"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (i *InitializeRenderJobRequestFormatOptsDimensions) GetWidth() float64 {
+	if i == nil {
+		return 0
+	}
+	return i.Width
+}
+
+func (i *InitializeRenderJobRequestFormatOptsDimensions) GetHeight() float64 {
+	if i == nil {
+		return 0
+	}
+	return i.Height
+}
+
+func (i *InitializeRenderJobRequestFormatOptsDimensions) GetExtraProperties() map[string]interface{} {
+	return i.extraProperties
+}
+
+func (i *InitializeRenderJobRequestFormatOptsDimensions) UnmarshalJSON(data []byte) error {
+	type unmarshaler InitializeRenderJobRequestFormatOptsDimensions
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*i = InitializeRenderJobRequestFormatOptsDimensions(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *i)
+	if err != nil {
+		return err
+	}
+	i.extraProperties = extraProperties
+	i.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (i *InitializeRenderJobRequestFormatOptsDimensions) String() string {
 	if len(i.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(i.rawJSON); err == nil {
 			return value
@@ -552,6 +474,28 @@ func (i InitializeRenderJobRequestFormatOptsFormat) Ptr() *InitializeRenderJobRe
 	return &i
 }
 
+type InitializeRenderJobRequestFormatOptsOrientation string
+
+const (
+	InitializeRenderJobRequestFormatOptsOrientationLandscape InitializeRenderJobRequestFormatOptsOrientation = "landscape"
+	InitializeRenderJobRequestFormatOptsOrientationPortrait  InitializeRenderJobRequestFormatOptsOrientation = "portrait"
+)
+
+func NewInitializeRenderJobRequestFormatOptsOrientationFromString(s string) (InitializeRenderJobRequestFormatOptsOrientation, error) {
+	switch s {
+	case "landscape":
+		return InitializeRenderJobRequestFormatOptsOrientationLandscape, nil
+	case "portrait":
+		return InitializeRenderJobRequestFormatOptsOrientationPortrait, nil
+	}
+	var t InitializeRenderJobRequestFormatOptsOrientation
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (i InitializeRenderJobRequestFormatOptsOrientation) Ptr() *InitializeRenderJobRequestFormatOptsOrientation {
+	return &i
+}
+
 // Type of output to be rendered
 type InitializeRenderJobRequestTarget string
 
@@ -594,13 +538,13 @@ func (i InitializeRenderJobRequestTarget) Ptr() *InitializeRenderJobRequestTarge
 type InitializeRenderJobRequestType string
 
 const (
-	InitializeRenderJobRequestTypeDocx  InitializeRenderJobRequestType = "docx"
-	InitializeRenderJobRequestTypeXlsx  InitializeRenderJobRequestType = "xlsx"
-	InitializeRenderJobRequestTypePptx  InitializeRenderJobRequestType = "pptx"
-	InitializeRenderJobRequestTypeEjs   InitializeRenderJobRequestType = "ejs"
-	InitializeRenderJobRequestTypeHtml  InitializeRenderJobRequestType = "html"
-	InitializeRenderJobRequestTypeLatex InitializeRenderJobRequestType = "latex"
-	InitializeRenderJobRequestTypeReact InitializeRenderJobRequestType = "react"
+	InitializeRenderJobRequestTypeDocx      InitializeRenderJobRequestType = "docx"
+	InitializeRenderJobRequestTypeXlsx      InitializeRenderJobRequestType = "xlsx"
+	InitializeRenderJobRequestTypePptx      InitializeRenderJobRequestType = "pptx"
+	InitializeRenderJobRequestTypeEjs       InitializeRenderJobRequestType = "ejs"
+	InitializeRenderJobRequestTypeHtml      InitializeRenderJobRequestType = "html"
+	InitializeRenderJobRequestTypeLatex     InitializeRenderJobRequestType = "latex"
+	InitializeRenderJobRequestTypeFramework InitializeRenderJobRequestType = "framework"
 )
 
 func NewInitializeRenderJobRequestTypeFromString(s string) (InitializeRenderJobRequestType, error) {
@@ -617,8 +561,8 @@ func NewInitializeRenderJobRequestTypeFromString(s string) (InitializeRenderJobR
 		return InitializeRenderJobRequestTypeHtml, nil
 	case "latex":
 		return InitializeRenderJobRequestTypeLatex, nil
-	case "react":
-		return InitializeRenderJobRequestTypeReact, nil
+	case "framework":
+		return InitializeRenderJobRequestTypeFramework, nil
 	}
 	var t InitializeRenderJobRequestType
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -746,7 +690,9 @@ type StartImmediateRenderRequestFormatOpts struct {
 	ToPage   *float64                                     `json:"toPage,omitempty" url:"toPage,omitempty"`
 	Format   *StartImmediateRenderRequestFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
 	// Selector to wait for to know when the page is loaded and can be saved as pdf, png, etc.
-	WaitForSelector *string `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
+	WaitForSelector *string                                           `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
+	Orientation     *StartImmediateRenderRequestFormatOptsOrientation `json:"orientation,omitempty" url:"orientation,omitempty"`
+	Dimensions      *StartImmediateRenderRequestFormatOptsDimensions  `json:"dimensions,omitempty" url:"dimensions,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -780,6 +726,20 @@ func (s *StartImmediateRenderRequestFormatOpts) GetWaitForSelector() *string {
 	return s.WaitForSelector
 }
 
+func (s *StartImmediateRenderRequestFormatOpts) GetOrientation() *StartImmediateRenderRequestFormatOptsOrientation {
+	if s == nil {
+		return nil
+	}
+	return s.Orientation
+}
+
+func (s *StartImmediateRenderRequestFormatOpts) GetDimensions() *StartImmediateRenderRequestFormatOptsDimensions {
+	if s == nil {
+		return nil
+	}
+	return s.Dimensions
+}
+
 func (s *StartImmediateRenderRequestFormatOpts) GetExtraProperties() map[string]interface{} {
 	return s.extraProperties
 }
@@ -801,6 +761,60 @@ func (s *StartImmediateRenderRequestFormatOpts) UnmarshalJSON(data []byte) error
 }
 
 func (s *StartImmediateRenderRequestFormatOpts) String() string {
+	if len(s.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
+}
+
+type StartImmediateRenderRequestFormatOptsDimensions struct {
+	Width  float64 `json:"width" url:"width"`
+	Height float64 `json:"height" url:"height"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (s *StartImmediateRenderRequestFormatOptsDimensions) GetWidth() float64 {
+	if s == nil {
+		return 0
+	}
+	return s.Width
+}
+
+func (s *StartImmediateRenderRequestFormatOptsDimensions) GetHeight() float64 {
+	if s == nil {
+		return 0
+	}
+	return s.Height
+}
+
+func (s *StartImmediateRenderRequestFormatOptsDimensions) GetExtraProperties() map[string]interface{} {
+	return s.extraProperties
+}
+
+func (s *StartImmediateRenderRequestFormatOptsDimensions) UnmarshalJSON(data []byte) error {
+	type unmarshaler StartImmediateRenderRequestFormatOptsDimensions
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*s = StartImmediateRenderRequestFormatOptsDimensions(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *s)
+	if err != nil {
+		return err
+	}
+	s.extraProperties = extraProperties
+	s.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (s *StartImmediateRenderRequestFormatOptsDimensions) String() string {
 	if len(s.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
 			return value
@@ -861,6 +875,28 @@ func (s StartImmediateRenderRequestFormatOptsFormat) Ptr() *StartImmediateRender
 	return &s
 }
 
+type StartImmediateRenderRequestFormatOptsOrientation string
+
+const (
+	StartImmediateRenderRequestFormatOptsOrientationLandscape StartImmediateRenderRequestFormatOptsOrientation = "landscape"
+	StartImmediateRenderRequestFormatOptsOrientationPortrait  StartImmediateRenderRequestFormatOptsOrientation = "portrait"
+)
+
+func NewStartImmediateRenderRequestFormatOptsOrientationFromString(s string) (StartImmediateRenderRequestFormatOptsOrientation, error) {
+	switch s {
+	case "landscape":
+		return StartImmediateRenderRequestFormatOptsOrientationLandscape, nil
+	case "portrait":
+		return StartImmediateRenderRequestFormatOptsOrientationPortrait, nil
+	}
+	var t StartImmediateRenderRequestFormatOptsOrientation
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s StartImmediateRenderRequestFormatOptsOrientation) Ptr() *StartImmediateRenderRequestFormatOptsOrientation {
+	return &s
+}
+
 // Type of output to be rendered
 type StartImmediateRenderRequestTarget string
 
@@ -903,13 +939,13 @@ func (s StartImmediateRenderRequestTarget) Ptr() *StartImmediateRenderRequestTar
 type StartImmediateRenderRequestType string
 
 const (
-	StartImmediateRenderRequestTypeDocx  StartImmediateRenderRequestType = "docx"
-	StartImmediateRenderRequestTypeXlsx  StartImmediateRenderRequestType = "xlsx"
-	StartImmediateRenderRequestTypePptx  StartImmediateRenderRequestType = "pptx"
-	StartImmediateRenderRequestTypeEjs   StartImmediateRenderRequestType = "ejs"
-	StartImmediateRenderRequestTypeHtml  StartImmediateRenderRequestType = "html"
-	StartImmediateRenderRequestTypeLatex StartImmediateRenderRequestType = "latex"
-	StartImmediateRenderRequestTypeReact StartImmediateRenderRequestType = "react"
+	StartImmediateRenderRequestTypeDocx      StartImmediateRenderRequestType = "docx"
+	StartImmediateRenderRequestTypeXlsx      StartImmediateRenderRequestType = "xlsx"
+	StartImmediateRenderRequestTypePptx      StartImmediateRenderRequestType = "pptx"
+	StartImmediateRenderRequestTypeEjs       StartImmediateRenderRequestType = "ejs"
+	StartImmediateRenderRequestTypeHtml      StartImmediateRenderRequestType = "html"
+	StartImmediateRenderRequestTypeLatex     StartImmediateRenderRequestType = "latex"
+	StartImmediateRenderRequestTypeFramework StartImmediateRenderRequestType = "framework"
 )
 
 func NewStartImmediateRenderRequestTypeFromString(s string) (StartImmediateRenderRequestType, error) {
@@ -926,8 +962,8 @@ func NewStartImmediateRenderRequestTypeFromString(s string) (StartImmediateRende
 		return StartImmediateRenderRequestTypeHtml, nil
 	case "latex":
 		return StartImmediateRenderRequestTypeLatex, nil
-	case "react":
-		return StartImmediateRenderRequestTypeReact, nil
+	case "framework":
+		return StartImmediateRenderRequestTypeFramework, nil
 	}
 	var t StartImmediateRenderRequestType
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -987,14 +1023,8 @@ func (s *StartImmediateRenderResponse) String() string {
 type StartRenderJobResponse struct {
 	// ID of the render job
 	JobId string `json:"jobId" url:"jobId"`
-	// ID of the template being used
-	TemplateId *string `json:"templateId,omitempty" url:"templateId,omitempty"`
 	// Type of output to be rendered
 	Target *StartRenderJobResponseTarget `json:"target,omitempty" url:"target,omitempty"`
-	// Presigned URL to upload the rendered output to S3
-	UploadPresignedS3Url *string `json:"uploadPresignedS3Url,omitempty" url:"uploadPresignedS3Url,omitempty"`
-	// Format options for the rendered document
-	FormatOpts *StartRenderJobResponseFormatOpts `json:"formatOpts,omitempty" url:"formatOpts,omitempty"`
 	// Status of the render job
 	Status *string `json:"status,omitempty" url:"status,omitempty"`
 	// Whether the render job was successful
@@ -1014,32 +1044,11 @@ func (s *StartRenderJobResponse) GetJobId() string {
 	return s.JobId
 }
 
-func (s *StartRenderJobResponse) GetTemplateId() *string {
-	if s == nil {
-		return nil
-	}
-	return s.TemplateId
-}
-
 func (s *StartRenderJobResponse) GetTarget() *StartRenderJobResponseTarget {
 	if s == nil {
 		return nil
 	}
 	return s.Target
-}
-
-func (s *StartRenderJobResponse) GetUploadPresignedS3Url() *string {
-	if s == nil {
-		return nil
-	}
-	return s.UploadPresignedS3Url
-}
-
-func (s *StartRenderJobResponse) GetFormatOpts() *StartRenderJobResponseFormatOpts {
-	if s == nil {
-		return nil
-	}
-	return s.FormatOpts
 }
 
 func (s *StartRenderJobResponse) GetStatus() *string {
@@ -1100,127 +1109,6 @@ func (s *StartRenderJobResponse) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", s)
-}
-
-// Format options for the rendered document
-type StartRenderJobResponseFormatOpts struct {
-	FromPage *float64                                `json:"fromPage,omitempty" url:"fromPage,omitempty"`
-	ToPage   *float64                                `json:"toPage,omitempty" url:"toPage,omitempty"`
-	Format   *StartRenderJobResponseFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
-	// Selector to wait for to know when the page is loaded and can be saved as pdf, png, etc.
-	WaitForSelector *string `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
-
-	extraProperties map[string]interface{}
-	rawJSON         json.RawMessage
-}
-
-func (s *StartRenderJobResponseFormatOpts) GetFromPage() *float64 {
-	if s == nil {
-		return nil
-	}
-	return s.FromPage
-}
-
-func (s *StartRenderJobResponseFormatOpts) GetToPage() *float64 {
-	if s == nil {
-		return nil
-	}
-	return s.ToPage
-}
-
-func (s *StartRenderJobResponseFormatOpts) GetFormat() *StartRenderJobResponseFormatOptsFormat {
-	if s == nil {
-		return nil
-	}
-	return s.Format
-}
-
-func (s *StartRenderJobResponseFormatOpts) GetWaitForSelector() *string {
-	if s == nil {
-		return nil
-	}
-	return s.WaitForSelector
-}
-
-func (s *StartRenderJobResponseFormatOpts) GetExtraProperties() map[string]interface{} {
-	return s.extraProperties
-}
-
-func (s *StartRenderJobResponseFormatOpts) UnmarshalJSON(data []byte) error {
-	type unmarshaler StartRenderJobResponseFormatOpts
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*s = StartRenderJobResponseFormatOpts(value)
-	extraProperties, err := internal.ExtractExtraProperties(data, *s)
-	if err != nil {
-		return err
-	}
-	s.extraProperties = extraProperties
-	s.rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (s *StartRenderJobResponseFormatOpts) String() string {
-	if len(s.rawJSON) > 0 {
-		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := internal.StringifyJSON(s); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", s)
-}
-
-type StartRenderJobResponseFormatOptsFormat string
-
-const (
-	StartRenderJobResponseFormatOptsFormatLetter  StartRenderJobResponseFormatOptsFormat = "letter"
-	StartRenderJobResponseFormatOptsFormatLegal   StartRenderJobResponseFormatOptsFormat = "legal"
-	StartRenderJobResponseFormatOptsFormatTabloid StartRenderJobResponseFormatOptsFormat = "tabloid"
-	StartRenderJobResponseFormatOptsFormatLedger  StartRenderJobResponseFormatOptsFormat = "ledger"
-	StartRenderJobResponseFormatOptsFormatA0      StartRenderJobResponseFormatOptsFormat = "a0"
-	StartRenderJobResponseFormatOptsFormatA1      StartRenderJobResponseFormatOptsFormat = "a1"
-	StartRenderJobResponseFormatOptsFormatA2      StartRenderJobResponseFormatOptsFormat = "a2"
-	StartRenderJobResponseFormatOptsFormatA3      StartRenderJobResponseFormatOptsFormat = "a3"
-	StartRenderJobResponseFormatOptsFormatA4      StartRenderJobResponseFormatOptsFormat = "a4"
-	StartRenderJobResponseFormatOptsFormatA5      StartRenderJobResponseFormatOptsFormat = "a5"
-	StartRenderJobResponseFormatOptsFormatA6      StartRenderJobResponseFormatOptsFormat = "a6"
-)
-
-func NewStartRenderJobResponseFormatOptsFormatFromString(s string) (StartRenderJobResponseFormatOptsFormat, error) {
-	switch s {
-	case "letter":
-		return StartRenderJobResponseFormatOptsFormatLetter, nil
-	case "legal":
-		return StartRenderJobResponseFormatOptsFormatLegal, nil
-	case "tabloid":
-		return StartRenderJobResponseFormatOptsFormatTabloid, nil
-	case "ledger":
-		return StartRenderJobResponseFormatOptsFormatLedger, nil
-	case "a0":
-		return StartRenderJobResponseFormatOptsFormatA0, nil
-	case "a1":
-		return StartRenderJobResponseFormatOptsFormatA1, nil
-	case "a2":
-		return StartRenderJobResponseFormatOptsFormatA2, nil
-	case "a3":
-		return StartRenderJobResponseFormatOptsFormatA3, nil
-	case "a4":
-		return StartRenderJobResponseFormatOptsFormatA4, nil
-	case "a5":
-		return StartRenderJobResponseFormatOptsFormatA5, nil
-	case "a6":
-		return StartRenderJobResponseFormatOptsFormatA6, nil
-	}
-	var t StartRenderJobResponseFormatOptsFormat
-	return "", fmt.Errorf("%s is not a valid %T", s, t)
-}
-
-func (s StartRenderJobResponseFormatOptsFormat) Ptr() *StartRenderJobResponseFormatOptsFormat {
-	return &s
 }
 
 type StartRenderJobResponseOutput struct {

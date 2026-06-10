@@ -17,6 +17,17 @@ type GenerateTemplatePreviewsRequest struct {
 	FormatOpts *GenerateTemplatePreviewsRequestFormatOpts `json:"formatOpts,omitempty" url:"-"`
 }
 
+type GetUserTemplatesRequest struct {
+	// Category of the template
+	Category *GetUserTemplatesRequestCategory `json:"-" url:"category,omitempty"`
+	// Search by title or description
+	Search *string `json:"-" url:"search,omitempty"`
+	// Type of template to be rendered
+	Type *GetUserTemplatesRequestType `json:"-" url:"type,omitempty"`
+	// Sort order
+	Sort *GetUserTemplatesRequestSort `json:"-" url:"sort,omitempty"`
+}
+
 type SaveCreatedTemplateRequest struct {
 	TemplateInfo *SaveCreatedTemplateRequestTemplateInfo `json:"templateInfo,omitempty" url:"-"`
 	PreviewIds   *SaveCreatedTemplateRequestPreviewIds   `json:"previewIds,omitempty" url:"-"`
@@ -168,7 +179,9 @@ type GenerateTemplatePreviewsRequestFormatOpts struct {
 	ToPage   *float64                                         `json:"toPage,omitempty" url:"toPage,omitempty"`
 	Format   *GenerateTemplatePreviewsRequestFormatOptsFormat `json:"format,omitempty" url:"format,omitempty"`
 	// Selector to wait for to know when the page is loaded and can be saved as pdf, png, etc.
-	WaitForSelector *string `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
+	WaitForSelector *string                                               `json:"waitForSelector,omitempty" url:"waitForSelector,omitempty"`
+	Orientation     *GenerateTemplatePreviewsRequestFormatOptsOrientation `json:"orientation,omitempty" url:"orientation,omitempty"`
+	Dimensions      *GenerateTemplatePreviewsRequestFormatOptsDimensions  `json:"dimensions,omitempty" url:"dimensions,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -202,6 +215,20 @@ func (g *GenerateTemplatePreviewsRequestFormatOpts) GetWaitForSelector() *string
 	return g.WaitForSelector
 }
 
+func (g *GenerateTemplatePreviewsRequestFormatOpts) GetOrientation() *GenerateTemplatePreviewsRequestFormatOptsOrientation {
+	if g == nil {
+		return nil
+	}
+	return g.Orientation
+}
+
+func (g *GenerateTemplatePreviewsRequestFormatOpts) GetDimensions() *GenerateTemplatePreviewsRequestFormatOptsDimensions {
+	if g == nil {
+		return nil
+	}
+	return g.Dimensions
+}
+
 func (g *GenerateTemplatePreviewsRequestFormatOpts) GetExtraProperties() map[string]interface{} {
 	return g.extraProperties
 }
@@ -223,6 +250,60 @@ func (g *GenerateTemplatePreviewsRequestFormatOpts) UnmarshalJSON(data []byte) e
 }
 
 func (g *GenerateTemplatePreviewsRequestFormatOpts) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
+}
+
+type GenerateTemplatePreviewsRequestFormatOptsDimensions struct {
+	Width  float64 `json:"width" url:"width"`
+	Height float64 `json:"height" url:"height"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (g *GenerateTemplatePreviewsRequestFormatOptsDimensions) GetWidth() float64 {
+	if g == nil {
+		return 0
+	}
+	return g.Width
+}
+
+func (g *GenerateTemplatePreviewsRequestFormatOptsDimensions) GetHeight() float64 {
+	if g == nil {
+		return 0
+	}
+	return g.Height
+}
+
+func (g *GenerateTemplatePreviewsRequestFormatOptsDimensions) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GenerateTemplatePreviewsRequestFormatOptsDimensions) UnmarshalJSON(data []byte) error {
+	type unmarshaler GenerateTemplatePreviewsRequestFormatOptsDimensions
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GenerateTemplatePreviewsRequestFormatOptsDimensions(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GenerateTemplatePreviewsRequestFormatOptsDimensions) String() string {
 	if len(g.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
 			return value
@@ -283,17 +364,39 @@ func (g GenerateTemplatePreviewsRequestFormatOptsFormat) Ptr() *GenerateTemplate
 	return &g
 }
 
+type GenerateTemplatePreviewsRequestFormatOptsOrientation string
+
+const (
+	GenerateTemplatePreviewsRequestFormatOptsOrientationLandscape GenerateTemplatePreviewsRequestFormatOptsOrientation = "landscape"
+	GenerateTemplatePreviewsRequestFormatOptsOrientationPortrait  GenerateTemplatePreviewsRequestFormatOptsOrientation = "portrait"
+)
+
+func NewGenerateTemplatePreviewsRequestFormatOptsOrientationFromString(s string) (GenerateTemplatePreviewsRequestFormatOptsOrientation, error) {
+	switch s {
+	case "landscape":
+		return GenerateTemplatePreviewsRequestFormatOptsOrientationLandscape, nil
+	case "portrait":
+		return GenerateTemplatePreviewsRequestFormatOptsOrientationPortrait, nil
+	}
+	var t GenerateTemplatePreviewsRequestFormatOptsOrientation
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (g GenerateTemplatePreviewsRequestFormatOptsOrientation) Ptr() *GenerateTemplatePreviewsRequestFormatOptsOrientation {
+	return &g
+}
+
 // Type of template to be rendered
 type GenerateTemplatePreviewsRequestType string
 
 const (
-	GenerateTemplatePreviewsRequestTypeDocx  GenerateTemplatePreviewsRequestType = "docx"
-	GenerateTemplatePreviewsRequestTypeXlsx  GenerateTemplatePreviewsRequestType = "xlsx"
-	GenerateTemplatePreviewsRequestTypePptx  GenerateTemplatePreviewsRequestType = "pptx"
-	GenerateTemplatePreviewsRequestTypeEjs   GenerateTemplatePreviewsRequestType = "ejs"
-	GenerateTemplatePreviewsRequestTypeHtml  GenerateTemplatePreviewsRequestType = "html"
-	GenerateTemplatePreviewsRequestTypeLatex GenerateTemplatePreviewsRequestType = "latex"
-	GenerateTemplatePreviewsRequestTypeReact GenerateTemplatePreviewsRequestType = "react"
+	GenerateTemplatePreviewsRequestTypeDocx      GenerateTemplatePreviewsRequestType = "docx"
+	GenerateTemplatePreviewsRequestTypeXlsx      GenerateTemplatePreviewsRequestType = "xlsx"
+	GenerateTemplatePreviewsRequestTypePptx      GenerateTemplatePreviewsRequestType = "pptx"
+	GenerateTemplatePreviewsRequestTypeEjs       GenerateTemplatePreviewsRequestType = "ejs"
+	GenerateTemplatePreviewsRequestTypeHtml      GenerateTemplatePreviewsRequestType = "html"
+	GenerateTemplatePreviewsRequestTypeLatex     GenerateTemplatePreviewsRequestType = "latex"
+	GenerateTemplatePreviewsRequestTypeFramework GenerateTemplatePreviewsRequestType = "framework"
 )
 
 func NewGenerateTemplatePreviewsRequestTypeFromString(s string) (GenerateTemplatePreviewsRequestType, error) {
@@ -310,8 +413,8 @@ func NewGenerateTemplatePreviewsRequestTypeFromString(s string) (GenerateTemplat
 		return GenerateTemplatePreviewsRequestTypeHtml, nil
 	case "latex":
 		return GenerateTemplatePreviewsRequestTypeLatex, nil
-	case "react":
-		return GenerateTemplatePreviewsRequestTypeReact, nil
+	case "framework":
+		return GenerateTemplatePreviewsRequestTypeFramework, nil
 	}
 	var t GenerateTemplatePreviewsRequestType
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -487,6 +590,195 @@ func (g *GenerateTemplatePreviewsResponsePngPreview) String() string {
 	return fmt.Sprintf("%#v", g)
 }
 
+type GetTemplateByIdResponse struct {
+	// Unique ID of the template
+	Uuid string `json:"uuid" url:"uuid"`
+	// Title of the template
+	Title string `json:"title" url:"title"`
+	// Description of the template
+	Description *string `json:"description,omitempty" url:"description,omitempty"`
+	// Type of template to be rendered
+	Type GetTemplateByIdResponseType `json:"type" url:"type"`
+	// Categories of the template
+	Categories []string `json:"categories,omitempty" url:"categories,omitempty"`
+	// Permissions of the template
+	Permissions GetTemplateByIdResponsePermissions `json:"permissions" url:"permissions"`
+	// Preview URL of the template
+	Preview *string `json:"preview,omitempty" url:"preview,omitempty"`
+	// Content ID of the template in S3
+	ContentId string `json:"contentId" url:"contentId"`
+	// Source code of the template
+	SourceCode *string `json:"sourceCode,omitempty" url:"sourceCode,omitempty"`
+	// Sample data for the template
+	SampleData map[string]interface{} `json:"sampleData,omitempty" url:"sampleData,omitempty"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (g *GetTemplateByIdResponse) GetUuid() string {
+	if g == nil {
+		return ""
+	}
+	return g.Uuid
+}
+
+func (g *GetTemplateByIdResponse) GetTitle() string {
+	if g == nil {
+		return ""
+	}
+	return g.Title
+}
+
+func (g *GetTemplateByIdResponse) GetDescription() *string {
+	if g == nil {
+		return nil
+	}
+	return g.Description
+}
+
+func (g *GetTemplateByIdResponse) GetType() GetTemplateByIdResponseType {
+	if g == nil {
+		return ""
+	}
+	return g.Type
+}
+
+func (g *GetTemplateByIdResponse) GetCategories() []string {
+	if g == nil {
+		return nil
+	}
+	return g.Categories
+}
+
+func (g *GetTemplateByIdResponse) GetPermissions() GetTemplateByIdResponsePermissions {
+	if g == nil {
+		return ""
+	}
+	return g.Permissions
+}
+
+func (g *GetTemplateByIdResponse) GetPreview() *string {
+	if g == nil {
+		return nil
+	}
+	return g.Preview
+}
+
+func (g *GetTemplateByIdResponse) GetContentId() string {
+	if g == nil {
+		return ""
+	}
+	return g.ContentId
+}
+
+func (g *GetTemplateByIdResponse) GetSourceCode() *string {
+	if g == nil {
+		return nil
+	}
+	return g.SourceCode
+}
+
+func (g *GetTemplateByIdResponse) GetSampleData() map[string]interface{} {
+	if g == nil {
+		return nil
+	}
+	return g.SampleData
+}
+
+func (g *GetTemplateByIdResponse) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GetTemplateByIdResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler GetTemplateByIdResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GetTemplateByIdResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GetTemplateByIdResponse) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
+}
+
+// Permissions of the template
+type GetTemplateByIdResponsePermissions string
+
+const (
+	GetTemplateByIdResponsePermissionsPublic  GetTemplateByIdResponsePermissions = "public"
+	GetTemplateByIdResponsePermissionsPrivate GetTemplateByIdResponsePermissions = "private"
+)
+
+func NewGetTemplateByIdResponsePermissionsFromString(s string) (GetTemplateByIdResponsePermissions, error) {
+	switch s {
+	case "public":
+		return GetTemplateByIdResponsePermissionsPublic, nil
+	case "private":
+		return GetTemplateByIdResponsePermissionsPrivate, nil
+	}
+	var t GetTemplateByIdResponsePermissions
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (g GetTemplateByIdResponsePermissions) Ptr() *GetTemplateByIdResponsePermissions {
+	return &g
+}
+
+// Type of template to be rendered
+type GetTemplateByIdResponseType string
+
+const (
+	GetTemplateByIdResponseTypeDocx      GetTemplateByIdResponseType = "docx"
+	GetTemplateByIdResponseTypeXlsx      GetTemplateByIdResponseType = "xlsx"
+	GetTemplateByIdResponseTypePptx      GetTemplateByIdResponseType = "pptx"
+	GetTemplateByIdResponseTypeEjs       GetTemplateByIdResponseType = "ejs"
+	GetTemplateByIdResponseTypeHtml      GetTemplateByIdResponseType = "html"
+	GetTemplateByIdResponseTypeLatex     GetTemplateByIdResponseType = "latex"
+	GetTemplateByIdResponseTypeFramework GetTemplateByIdResponseType = "framework"
+)
+
+func NewGetTemplateByIdResponseTypeFromString(s string) (GetTemplateByIdResponseType, error) {
+	switch s {
+	case "docx":
+		return GetTemplateByIdResponseTypeDocx, nil
+	case "xlsx":
+		return GetTemplateByIdResponseTypeXlsx, nil
+	case "pptx":
+		return GetTemplateByIdResponseTypePptx, nil
+	case "ejs":
+		return GetTemplateByIdResponseTypeEjs, nil
+	case "html":
+		return GetTemplateByIdResponseTypeHtml, nil
+	case "latex":
+		return GetTemplateByIdResponseTypeLatex, nil
+	case "framework":
+		return GetTemplateByIdResponseTypeFramework, nil
+	}
+	var t GetTemplateByIdResponseType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (g GetTemplateByIdResponseType) Ptr() *GetTemplateByIdResponseType {
+	return &g
+}
+
 type GetTemplateIndexHtmlResponse struct {
 	// Index.html file of the template
 	IndexHtml string `json:"indexHtml" url:"indexHtml"`
@@ -523,6 +815,255 @@ func (g *GetTemplateIndexHtmlResponse) UnmarshalJSON(data []byte) error {
 }
 
 func (g *GetTemplateIndexHtmlResponse) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
+}
+
+type GetUserTemplatesRequestCategory string
+
+const (
+	GetUserTemplatesRequestCategoryInvoice       GetUserTemplatesRequestCategory = "invoice"
+	GetUserTemplatesRequestCategoryMail          GetUserTemplatesRequestCategory = "mail"
+	GetUserTemplatesRequestCategoryReport        GetUserTemplatesRequestCategory = "report"
+	GetUserTemplatesRequestCategoryCv            GetUserTemplatesRequestCategory = "cv"
+	GetUserTemplatesRequestCategoryReceipt       GetUserTemplatesRequestCategory = "receipt"
+	GetUserTemplatesRequestCategoryOrder         GetUserTemplatesRequestCategory = "order"
+	GetUserTemplatesRequestCategoryContract      GetUserTemplatesRequestCategory = "contract"
+	GetUserTemplatesRequestCategoryCertificate   GetUserTemplatesRequestCategory = "certificate"
+	GetUserTemplatesRequestCategoryStatement     GetUserTemplatesRequestCategory = "statement"
+	GetUserTemplatesRequestCategoryBrochure      GetUserTemplatesRequestCategory = "brochure"
+	GetUserTemplatesRequestCategoryWarranty      GetUserTemplatesRequestCategory = "warranty"
+	GetUserTemplatesRequestCategoryPoster        GetUserTemplatesRequestCategory = "poster"
+	GetUserTemplatesRequestCategoryMenu          GetUserTemplatesRequestCategory = "menu"
+	GetUserTemplatesRequestCategoryCatalog       GetUserTemplatesRequestCategory = "catalog"
+	GetUserTemplatesRequestCategoryPackaging     GetUserTemplatesRequestCategory = "packaging"
+	GetUserTemplatesRequestCategoryAdvertisement GetUserTemplatesRequestCategory = "advertisement"
+	GetUserTemplatesRequestCategoryOther         GetUserTemplatesRequestCategory = "other"
+	GetUserTemplatesRequestCategoryFavorite      GetUserTemplatesRequestCategory = "favorite"
+)
+
+func NewGetUserTemplatesRequestCategoryFromString(s string) (GetUserTemplatesRequestCategory, error) {
+	switch s {
+	case "invoice":
+		return GetUserTemplatesRequestCategoryInvoice, nil
+	case "mail":
+		return GetUserTemplatesRequestCategoryMail, nil
+	case "report":
+		return GetUserTemplatesRequestCategoryReport, nil
+	case "cv":
+		return GetUserTemplatesRequestCategoryCv, nil
+	case "receipt":
+		return GetUserTemplatesRequestCategoryReceipt, nil
+	case "order":
+		return GetUserTemplatesRequestCategoryOrder, nil
+	case "contract":
+		return GetUserTemplatesRequestCategoryContract, nil
+	case "certificate":
+		return GetUserTemplatesRequestCategoryCertificate, nil
+	case "statement":
+		return GetUserTemplatesRequestCategoryStatement, nil
+	case "brochure":
+		return GetUserTemplatesRequestCategoryBrochure, nil
+	case "warranty":
+		return GetUserTemplatesRequestCategoryWarranty, nil
+	case "poster":
+		return GetUserTemplatesRequestCategoryPoster, nil
+	case "menu":
+		return GetUserTemplatesRequestCategoryMenu, nil
+	case "catalog":
+		return GetUserTemplatesRequestCategoryCatalog, nil
+	case "packaging":
+		return GetUserTemplatesRequestCategoryPackaging, nil
+	case "advertisement":
+		return GetUserTemplatesRequestCategoryAdvertisement, nil
+	case "other":
+		return GetUserTemplatesRequestCategoryOther, nil
+	case "favorite":
+		return GetUserTemplatesRequestCategoryFavorite, nil
+	}
+	var t GetUserTemplatesRequestCategory
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (g GetUserTemplatesRequestCategory) Ptr() *GetUserTemplatesRequestCategory {
+	return &g
+}
+
+type GetUserTemplatesRequestSort string
+
+const (
+	GetUserTemplatesRequestSortCreatedAtDesc GetUserTemplatesRequestSort = "createdAt:desc"
+	GetUserTemplatesRequestSortCreatedAtAsc  GetUserTemplatesRequestSort = "createdAt:asc"
+	GetUserTemplatesRequestSortUpdatedAtDesc GetUserTemplatesRequestSort = "updatedAt:desc"
+	GetUserTemplatesRequestSortUpdatedAtAsc  GetUserTemplatesRequestSort = "updatedAt:asc"
+	GetUserTemplatesRequestSortTitleAsc      GetUserTemplatesRequestSort = "title:asc"
+	GetUserTemplatesRequestSortTitleDesc     GetUserTemplatesRequestSort = "title:desc"
+)
+
+func NewGetUserTemplatesRequestSortFromString(s string) (GetUserTemplatesRequestSort, error) {
+	switch s {
+	case "createdAt:desc":
+		return GetUserTemplatesRequestSortCreatedAtDesc, nil
+	case "createdAt:asc":
+		return GetUserTemplatesRequestSortCreatedAtAsc, nil
+	case "updatedAt:desc":
+		return GetUserTemplatesRequestSortUpdatedAtDesc, nil
+	case "updatedAt:asc":
+		return GetUserTemplatesRequestSortUpdatedAtAsc, nil
+	case "title:asc":
+		return GetUserTemplatesRequestSortTitleAsc, nil
+	case "title:desc":
+		return GetUserTemplatesRequestSortTitleDesc, nil
+	}
+	var t GetUserTemplatesRequestSort
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (g GetUserTemplatesRequestSort) Ptr() *GetUserTemplatesRequestSort {
+	return &g
+}
+
+type GetUserTemplatesRequestType string
+
+const (
+	GetUserTemplatesRequestTypeDocx      GetUserTemplatesRequestType = "docx"
+	GetUserTemplatesRequestTypeXlsx      GetUserTemplatesRequestType = "xlsx"
+	GetUserTemplatesRequestTypePptx      GetUserTemplatesRequestType = "pptx"
+	GetUserTemplatesRequestTypeEjs       GetUserTemplatesRequestType = "ejs"
+	GetUserTemplatesRequestTypeHtml      GetUserTemplatesRequestType = "html"
+	GetUserTemplatesRequestTypeLatex     GetUserTemplatesRequestType = "latex"
+	GetUserTemplatesRequestTypeFramework GetUserTemplatesRequestType = "framework"
+)
+
+func NewGetUserTemplatesRequestTypeFromString(s string) (GetUserTemplatesRequestType, error) {
+	switch s {
+	case "docx":
+		return GetUserTemplatesRequestTypeDocx, nil
+	case "xlsx":
+		return GetUserTemplatesRequestTypeXlsx, nil
+	case "pptx":
+		return GetUserTemplatesRequestTypePptx, nil
+	case "ejs":
+		return GetUserTemplatesRequestTypeEjs, nil
+	case "html":
+		return GetUserTemplatesRequestTypeHtml, nil
+	case "latex":
+		return GetUserTemplatesRequestTypeLatex, nil
+	case "framework":
+		return GetUserTemplatesRequestTypeFramework, nil
+	}
+	var t GetUserTemplatesRequestType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (g GetUserTemplatesRequestType) Ptr() *GetUserTemplatesRequestType {
+	return &g
+}
+
+type GetUserTemplatesResponse struct {
+	Templates []*GetUserTemplatesResponseTemplatesItem `json:"templates,omitempty" url:"templates,omitempty"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (g *GetUserTemplatesResponse) GetTemplates() []*GetUserTemplatesResponseTemplatesItem {
+	if g == nil {
+		return nil
+	}
+	return g.Templates
+}
+
+func (g *GetUserTemplatesResponse) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GetUserTemplatesResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler GetUserTemplatesResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GetUserTemplatesResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GetUserTemplatesResponse) String() string {
+	if len(g.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(g); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", g)
+}
+
+type GetUserTemplatesResponseTemplatesItem struct {
+	Uuid        string  `json:"uuid" url:"uuid"`
+	Title       string  `json:"title" url:"title"`
+	Description *string `json:"description,omitempty" url:"description,omitempty"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (g *GetUserTemplatesResponseTemplatesItem) GetUuid() string {
+	if g == nil {
+		return ""
+	}
+	return g.Uuid
+}
+
+func (g *GetUserTemplatesResponseTemplatesItem) GetTitle() string {
+	if g == nil {
+		return ""
+	}
+	return g.Title
+}
+
+func (g *GetUserTemplatesResponseTemplatesItem) GetDescription() *string {
+	if g == nil {
+		return nil
+	}
+	return g.Description
+}
+
+func (g *GetUserTemplatesResponseTemplatesItem) GetExtraProperties() map[string]interface{} {
+	return g.extraProperties
+}
+
+func (g *GetUserTemplatesResponseTemplatesItem) UnmarshalJSON(data []byte) error {
+	type unmarshaler GetUserTemplatesResponseTemplatesItem
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*g = GetUserTemplatesResponseTemplatesItem(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *g)
+	if err != nil {
+		return err
+	}
+	g.extraProperties = extraProperties
+	g.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (g *GetUserTemplatesResponseTemplatesItem) String() string {
 	if len(g.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(g.rawJSON); err == nil {
 			return value
@@ -657,7 +1198,9 @@ type SaveCreatedTemplateRequestTemplateInfo struct {
 	SampleData map[string]interface{} `json:"sampleData,omitempty" url:"sampleData,omitempty"`
 	SourceCode *string                `json:"sourceCode,omitempty" url:"sourceCode,omitempty"`
 	// Categories of the template
-	Categories []SaveCreatedTemplateRequestTemplateInfoCategoriesItem `json:"categories,omitempty" url:"categories,omitempty"`
+	Categories  []SaveCreatedTemplateRequestTemplateInfoCategoriesItem `json:"categories,omitempty" url:"categories,omitempty"`
+	Orientation *SaveCreatedTemplateRequestTemplateInfoOrientation     `json:"orientation,omitempty" url:"orientation,omitempty"`
+	Dimensions  *SaveCreatedTemplateRequestTemplateInfoDimensions      `json:"dimensions,omitempty" url:"dimensions,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -705,6 +1248,20 @@ func (s *SaveCreatedTemplateRequestTemplateInfo) GetCategories() []SaveCreatedTe
 	return s.Categories
 }
 
+func (s *SaveCreatedTemplateRequestTemplateInfo) GetOrientation() *SaveCreatedTemplateRequestTemplateInfoOrientation {
+	if s == nil {
+		return nil
+	}
+	return s.Orientation
+}
+
+func (s *SaveCreatedTemplateRequestTemplateInfo) GetDimensions() *SaveCreatedTemplateRequestTemplateInfoDimensions {
+	if s == nil {
+		return nil
+	}
+	return s.Dimensions
+}
+
 func (s *SaveCreatedTemplateRequestTemplateInfo) GetExtraProperties() map[string]interface{} {
 	return s.extraProperties
 }
@@ -737,14 +1294,28 @@ func (s *SaveCreatedTemplateRequestTemplateInfo) String() string {
 	return fmt.Sprintf("%#v", s)
 }
 
+// Category of the template
 type SaveCreatedTemplateRequestTemplateInfoCategoriesItem string
 
 const (
-	SaveCreatedTemplateRequestTemplateInfoCategoriesItemInvoice SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "invoice"
-	SaveCreatedTemplateRequestTemplateInfoCategoriesItemMail    SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "mail"
-	SaveCreatedTemplateRequestTemplateInfoCategoriesItemReport  SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "report"
-	SaveCreatedTemplateRequestTemplateInfoCategoriesItemCv      SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "cv"
-	SaveCreatedTemplateRequestTemplateInfoCategoriesItemOther   SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "other"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemInvoice       SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "invoice"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemMail          SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "mail"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemReport        SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "report"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemCv            SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "cv"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemReceipt       SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "receipt"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemOrder         SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "order"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemContract      SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "contract"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemCertificate   SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "certificate"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemStatement     SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "statement"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemBrochure      SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "brochure"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemWarranty      SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "warranty"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemPoster        SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "poster"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemMenu          SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "menu"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemCatalog       SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "catalog"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemPackaging     SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "packaging"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemAdvertisement SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "advertisement"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemOther         SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "other"
+	SaveCreatedTemplateRequestTemplateInfoCategoriesItemFavorite      SaveCreatedTemplateRequestTemplateInfoCategoriesItem = "favorite"
 )
 
 func NewSaveCreatedTemplateRequestTemplateInfoCategoriesItemFromString(s string) (SaveCreatedTemplateRequestTemplateInfoCategoriesItem, error) {
@@ -757,8 +1328,34 @@ func NewSaveCreatedTemplateRequestTemplateInfoCategoriesItemFromString(s string)
 		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemReport, nil
 	case "cv":
 		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemCv, nil
+	case "receipt":
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemReceipt, nil
+	case "order":
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemOrder, nil
+	case "contract":
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemContract, nil
+	case "certificate":
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemCertificate, nil
+	case "statement":
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemStatement, nil
+	case "brochure":
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemBrochure, nil
+	case "warranty":
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemWarranty, nil
+	case "poster":
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemPoster, nil
+	case "menu":
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemMenu, nil
+	case "catalog":
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemCatalog, nil
+	case "packaging":
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemPackaging, nil
+	case "advertisement":
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemAdvertisement, nil
 	case "other":
 		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemOther, nil
+	case "favorite":
+		return SaveCreatedTemplateRequestTemplateInfoCategoriesItemFavorite, nil
 	}
 	var t SaveCreatedTemplateRequestTemplateInfoCategoriesItem
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -768,17 +1365,93 @@ func (s SaveCreatedTemplateRequestTemplateInfoCategoriesItem) Ptr() *SaveCreated
 	return &s
 }
 
+type SaveCreatedTemplateRequestTemplateInfoDimensions struct {
+	Width  float64 `json:"width" url:"width"`
+	Height float64 `json:"height" url:"height"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (s *SaveCreatedTemplateRequestTemplateInfoDimensions) GetWidth() float64 {
+	if s == nil {
+		return 0
+	}
+	return s.Width
+}
+
+func (s *SaveCreatedTemplateRequestTemplateInfoDimensions) GetHeight() float64 {
+	if s == nil {
+		return 0
+	}
+	return s.Height
+}
+
+func (s *SaveCreatedTemplateRequestTemplateInfoDimensions) GetExtraProperties() map[string]interface{} {
+	return s.extraProperties
+}
+
+func (s *SaveCreatedTemplateRequestTemplateInfoDimensions) UnmarshalJSON(data []byte) error {
+	type unmarshaler SaveCreatedTemplateRequestTemplateInfoDimensions
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*s = SaveCreatedTemplateRequestTemplateInfoDimensions(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *s)
+	if err != nil {
+		return err
+	}
+	s.extraProperties = extraProperties
+	s.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (s *SaveCreatedTemplateRequestTemplateInfoDimensions) String() string {
+	if len(s.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
+}
+
+type SaveCreatedTemplateRequestTemplateInfoOrientation string
+
+const (
+	SaveCreatedTemplateRequestTemplateInfoOrientationLandscape SaveCreatedTemplateRequestTemplateInfoOrientation = "landscape"
+	SaveCreatedTemplateRequestTemplateInfoOrientationPortrait  SaveCreatedTemplateRequestTemplateInfoOrientation = "portrait"
+)
+
+func NewSaveCreatedTemplateRequestTemplateInfoOrientationFromString(s string) (SaveCreatedTemplateRequestTemplateInfoOrientation, error) {
+	switch s {
+	case "landscape":
+		return SaveCreatedTemplateRequestTemplateInfoOrientationLandscape, nil
+	case "portrait":
+		return SaveCreatedTemplateRequestTemplateInfoOrientationPortrait, nil
+	}
+	var t SaveCreatedTemplateRequestTemplateInfoOrientation
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (s SaveCreatedTemplateRequestTemplateInfoOrientation) Ptr() *SaveCreatedTemplateRequestTemplateInfoOrientation {
+	return &s
+}
+
 // Type of template to be rendered
 type SaveCreatedTemplateRequestTemplateInfoType string
 
 const (
-	SaveCreatedTemplateRequestTemplateInfoTypeDocx  SaveCreatedTemplateRequestTemplateInfoType = "docx"
-	SaveCreatedTemplateRequestTemplateInfoTypeXlsx  SaveCreatedTemplateRequestTemplateInfoType = "xlsx"
-	SaveCreatedTemplateRequestTemplateInfoTypePptx  SaveCreatedTemplateRequestTemplateInfoType = "pptx"
-	SaveCreatedTemplateRequestTemplateInfoTypeEjs   SaveCreatedTemplateRequestTemplateInfoType = "ejs"
-	SaveCreatedTemplateRequestTemplateInfoTypeHtml  SaveCreatedTemplateRequestTemplateInfoType = "html"
-	SaveCreatedTemplateRequestTemplateInfoTypeLatex SaveCreatedTemplateRequestTemplateInfoType = "latex"
-	SaveCreatedTemplateRequestTemplateInfoTypeReact SaveCreatedTemplateRequestTemplateInfoType = "react"
+	SaveCreatedTemplateRequestTemplateInfoTypeDocx      SaveCreatedTemplateRequestTemplateInfoType = "docx"
+	SaveCreatedTemplateRequestTemplateInfoTypeXlsx      SaveCreatedTemplateRequestTemplateInfoType = "xlsx"
+	SaveCreatedTemplateRequestTemplateInfoTypePptx      SaveCreatedTemplateRequestTemplateInfoType = "pptx"
+	SaveCreatedTemplateRequestTemplateInfoTypeEjs       SaveCreatedTemplateRequestTemplateInfoType = "ejs"
+	SaveCreatedTemplateRequestTemplateInfoTypeHtml      SaveCreatedTemplateRequestTemplateInfoType = "html"
+	SaveCreatedTemplateRequestTemplateInfoTypeLatex     SaveCreatedTemplateRequestTemplateInfoType = "latex"
+	SaveCreatedTemplateRequestTemplateInfoTypeFramework SaveCreatedTemplateRequestTemplateInfoType = "framework"
 )
 
 func NewSaveCreatedTemplateRequestTemplateInfoTypeFromString(s string) (SaveCreatedTemplateRequestTemplateInfoType, error) {
@@ -795,8 +1468,8 @@ func NewSaveCreatedTemplateRequestTemplateInfoTypeFromString(s string) (SaveCrea
 		return SaveCreatedTemplateRequestTemplateInfoTypeHtml, nil
 	case "latex":
 		return SaveCreatedTemplateRequestTemplateInfoTypeLatex, nil
-	case "react":
-		return SaveCreatedTemplateRequestTemplateInfoTypeReact, nil
+	case "framework":
+		return SaveCreatedTemplateRequestTemplateInfoTypeFramework, nil
 	}
 	var t SaveCreatedTemplateRequestTemplateInfoType
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -807,9 +1480,7 @@ func (s SaveCreatedTemplateRequestTemplateInfoType) Ptr() *SaveCreatedTemplateRe
 }
 
 type UpdateTemplateRequestPreviewIds struct {
-	// ID of the job for the PNG preview
 	PngJobId string `json:"pngJobId" url:"pngJobId"`
-	// ID of the job for the PDF preview
 	PdfJobId string `json:"pdfJobId" url:"pdfJobId"`
 
 	extraProperties map[string]interface{}
@@ -864,38 +1535,40 @@ func (u *UpdateTemplateRequestPreviewIds) String() string {
 
 type UpdateTemplateRequestTemplateInfo struct {
 	// Title of the template
-	Title string `json:"title" url:"title"`
+	Title *string `json:"title,omitempty" url:"title,omitempty"`
 	// Description of the template
-	Description string `json:"description" url:"description"`
+	Description *string `json:"description,omitempty" url:"description,omitempty"`
 	// Type of template to be rendered
-	Type UpdateTemplateRequestTemplateInfoType `json:"type" url:"type"`
+	Type *UpdateTemplateRequestTemplateInfoType `json:"type,omitempty" url:"type,omitempty"`
 	// Sample data for the template
 	SampleData map[string]interface{} `json:"sampleData,omitempty" url:"sampleData,omitempty"`
 	SourceCode *string                `json:"sourceCode,omitempty" url:"sourceCode,omitempty"`
 	// Categories of the template
-	Categories []UpdateTemplateRequestTemplateInfoCategoriesItem `json:"categories,omitempty" url:"categories,omitempty"`
+	Categories  []UpdateTemplateRequestTemplateInfoCategoriesItem `json:"categories,omitempty" url:"categories,omitempty"`
+	Orientation *UpdateTemplateRequestTemplateInfoOrientation     `json:"orientation,omitempty" url:"orientation,omitempty"`
+	Dimensions  *UpdateTemplateRequestTemplateInfoDimensions      `json:"dimensions,omitempty" url:"dimensions,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
 
-func (u *UpdateTemplateRequestTemplateInfo) GetTitle() string {
+func (u *UpdateTemplateRequestTemplateInfo) GetTitle() *string {
 	if u == nil {
-		return ""
+		return nil
 	}
 	return u.Title
 }
 
-func (u *UpdateTemplateRequestTemplateInfo) GetDescription() string {
+func (u *UpdateTemplateRequestTemplateInfo) GetDescription() *string {
 	if u == nil {
-		return ""
+		return nil
 	}
 	return u.Description
 }
 
-func (u *UpdateTemplateRequestTemplateInfo) GetType() UpdateTemplateRequestTemplateInfoType {
+func (u *UpdateTemplateRequestTemplateInfo) GetType() *UpdateTemplateRequestTemplateInfoType {
 	if u == nil {
-		return ""
+		return nil
 	}
 	return u.Type
 }
@@ -919,6 +1592,20 @@ func (u *UpdateTemplateRequestTemplateInfo) GetCategories() []UpdateTemplateRequ
 		return nil
 	}
 	return u.Categories
+}
+
+func (u *UpdateTemplateRequestTemplateInfo) GetOrientation() *UpdateTemplateRequestTemplateInfoOrientation {
+	if u == nil {
+		return nil
+	}
+	return u.Orientation
+}
+
+func (u *UpdateTemplateRequestTemplateInfo) GetDimensions() *UpdateTemplateRequestTemplateInfoDimensions {
+	if u == nil {
+		return nil
+	}
+	return u.Dimensions
 }
 
 func (u *UpdateTemplateRequestTemplateInfo) GetExtraProperties() map[string]interface{} {
@@ -953,14 +1640,28 @@ func (u *UpdateTemplateRequestTemplateInfo) String() string {
 	return fmt.Sprintf("%#v", u)
 }
 
+// Category of the template
 type UpdateTemplateRequestTemplateInfoCategoriesItem string
 
 const (
-	UpdateTemplateRequestTemplateInfoCategoriesItemInvoice UpdateTemplateRequestTemplateInfoCategoriesItem = "invoice"
-	UpdateTemplateRequestTemplateInfoCategoriesItemMail    UpdateTemplateRequestTemplateInfoCategoriesItem = "mail"
-	UpdateTemplateRequestTemplateInfoCategoriesItemReport  UpdateTemplateRequestTemplateInfoCategoriesItem = "report"
-	UpdateTemplateRequestTemplateInfoCategoriesItemCv      UpdateTemplateRequestTemplateInfoCategoriesItem = "cv"
-	UpdateTemplateRequestTemplateInfoCategoriesItemOther   UpdateTemplateRequestTemplateInfoCategoriesItem = "other"
+	UpdateTemplateRequestTemplateInfoCategoriesItemInvoice       UpdateTemplateRequestTemplateInfoCategoriesItem = "invoice"
+	UpdateTemplateRequestTemplateInfoCategoriesItemMail          UpdateTemplateRequestTemplateInfoCategoriesItem = "mail"
+	UpdateTemplateRequestTemplateInfoCategoriesItemReport        UpdateTemplateRequestTemplateInfoCategoriesItem = "report"
+	UpdateTemplateRequestTemplateInfoCategoriesItemCv            UpdateTemplateRequestTemplateInfoCategoriesItem = "cv"
+	UpdateTemplateRequestTemplateInfoCategoriesItemReceipt       UpdateTemplateRequestTemplateInfoCategoriesItem = "receipt"
+	UpdateTemplateRequestTemplateInfoCategoriesItemOrder         UpdateTemplateRequestTemplateInfoCategoriesItem = "order"
+	UpdateTemplateRequestTemplateInfoCategoriesItemContract      UpdateTemplateRequestTemplateInfoCategoriesItem = "contract"
+	UpdateTemplateRequestTemplateInfoCategoriesItemCertificate   UpdateTemplateRequestTemplateInfoCategoriesItem = "certificate"
+	UpdateTemplateRequestTemplateInfoCategoriesItemStatement     UpdateTemplateRequestTemplateInfoCategoriesItem = "statement"
+	UpdateTemplateRequestTemplateInfoCategoriesItemBrochure      UpdateTemplateRequestTemplateInfoCategoriesItem = "brochure"
+	UpdateTemplateRequestTemplateInfoCategoriesItemWarranty      UpdateTemplateRequestTemplateInfoCategoriesItem = "warranty"
+	UpdateTemplateRequestTemplateInfoCategoriesItemPoster        UpdateTemplateRequestTemplateInfoCategoriesItem = "poster"
+	UpdateTemplateRequestTemplateInfoCategoriesItemMenu          UpdateTemplateRequestTemplateInfoCategoriesItem = "menu"
+	UpdateTemplateRequestTemplateInfoCategoriesItemCatalog       UpdateTemplateRequestTemplateInfoCategoriesItem = "catalog"
+	UpdateTemplateRequestTemplateInfoCategoriesItemPackaging     UpdateTemplateRequestTemplateInfoCategoriesItem = "packaging"
+	UpdateTemplateRequestTemplateInfoCategoriesItemAdvertisement UpdateTemplateRequestTemplateInfoCategoriesItem = "advertisement"
+	UpdateTemplateRequestTemplateInfoCategoriesItemOther         UpdateTemplateRequestTemplateInfoCategoriesItem = "other"
+	UpdateTemplateRequestTemplateInfoCategoriesItemFavorite      UpdateTemplateRequestTemplateInfoCategoriesItem = "favorite"
 )
 
 func NewUpdateTemplateRequestTemplateInfoCategoriesItemFromString(s string) (UpdateTemplateRequestTemplateInfoCategoriesItem, error) {
@@ -973,8 +1674,34 @@ func NewUpdateTemplateRequestTemplateInfoCategoriesItemFromString(s string) (Upd
 		return UpdateTemplateRequestTemplateInfoCategoriesItemReport, nil
 	case "cv":
 		return UpdateTemplateRequestTemplateInfoCategoriesItemCv, nil
+	case "receipt":
+		return UpdateTemplateRequestTemplateInfoCategoriesItemReceipt, nil
+	case "order":
+		return UpdateTemplateRequestTemplateInfoCategoriesItemOrder, nil
+	case "contract":
+		return UpdateTemplateRequestTemplateInfoCategoriesItemContract, nil
+	case "certificate":
+		return UpdateTemplateRequestTemplateInfoCategoriesItemCertificate, nil
+	case "statement":
+		return UpdateTemplateRequestTemplateInfoCategoriesItemStatement, nil
+	case "brochure":
+		return UpdateTemplateRequestTemplateInfoCategoriesItemBrochure, nil
+	case "warranty":
+		return UpdateTemplateRequestTemplateInfoCategoriesItemWarranty, nil
+	case "poster":
+		return UpdateTemplateRequestTemplateInfoCategoriesItemPoster, nil
+	case "menu":
+		return UpdateTemplateRequestTemplateInfoCategoriesItemMenu, nil
+	case "catalog":
+		return UpdateTemplateRequestTemplateInfoCategoriesItemCatalog, nil
+	case "packaging":
+		return UpdateTemplateRequestTemplateInfoCategoriesItemPackaging, nil
+	case "advertisement":
+		return UpdateTemplateRequestTemplateInfoCategoriesItemAdvertisement, nil
 	case "other":
 		return UpdateTemplateRequestTemplateInfoCategoriesItemOther, nil
+	case "favorite":
+		return UpdateTemplateRequestTemplateInfoCategoriesItemFavorite, nil
 	}
 	var t UpdateTemplateRequestTemplateInfoCategoriesItem
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -984,17 +1711,93 @@ func (u UpdateTemplateRequestTemplateInfoCategoriesItem) Ptr() *UpdateTemplateRe
 	return &u
 }
 
+type UpdateTemplateRequestTemplateInfoDimensions struct {
+	Width  float64 `json:"width" url:"width"`
+	Height float64 `json:"height" url:"height"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (u *UpdateTemplateRequestTemplateInfoDimensions) GetWidth() float64 {
+	if u == nil {
+		return 0
+	}
+	return u.Width
+}
+
+func (u *UpdateTemplateRequestTemplateInfoDimensions) GetHeight() float64 {
+	if u == nil {
+		return 0
+	}
+	return u.Height
+}
+
+func (u *UpdateTemplateRequestTemplateInfoDimensions) GetExtraProperties() map[string]interface{} {
+	return u.extraProperties
+}
+
+func (u *UpdateTemplateRequestTemplateInfoDimensions) UnmarshalJSON(data []byte) error {
+	type unmarshaler UpdateTemplateRequestTemplateInfoDimensions
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*u = UpdateTemplateRequestTemplateInfoDimensions(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *u)
+	if err != nil {
+		return err
+	}
+	u.extraProperties = extraProperties
+	u.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (u *UpdateTemplateRequestTemplateInfoDimensions) String() string {
+	if len(u.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(u.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(u); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", u)
+}
+
+type UpdateTemplateRequestTemplateInfoOrientation string
+
+const (
+	UpdateTemplateRequestTemplateInfoOrientationLandscape UpdateTemplateRequestTemplateInfoOrientation = "landscape"
+	UpdateTemplateRequestTemplateInfoOrientationPortrait  UpdateTemplateRequestTemplateInfoOrientation = "portrait"
+)
+
+func NewUpdateTemplateRequestTemplateInfoOrientationFromString(s string) (UpdateTemplateRequestTemplateInfoOrientation, error) {
+	switch s {
+	case "landscape":
+		return UpdateTemplateRequestTemplateInfoOrientationLandscape, nil
+	case "portrait":
+		return UpdateTemplateRequestTemplateInfoOrientationPortrait, nil
+	}
+	var t UpdateTemplateRequestTemplateInfoOrientation
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (u UpdateTemplateRequestTemplateInfoOrientation) Ptr() *UpdateTemplateRequestTemplateInfoOrientation {
+	return &u
+}
+
 // Type of template to be rendered
 type UpdateTemplateRequestTemplateInfoType string
 
 const (
-	UpdateTemplateRequestTemplateInfoTypeDocx  UpdateTemplateRequestTemplateInfoType = "docx"
-	UpdateTemplateRequestTemplateInfoTypeXlsx  UpdateTemplateRequestTemplateInfoType = "xlsx"
-	UpdateTemplateRequestTemplateInfoTypePptx  UpdateTemplateRequestTemplateInfoType = "pptx"
-	UpdateTemplateRequestTemplateInfoTypeEjs   UpdateTemplateRequestTemplateInfoType = "ejs"
-	UpdateTemplateRequestTemplateInfoTypeHtml  UpdateTemplateRequestTemplateInfoType = "html"
-	UpdateTemplateRequestTemplateInfoTypeLatex UpdateTemplateRequestTemplateInfoType = "latex"
-	UpdateTemplateRequestTemplateInfoTypeReact UpdateTemplateRequestTemplateInfoType = "react"
+	UpdateTemplateRequestTemplateInfoTypeDocx      UpdateTemplateRequestTemplateInfoType = "docx"
+	UpdateTemplateRequestTemplateInfoTypeXlsx      UpdateTemplateRequestTemplateInfoType = "xlsx"
+	UpdateTemplateRequestTemplateInfoTypePptx      UpdateTemplateRequestTemplateInfoType = "pptx"
+	UpdateTemplateRequestTemplateInfoTypeEjs       UpdateTemplateRequestTemplateInfoType = "ejs"
+	UpdateTemplateRequestTemplateInfoTypeHtml      UpdateTemplateRequestTemplateInfoType = "html"
+	UpdateTemplateRequestTemplateInfoTypeLatex     UpdateTemplateRequestTemplateInfoType = "latex"
+	UpdateTemplateRequestTemplateInfoTypeFramework UpdateTemplateRequestTemplateInfoType = "framework"
 )
 
 func NewUpdateTemplateRequestTemplateInfoTypeFromString(s string) (UpdateTemplateRequestTemplateInfoType, error) {
@@ -1011,8 +1814,8 @@ func NewUpdateTemplateRequestTemplateInfoTypeFromString(s string) (UpdateTemplat
 		return UpdateTemplateRequestTemplateInfoTypeHtml, nil
 	case "latex":
 		return UpdateTemplateRequestTemplateInfoTypeLatex, nil
-	case "react":
-		return UpdateTemplateRequestTemplateInfoTypeReact, nil
+	case "framework":
+		return UpdateTemplateRequestTemplateInfoTypeFramework, nil
 	}
 	var t UpdateTemplateRequestTemplateInfoType
 	return "", fmt.Errorf("%s is not a valid %T", s, t)
@@ -1023,15 +1826,15 @@ func (u UpdateTemplateRequestTemplateInfoType) Ptr() *UpdateTemplateRequestTempl
 }
 
 type UpdateTemplateResponse struct {
-	NewContentId string `json:"newContentId" url:"newContentId"`
+	NewContentId *string `json:"newContentId,omitempty" url:"newContentId,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
 
-func (u *UpdateTemplateResponse) GetNewContentId() string {
+func (u *UpdateTemplateResponse) GetNewContentId() *string {
 	if u == nil {
-		return ""
+		return nil
 	}
 	return u.NewContentId
 }
@@ -1072,7 +1875,7 @@ type UpdateTemplateRequest struct {
 	TemplateInfo *UpdateTemplateRequestTemplateInfo `json:"templateInfo,omitempty" url:"-"`
 	PreviewIds   *UpdateTemplateRequestPreviewIds   `json:"previewIds,omitempty" url:"-"`
 	// ID by which the new template content is saved
-	ContentId string `json:"contentId" url:"-"`
+	ContentId *string `json:"contentId,omitempty" url:"-"`
 }
 
 type UploadTemplateIndexHtmlRequest struct {

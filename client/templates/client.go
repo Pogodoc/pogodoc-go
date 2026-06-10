@@ -67,6 +67,47 @@ func (c *Client) InitializeTemplateCreation(
 	return response, nil
 }
 
+// Fetches a single template by its ID for the authenticated user.
+func (c *Client) GetTemplateById(
+	ctx context.Context,
+	// UUID of the template
+	templateId string,
+	opts ...option.RequestOption,
+) (*pogodocgoclient.GetTemplateByIdResponse, error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com/v1",
+	)
+	endpointURL := internal.EncodeURL(
+		baseURL+"/templates/%v",
+		templateId,
+	)
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
+
+	var response *pogodocgoclient.GetTemplateByIdResponse
+	if err := c.caller.Call(
+		ctx,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodGet,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Response:        &response,
+		},
+	); err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
 // Finalizes template creation by saving template info to Strapi, copying preview files to permanent storage, and creating template index. Removes unfinished tag upon completion.
 func (c *Client) SaveCreatedTemplate(
 	ctx context.Context,
@@ -427,6 +468,50 @@ func (c *Client) CloneTemplate(
 		&internal.CallParams{
 			URL:             endpointURL,
 			Method:          http.MethodPost,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Response:        &response,
+		},
+	); err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+// Fetches all templates belonging to the authenticated user. Optionally filter by category.
+func (c *Client) GetUserTemplates(
+	ctx context.Context,
+	request *pogodocgoclient.GetUserTemplatesRequest,
+	opts ...option.RequestOption,
+) (*pogodocgoclient.GetUserTemplatesResponse, error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://api.pogodoc.com/v1",
+	)
+	endpointURL := baseURL + "/templates"
+	queryParams, err := internal.QueryValues(request)
+	if err != nil {
+		return nil, err
+	}
+	if len(queryParams) > 0 {
+		endpointURL += "?" + queryParams.Encode()
+	}
+	headers := internal.MergeHeaders(
+		c.header.Clone(),
+		options.ToHeader(),
+	)
+
+	var response *pogodocgoclient.GetUserTemplatesResponse
+	if err := c.caller.Call(
+		ctx,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodGet,
 			Headers:         headers,
 			MaxAttempts:     options.MaxAttempts,
 			BodyProperties:  options.BodyProperties,
